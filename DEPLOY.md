@@ -39,9 +39,14 @@ pnpm db:seed
 1. Ga naar [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**  
    (push je code eerst naar GitHub als dat nog niet zo is)
 
-2. **New Service** → **Dockerfile** → kies `Dockerfile.api`
+2. **New Service** → koppel repo `EdSan92/besliswijzer`
 
-3. Stel **Environment Variables** in:
+3. **Settings → Build:**
+   - **Root Directory:** leeg laten (repo-root)
+   - **Config file:** `apps/api/railway.toml` (gebruikt `Dockerfile.api`)
+   - **Builder:** Dockerfile (niet Nixpacks)
+
+4. Stel **Environment Variables** in:
 
 | Variable | Waarde |
 |----------|--------|
@@ -62,9 +67,13 @@ pnpm db:seed
 
 ## Stap 3 — Web deployen (Railway)
 
-1. In hetzelfde Railway-project: **New Service** → **Dockerfile** → `Dockerfile.web`
+1. In hetzelfde Railway-project: **New Service** → zelfde repo
 
-2. **Build argument** (Railway → Settings → Build):
+2. **Settings → Build:**
+   - **Root Directory:** leeg laten (repo-root)
+   - **Config file:** `apps/web/railway.toml` (gebruikt `Dockerfile.web`)
+
+3. **Build argument** (Railway → Settings → Build):
 
 | Build arg | Waarde |
 |-----------|--------|

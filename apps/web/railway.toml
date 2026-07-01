@@ -1,7 +1,8 @@
 [build]
-builder = "NIXPACKS"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile.web"
 
 [deploy]
-startCommand = "node .output/server/index.mjs"
 healthcheckPath = "/"
 healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"

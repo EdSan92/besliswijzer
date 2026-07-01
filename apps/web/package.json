@@ -1,0 +1,28 @@
+{
+  "name": "@besliswijzer/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@besliswijzer/flow-engine": "workspace:*",
+    "@besliswijzer/flow-schema": "workspace:*",
+    "@pinia/nuxt": "^0.9.0",
+    "nuxt": "^3.15.4",
+    "pinia": "^2.3.1",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "^2.0.0",
+    "typescript": "^5.7.3",
+    "vue-tsc": "^2.2.0"
+  }
+}

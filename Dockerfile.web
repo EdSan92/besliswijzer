@@ -1,0 +1,27 @@
+FROM node:20-alpine AS base
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+WORKDIR /app
+
+FROM base AS deps
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.base.json ./
+COPY packages packages
+COPY apps/web apps/web
+RUN pnpm install --frozen-lockfile
+
+FROM deps AS build
+ARG NUXT_PUBLIC_API_BASE=http://localhost:3001
+ENV NUXT_PUBLIC_API_BASE=$NUXT_PUBLIC_API_BASE
+RUN pnpm --filter @besliswijzer/flow-schema build && \
+    pnpm --filter @besliswijzer/flow-engine build && \
+    pnpm --filter @besliswijzer/web build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=3000
+
+COPY --from=build /app/apps/web/.output ./.output
+
+EXPOSE 3000
+CMD ["node", ".output/server/index.mjs"]

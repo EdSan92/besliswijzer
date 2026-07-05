@@ -1,4 +1,5 @@
 import { FetchError } from 'ofetch'
+import { resolveApiBase } from '../../utils/api-base'
 import { getBackendAdminHeaders, isAdminAuthenticated } from '../../utils/admin-auth'
 
 export default defineEventHandler(async (event) => {
@@ -7,10 +8,11 @@ export default defineEventHandler(async (event) => {
   }
 
   const config = useRuntimeConfig()
+  const apiBase = resolveApiBase(config.public.apiBase)
   const path = getRouterParam(event, 'path') ?? ''
   const query = getQuery(event)
   const queryString = new URLSearchParams(query as Record<string, string>).toString()
-  const target = `${config.public.apiBase}/api/v1/admin/${path}${queryString ? `?${queryString}` : ''}`
+  const target = `${apiBase}/api/v1/admin/${path}${queryString ? `?${queryString}` : ''}`
 
   const method = event.method
   const hasBody = !['GET', 'HEAD', 'DELETE'].includes(method)
@@ -33,7 +35,7 @@ export default defineEventHandler(async (event) => {
         'error' in data &&
         typeof (data as { error: unknown }).error === 'string'
           ? (data as { error: string }).error
-          : `${error.statusMessage || 'Backend request failed'} (API: ${config.public.apiBase})`
+          : `${error.statusMessage || 'Backend request failed'} (API: ${apiBase})`
 
       throw createError({
         statusCode,
@@ -46,8 +48,8 @@ export default defineEventHandler(async (event) => {
       statusCode: 502,
       statusMessage:
         error instanceof Error
-          ? `${error.message} (API: ${config.public.apiBase})`
-          : `Kan API niet bereiken. Check NUXT_PUBLIC_API_BASE (nu: ${config.public.apiBase}).`,
+          ? `${error.message} (API: ${apiBase})`
+          : `Kan API niet bereiken. Check NUXT_PUBLIC_API_BASE (nu: ${apiBase}).`,
     })
   }
 })

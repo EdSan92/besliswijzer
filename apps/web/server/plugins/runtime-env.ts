@@ -1,10 +1,8 @@
+import { resolveApiBase } from '../utils/api-base'
+
 export default defineNitroPlugin(() => {
   const config = useRuntimeConfig()
-
-  const apiBase = process.env.NUXT_PUBLIC_API_BASE
-  if (apiBase) {
-    config.public.apiBase = apiBase.replace(/\/$/, '')
-  }
+  config.public.apiBase = resolveApiBase(config.public.apiBase)
 
   const key = process.env.NUXT_ADMIN_API_KEY || process.env.ADMIN_API_KEY
   if (key) {

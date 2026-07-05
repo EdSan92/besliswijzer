@@ -1,8 +1,15 @@
 import type { FlowNode, FlowResult, PublicFlowResponse } from '@besliswijzer/flow-schema'
 
+function resolveClientApiBase(configApiBase: string): string {
+  if (import.meta.server) {
+    return process.env.NUXT_PUBLIC_API_BASE?.trim().replace(/\/$/, '') || configApiBase
+  }
+  return configApiBase
+}
+
 export function useApiBase() {
   const config = useRuntimeConfig()
-  return config.public.apiBase as string
+  return resolveClientApiBase(config.public.apiBase as string)
 }
 
 export function useAdminFetch<T>(url: string, options: Parameters<typeof $fetch<T>>[1] = {}) {

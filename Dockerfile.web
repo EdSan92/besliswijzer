@@ -16,10 +16,12 @@ RUN pnpm --filter @besliswijzer/flow-schema build && \
     pnpm --filter @besliswijzer/web build
 
 FROM node:20-alpine AS runner
+ARG NUXT_PUBLIC_API_BASE=http://localhost:3001
 WORKDIR /app
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
+ENV NUXT_PUBLIC_API_BASE=$NUXT_PUBLIC_API_BASE
 
 COPY --from=build /app/apps/web/.output ./.output
 

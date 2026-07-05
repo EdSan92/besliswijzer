@@ -1,0 +1,284 @@
+{
+  "publish": true,
+  "overwrite": true,
+  "flow": {
+    "slug": "robotmaaiers",
+    "title": "Robot grasmaaier keuzehulp",
+    "categorySlug": null,
+    "seo": {
+      "title": "Welke robot grasmaaier past bij jouw tuin?",
+      "description": "Beantwoord 5 korte vragen over tuinoppervlak, helling en obstakels en ontdek welk type robotmaaier het beste bij je past."
+    },
+    "nodes": [
+      {
+        "nodeKey": "grootte",
+        "type": "question",
+        "title": "Hoe groot is het gazon?",
+        "content": {
+          "inputType": "single",
+          "description": "Schat het maaibare oppervlak — inclusief voortuin en achtertuin."
+        },
+        "sortOrder": 0,
+        "isEntry": true,
+        "options": [
+          { "optionKey": "klein", "label": "Klein (tot 300 m²)", "value": "klein", "sortOrder": 0 },
+          { "optionKey": "middel", "label": "Middel (300–700 m²)", "value": "middel", "sortOrder": 1 },
+          { "optionKey": "groot", "label": "Groot (700–1.500 m²)", "value": "groot", "sortOrder": 2 },
+          { "optionKey": "zeer_groot", "label": "Zeer groot (meer dan 1.500 m²)", "value": "zeer_groot", "sortOrder": 3 }
+        ]
+      },
+      {
+        "nodeKey": "helling",
+        "type": "question",
+        "title": "Hoe steil is het terrein?",
+        "content": {
+          "inputType": "single",
+          "description": "Let op de sterkste helling waar de maaier moet rijden."
+        },
+        "sortOrder": 1,
+        "isEntry": false,
+        "options": [
+          { "optionKey": "vlak", "label": "Vlak (tot 10% helling)", "value": "vlak", "sortOrder": 0 },
+          { "optionKey": "licht", "label": "Lichte helling (10–20%)", "value": "licht", "sortOrder": 1 },
+          { "optionKey": "steil", "label": "Steile helling (meer dan 20%)", "value": "steil", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "obstakels",
+        "type": "question",
+        "title": "Hoe complex is de tuin?",
+        "content": {
+          "inputType": "single",
+          "description": "Denk aan bomen, smalle paadjes, bloembedden en hoeken."
+        },
+        "sortOrder": 2,
+        "isEntry": false,
+        "options": [
+          { "optionKey": "open", "label": "Open en overzichtelijk", "value": "open", "sortOrder": 0 },
+          { "optionKey": "gemiddeld", "label": "Enkele obstakels of smalle plekken", "value": "gemiddeld", "sortOrder": 1 },
+          { "optionKey": "complex", "label": "Veel obstakels of smalle doorgangen", "value": "complex", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "wensen",
+        "type": "question",
+        "title": "Wat is voor jou het belangrijkst?",
+        "content": {
+          "inputType": "single",
+          "description": "Dit helpt bij het kiezen tussen instap-, midden- en premiummodellen."
+        },
+        "sortOrder": 3,
+        "isEntry": false,
+        "options": [
+          { "optionKey": "budget", "label": "Lage aanschafprijs", "value": "budget", "sortOrder": 0 },
+          { "optionKey": "gemak", "label": "App, planning en weinig gedoe", "value": "gemak", "sortOrder": 1 },
+          { "optionKey": "kracht", "label": "Zware omstandigheden aankunnen", "value": "kracht", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "lead",
+        "type": "lead_capture",
+        "title": "Advies per e-mail ontvangen?",
+        "content": {
+          "description": "Optioneel — we sturen een korte samenvatting met modeltype en aandachtspunten."
+        },
+        "sortOrder": 4,
+        "isEntry": false,
+        "options": []
+      }
+    ],
+    "rules": [
+      {
+        "fromNodeKey": "grootte",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.grootte" }, ""] },
+        "targetNodeKey": "helling",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "helling",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.helling" }, ""] },
+        "targetNodeKey": "obstakels",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "obstakels",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.obstakels" }, ""] },
+        "targetNodeKey": "wensen",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "wensen",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.wensen" }, ""] },
+        "targetNodeKey": "lead",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "*",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.helling" }, "steil"] },
+        "targetResultKey": "advies_helling",
+        "priority": 110
+      },
+      {
+        "fromNodeKey": "*",
+        "ruleType": "result_map",
+        "condition": {
+          "or": [
+            { "==": [{ "var": "answers.grootte" }, "zeer_groot"] },
+            { "==": [{ "var": "answers.grootte" }, "groot"] },
+            { "==": [{ "var": "answers.obstakels" }, "complex"] }
+          ]
+        },
+        "targetResultKey": "advies_premium",
+        "priority": 100
+      },
+      {
+        "fromNodeKey": "*",
+        "ruleType": "result_map",
+        "condition": {
+          "and": [
+            { "==": [{ "var": "answers.grootte" }, "middel"] },
+            { "==": [{ "var": "answers.wensen" }, "budget"] }
+          ]
+        },
+        "targetResultKey": "advies_instap",
+        "priority": 95
+      },
+      {
+        "fromNodeKey": "*",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.grootte" }, "middel"] },
+        "targetResultKey": "advies_midden",
+        "priority": 90
+      },
+      {
+        "fromNodeKey": "*",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.grootte" }, "klein"] },
+        "targetResultKey": "advies_instap",
+        "priority": 80
+      },
+      {
+        "fromNodeKey": "*",
+        "ruleType": "result_map",
+        "condition": { ">=": [{ "var": "answers.wensen" }, ""] },
+        "targetResultKey": "advies_midden",
+        "priority": 70
+      }
+    ],
+    "results": [
+      {
+        "resultKey": "advies_instap",
+        "title": "Instap robot grasmaaier",
+        "body": {
+          "summary": "Voor jouw tuin volstaat een compacte robotmaaier. Ideaal voor kleine tot middelgrote, overzichtelijke gazons zonder extreme hellingen.",
+          "checklist": [
+            "Kies een model voor max. 300–500 m² (check de fabrieksspecificatie)",
+            "Controleer of er een goed stopcontact bij het gazon is",
+            "Plan een duidelijke grensdraad of kies een draadloos/GPS-model als je geen kabel wilt",
+            "Let op geluidsniveau als buren dichtbij zijn"
+          ],
+          "voorbeeldmodellen": [
+            "Worx Landroid S/M",
+            "Gardena Sileno minimo / city 250",
+            "Robomow RX"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-instap-vergelijken",
+            "type": "affiliate",
+            "url": "https://example.com/robot-grasmaaiers-instap",
+            "label": "Vergelijk instapmodellen",
+            "trackingId": "aff-robot-instap"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_midden",
+        "title": "Middenklasse robot grasmaaier",
+        "body": {
+          "summary": "Een middenklasse model biedt meer maaicapaciteit, betere app-bediening en vaak betere navigatie in tuinen met enkele obstakels.",
+          "checklist": [
+            "Kies capaciteit passend bij 300–700 m²",
+            "Kies GPS- of vision-navigatie als je smalle paden hebt",
+            "Controleer regen- en hellingspecificaties",
+            "Overweeg anti-diefstal (PIN, GPS-tracker, alarm)"
+          ],
+          "voorbeeldmodellen": [
+            "Husqvarna Automower 305 / 405",
+            "Gardena Sileno life",
+            "Worx Landroid L"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-midden-vergelijken",
+            "type": "affiliate",
+            "url": "https://example.com/robot-grasmaaiers-midden",
+            "label": "Bekijk middenklasse modellen",
+            "trackingId": "aff-robot-midden"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_premium",
+        "title": "Premium robot grasmaaier (groot of complex)",
+        "body": {
+          "summary": "Voor grote of complexe tuinen is een premium robotmaaier met krachtige navigatie (GPS/RTK of vision) en hoge maaicapaciteit de beste keuze.",
+          "checklist": [
+            "Kies GPS/RTK of vision als je veel obstakels of meerdere zones hebt",
+            "Controleer of het model meerdere werkzones ondersteunt",
+            "Plan eventueel een tweede laadstation voor zeer grote percelen",
+            "Let op onderhoud: messen vervangen, winterberging, software-updates"
+          ],
+          "voorbeeldmodellen": [
+            "Husqvarna Automower 415X / 520",
+            "Segway Navimow i-series",
+            "Ambrogio L60 Elite / L250i"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-premium-vergelijken",
+            "type": "affiliate",
+            "url": "https://example.com/robot-grasmaaiers-premium",
+            "label": "Vergelijk premium robotmaaiers",
+            "trackingId": "aff-robot-premium"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_helling",
+        "title": "Robot grasmaaier voor steile hellingen",
+        "body": {
+          "summary": "Bij steile hellingen (>20%) heb je een model nodig met hoge tractie, grote wielen of AWD. Niet elke robotmaaier kan dit veilig aan.",
+          "checklist": [
+            "Check de maximale helling in de specificaties (minimaal 35–45% voor steile tuinen)",
+            "Overweeg AWD-modellen of zware premium units",
+            "Test de route handmatig: waar kan de maaier niet komen?",
+            "Plaats het laadstation op een vlakke plek"
+          ],
+          "voorbeeldmodellen": [
+            "Husqvarna Automower 435X AWD",
+            "Ambrogio L85 Elite",
+            "Robomow RS series (check helling per model)"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-helling-vergelijken",
+            "type": "affiliate",
+            "url": "https://example.com/robot-grasmaaiers-helling",
+            "label": "Modellen voor steile tuinen",
+            "trackingId": "aff-robot-helling"
+          }
+        ]
+      }
+    ]
+  }
+}

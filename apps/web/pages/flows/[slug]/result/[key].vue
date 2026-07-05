@@ -9,13 +9,16 @@ const apiBase = useApiBase()
 
 const query = versionQuery ? `?v=${versionQuery}` : ''
 
-const { data, error } = await useAsyncData(`result-${slug}-${resultKey}`, () =>
+const { data } = await useAsyncData(`result-${slug}-${resultKey}`, () =>
   $fetch<{ flowId: string; versionId: string; result: FlowResult }>(
     `${apiBase}/api/v1/public/flows/${slug}/results/${resultKey}${query}`,
-  ),
+  ).catch((err: { statusCode?: number }) => {
+    if (err?.statusCode === 404) return null
+    throw err
+  }),
 )
 
-if (error.value || !data.value) {
+if (!data.value) {
   throw createError({ statusCode: 404, statusMessage: 'Resultaat niet gevonden' })
 }
 

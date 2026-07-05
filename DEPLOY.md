@@ -140,6 +140,7 @@ psql "postgresql://...neon.../besliswijzer?sslmode=require" -f backup.sql
 | Web kan API niet bereiken | `NUXT_PUBLIC_API_BASE` moet HTTPS API-URL zijn; rebuild web |
 | CORS errors | `WEB_ORIGIN` moet exacte web-URL bevatten |
 | Admin 401 / kan niet inloggen | `ADMIN_API_KEY` identiek op **web én API**; web opnieuw deployen na wijziging; login via **HTTPS**-URL (cookie `secure`) |
+| Admin API 500 / Server Error | Check `NUXT_PUBLIC_API_BASE` op **web** = HTTPS API-URL; `ADMIN_API_KEY` gelijk op web + API; redeploy beide services |
 | Lege database | `pnpm db:migrate` + `pnpm db:seed` tegen Neon URL |
 
 ---

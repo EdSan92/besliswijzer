@@ -28,11 +28,13 @@ import {
   getAnalyticsSummary,
 } from '../services/analytics-service.js'
 
-async function verifyAdminKey(request: FastifyRequest, reply: FastifyReply) {
+async function verifyAdminKey(request: FastifyRequest, reply: FastifyReply): Promise<boolean> {
   const key = request.headers['x-admin-key']
   if (key !== request.server.config.adminApiKey) {
-    return reply.status(401).send({ error: 'Unauthorized' })
+    await reply.code(401).send({ error: 'Unauthorized' })
+    return false
   }
+  return true
 }
 
 async function createAdminToken(jwtSecret: string) {
@@ -68,7 +70,8 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     if (!request.url.startsWith('/api/v1/admin') || request.url.includes('/setup')) {
       return
     }
-    await verifyAdminKey(request, reply)
+    const authorized = await verifyAdminKey(request, reply)
+    if (!authorized) return
   })
 
   app.get('/api/v1/admin/flows', async () => {

@@ -5,6 +5,7 @@ import Fastify from 'fastify'
 import cookie from '@fastify/cookie'
 import cors from '@fastify/cors'
 import rateLimit from '@fastify/rate-limit'
+import { ZodError } from 'zod'
 import { createDb } from '@besliswijzer/db'
 import { registerPublicRoutes } from './routes/public.js'
 import { registerAdminRoutes } from './routes/admin.js'
@@ -42,6 +43,23 @@ app.decorate('config', {
 })
 
 app.get('/health', async () => ({ status: 'ok' }))
+
+app.setErrorHandler((error, _request, reply) => {
+  if (error instanceof ZodError) {
+    return reply.status(400).send({ error: 'Validation error', details: error.flatten() })
+  }
+
+  const pgCode = (error as { code?: string }).code
+  if (pgCode === '23505') {
+    return reply.status(409).send({ error: 'Record already exists' })
+  }
+  if (pgCode === '42P01') {
+    return reply.status(500).send({ error: 'Database schema missing — run migrations' })
+  }
+
+  app.log.error(error)
+  return reply.status(500).send({ error: 'Internal server error' })
+})
 
 await registerPublicRoutes(app)
 await registerAdminRoutes(app)

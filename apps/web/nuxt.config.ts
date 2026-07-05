@@ -4,7 +4,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     adminApiKey: process.env.ADMIN_API_KEY ?? 'dev-admin-key',
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE ?? 'http://localhost:3001',
+      apiBase:
+        process.env.NUXT_PUBLIC_API_BASE ??
+        (process.env.NODE_ENV === 'production'
+          ? 'https://besliswijzerapi-production.up.railway.app'
+          : 'http://localhost:3001'),
     },
   },
   css: ['~/assets/css/main.css'],

@@ -2,7 +2,14 @@
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile.web"
 
+[build.buildArgs]
+NUXT_PUBLIC_API_BASE = "https://besliswijzerapi-production.up.railway.app"
+
 [deploy]
 healthcheckPath = "/"
 healthcheckTimeout = 60
 restartPolicyType = "ON_FAILURE"
+
+[env]
+NUXT_PUBLIC_API_BASE = "https://besliswijzerapi-production.up.railway.app"
+API_BASE_URL = "https://besliswijzerapi-production.up.railway.app"

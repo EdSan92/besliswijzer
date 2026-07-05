@@ -9,14 +9,15 @@ COPY apps/web apps/web
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
-ARG NUXT_PUBLIC_API_BASE=http://localhost:3001
+ARG NUXT_PUBLIC_API_BASE=https://besliswijzerapi-production.up.railway.app
 ENV NUXT_PUBLIC_API_BASE=$NUXT_PUBLIC_API_BASE
+ENV NODE_ENV=production
 RUN pnpm --filter @besliswijzer/flow-schema build && \
     pnpm --filter @besliswijzer/flow-engine build && \
     pnpm --filter @besliswijzer/web build
 
 FROM node:20-alpine AS runner
-ARG NUXT_PUBLIC_API_BASE=http://localhost:3001
+ARG NUXT_PUBLIC_API_BASE=https://besliswijzerapi-production.up.railway.app
 WORKDIR /app
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0

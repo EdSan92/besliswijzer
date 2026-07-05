@@ -110,6 +110,57 @@ async function deleteCategory(id: string) {
   await refreshCategories()
   await refreshFlows()
 }
+
+const importJson = ref('')
+const importPublish = ref(false)
+const importOverwrite = ref(true)
+const importing = ref(false)
+const importMessage = ref('')
+
+function loadImportFile(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = () => {
+    importJson.value = String(reader.result ?? '')
+  }
+  reader.readAsText(file)
+}
+
+async function importFlow() {
+  importing.value = true
+  importMessage.value = ''
+  try {
+    const parsed = JSON.parse(importJson.value) as unknown
+    const payload =
+      parsed && typeof parsed === 'object' && 'flow' in parsed
+        ? parsed
+        : { publish: importPublish.value, overwrite: importOverwrite.value, flow: parsed }
+
+    if (!('publish' in (payload as object))) {
+      ;(payload as { publish: boolean }).publish = importPublish.value
+    }
+    if (!('overwrite' in (payload as object))) {
+      ;(payload as { overwrite: boolean }).overwrite = importOverwrite.value
+    }
+
+    const result = await useAdminFetch<{ slug: string; flowId: string; published: boolean; versionNumber: number | null }>(
+      '/api/v1/admin/flows/import',
+      { method: 'POST', body: payload },
+    )
+    importMessage.value = result.published
+      ? `Flow "${result.slug}" geïmporteerd en gepubliceerd als v${result.versionNumber}`
+      : `Flow "${result.slug}" geïmporteerd als draft`
+    importJson.value = ''
+    await refreshFlows()
+  } catch (error) {
+    importMessage.value =
+      error instanceof Error ? error.message : 'Import mislukt — controleer je JSON'
+  } finally {
+    importing.value = false
+  }
+}
 </script>
 
 <template>
@@ -170,6 +221,34 @@ async function deleteCategory(id: string) {
         </div>
         <button class="btn" type="submit" :disabled="creating">Flow aanmaken</button>
       </form>
+
+      <div class="card import-card">
+        <h3>Flow importeren (JSON)</h3>
+        <p class="hint">
+          Plak JSON of upload een bestand. Ik kan flows voor je schrijven in dit formaat — zie
+          <code>flows/examples/warmtepomp-keuzehulp.json</code> in de repo.
+        </p>
+        <div class="form-group">
+          <label>JSON-bestand</label>
+          <input type="file" accept="application/json,.json" @change="loadImportFile" />
+        </div>
+        <div class="form-group">
+          <label>Of plak JSON</label>
+          <textarea v-model="importJson" rows="8" placeholder='{"flow": { "slug": "...", ... }}' />
+        </div>
+        <label class="checkbox-row">
+          <input v-model="importOverwrite" type="checkbox" />
+          Bestaande flow met zelfde slug overschrijven (draft)
+        </label>
+        <label class="checkbox-row">
+          <input v-model="importPublish" type="checkbox" />
+          Direct publiceren na import
+        </label>
+        <button class="btn btn-secondary" type="button" :disabled="importing || !importJson.trim()" @click="importFlow">
+          {{ importing ? 'Importeren…' : 'Importeren' }}
+        </button>
+        <p v-if="importMessage" class="import-message">{{ importMessage }}</p>
+      </div>
     </div>
 
     <section v-if="categories?.length" class="section">
@@ -259,6 +338,38 @@ async function deleteCategory(id: string) {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
+}
+
+.import-card {
+  grid-column: 1 / -1;
+}
+
+.hint {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+}
+
+textarea {
+  width: 100%;
+  font: inherit;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  resize: vertical;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.import-message {
+  margin-top: 0.75rem;
+  color: var(--color-primary);
 }
 
 .section {

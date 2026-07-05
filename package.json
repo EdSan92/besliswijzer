@@ -10,7 +10,7 @@
     "db:generate": "pnpm --filter @besliswijzer/db generate",
     "db:migrate": "pnpm --filter @besliswijzer/db migrate",
     "db:seed": "pnpm --filter @besliswijzer/db seed",
-    "db:studio": "pnpm --filter @besliswijzer/db studio",
+    "flow:import": "pnpm --filter @besliswijzer/api flow:import",
     "lint": "pnpm run -r lint"
   },
   "engines": {

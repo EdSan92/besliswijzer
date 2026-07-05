@@ -15,6 +15,8 @@ import {
   flowOptionSchema,
   flowResultSchema,
   flowRuleSchema,
+  flowImportRequestSchema,
+  flowDefinitionSchema,
   seoMetaSchema,
 } from '@besliswijzer/flow-schema'
 import {
@@ -23,6 +25,11 @@ import {
   loadFlowSnapshot,
 } from '../services/flow-service.js'
 import { publishFlow } from '../services/publish-service.js'
+import {
+  exportFlowDefinition,
+  FlowImportError,
+  importFlowDefinition,
+} from '../services/flow-import-export-service.js'
 import {
   exportLeadsCsv,
   getAnalyticsSummary,
@@ -141,6 +148,19 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     return reply.status(204).send()
   })
 
+  app.post('/api/v1/admin/flows/import', async (request, reply) => {
+    try {
+      const body = flowImportRequestSchema.parse(request.body)
+      const result = await importFlowDefinition(app.db, body)
+      return result
+    } catch (error) {
+      if (error instanceof FlowImportError) {
+        return reply.status(error.statusCode).send({ error: error.message })
+      }
+      throw error
+    }
+  })
+
   app.post('/api/v1/admin/flows', async (request) => {
     const body = z
       .object({
@@ -202,6 +222,50 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     if (!updated) return reply.status(404).send({ error: 'Flow not found' })
     return updated
   })
+
+  app.get<{ Params: { id: string } }>('/api/v1/admin/flows/:id/export', async (request, reply) => {
+    try {
+      const definition = await exportFlowDefinition(app.db, request.params.id)
+      reply.header('Content-Disposition', `attachment; filename="${definition.slug}.json"`)
+      return definition
+    } catch (error) {
+      if (error instanceof FlowImportError) {
+        return reply.status(error.statusCode).send({ error: error.message })
+      }
+      throw error
+    }
+  })
+
+  app.post<{ Params: { id: string } }>(
+    '/api/v1/admin/flows/:id/import',
+    async (request, reply) => {
+      try {
+        const body = z
+          .object({
+            publish: z.boolean().default(false),
+            flow: flowDefinitionSchema,
+          })
+          .parse(request.body)
+
+        const existing = await app.db.query.flows.findFirst({
+          where: eq(flows.id, request.params.id),
+        })
+        if (!existing) return reply.status(404).send({ error: 'Flow not found' })
+
+        const result = await importFlowDefinition(app.db, {
+          publish: body.publish,
+          overwrite: true,
+          flow: { ...body.flow, slug: existing.slug },
+        })
+        return result
+      } catch (error) {
+        if (error instanceof FlowImportError) {
+          return reply.status(error.statusCode).send({ error: error.message })
+        }
+        throw error
+      }
+    },
+  )
 
   app.get<{ Params: { id: string } }>(
     '/api/v1/admin/flows/:id/preview',

@@ -1,0 +1,200 @@
+{
+  "publish": false,
+  "overwrite": true,
+  "flow": {
+    "slug": "warmtepomp-keuzehulp",
+    "title": "Warmtepomp keuzehulp",
+    "categorySlug": "energie",
+    "seo": {
+      "title": "Warmtepomp keuzehulp — vind de juiste warmtepomp",
+      "description": "Beantwoord een paar vragen en ontdek welke warmtepomp het beste bij jouw woning past."
+    },
+    "nodes": [
+      {
+        "nodeKey": "woningtype",
+        "type": "question",
+        "title": "Wat voor woning heb je?",
+        "content": {
+          "inputType": "single",
+          "description": "Dit bepaalt welk type warmtepomp geschikt is."
+        },
+        "sortOrder": 0,
+        "isEntry": true,
+        "options": [
+          { "optionKey": "apartment", "label": "Appartement", "value": "apartment", "sortOrder": 0 },
+          { "optionKey": "house", "label": "Rijtjeshuis / vrijstaand", "value": "house", "sortOrder": 1 }
+        ]
+      },
+      {
+        "nodeKey": "isolatie",
+        "type": "question",
+        "title": "Hoe goed is je isolatie?",
+        "content": { "inputType": "single" },
+        "sortOrder": 1,
+        "isEntry": false,
+        "options": [
+          { "optionKey": "good", "label": "Goed (dakisolatie + HR++)", "value": "good", "sortOrder": 0 },
+          { "optionKey": "poor", "label": "Matig tot slecht", "value": "poor", "sortOrder": 1 }
+        ]
+      },
+      {
+        "nodeKey": "oppervlakte",
+        "type": "question",
+        "title": "Wat is je woonoppervlakte?",
+        "content": {
+          "inputType": "slider",
+          "min": 40,
+          "max": 300,
+          "description": "In vierkante meters"
+        },
+        "sortOrder": 2,
+        "isEntry": false,
+        "options": []
+      },
+      {
+        "nodeKey": "lead",
+        "type": "lead_capture",
+        "title": "Wil je je advies per e-mail ontvangen?",
+        "content": { "description": "Optioneel — we sturen je een samenvatting." },
+        "sortOrder": 3,
+        "isEntry": false,
+        "options": []
+      }
+    ],
+    "rules": [
+      {
+        "fromNodeKey": "woningtype",
+        "ruleType": "branch",
+        "condition": { "==": [{ "var": "answers.woningtype" }, "apartment"] },
+        "targetNodeKey": "isolatie",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "woningtype",
+        "ruleType": "branch",
+        "condition": { "==": [{ "var": "answers.woningtype" }, "house"] },
+        "targetNodeKey": "oppervlakte",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "oppervlakte",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.oppervlakte" }, 0] },
+        "targetNodeKey": "lead",
+        "priority": 5
+      },
+      {
+        "fromNodeKey": "isolatie",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.isolatie" }, ""] },
+        "targetNodeKey": "lead",
+        "priority": 5
+      },
+      {
+        "fromNodeKey": "*",
+        "ruleType": "result_map",
+        "condition": {
+          "and": [
+            { "==": [{ "var": "answers.woningtype" }, "apartment"] },
+            { "==": [{ "var": "answers.isolatie" }, "good"] }
+          ]
+        },
+        "targetResultKey": "advies_klein",
+        "priority": 100
+      },
+      {
+        "fromNodeKey": "*",
+        "ruleType": "result_map",
+        "condition": {
+          "and": [
+            { "==": [{ "var": "answers.woningtype" }, "apartment"] },
+            { "==": [{ "var": "answers.isolatie" }, "poor"] }
+          ]
+        },
+        "targetResultKey": "advies_isolatie",
+        "priority": 90
+      },
+      {
+        "fromNodeKey": "*",
+        "ruleType": "result_map",
+        "condition": {
+          "and": [
+            { "==": [{ "var": "answers.woningtype" }, "house"] },
+            { ">=": [{ "var": "answers.oppervlakte" }, 120] }
+          ]
+        },
+        "targetResultKey": "advies_groot",
+        "priority": 100
+      },
+      {
+        "fromNodeKey": "*",
+        "ruleType": "result_map",
+        "condition": {
+          "and": [
+            { "==": [{ "var": "answers.woningtype" }, "house"] },
+            { "<": [{ "var": "answers.oppervlakte" }, 120] }
+          ]
+        },
+        "targetResultKey": "advies_klein",
+        "priority": 90
+      }
+    ],
+    "results": [
+      {
+        "resultKey": "advies_klein",
+        "title": "All-electric warmtepomp geschikt",
+        "body": {
+          "summary": "Voor jouw situatie is een all-electric warmtepomp een goede keuze.",
+          "checklist": [
+            "Vraag offerte aan bij minimaal 3 installateurs",
+            "Check ISDE-subsidie",
+            "Laat je cv-ketel behouden als backup (optioneel)"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-warmtepomp",
+            "type": "affiliate",
+            "url": "https://example.com/warmtepomp",
+            "label": "Bekijk warmtepompen",
+            "trackingId": "aff-warmtepomp"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_groot",
+        "title": "Hybride warmtepomp aanbevolen",
+        "body": {
+          "summary": "Voor grotere woningen raden we een hybride warmtepomp aan.",
+          "checklist": ["Hybride pomp + bestaande cv-ketel", "Geschikt voor woningen >120m²"]
+        },
+        "ctas": [
+          {
+            "id": "cta-hybride",
+            "type": "affiliate",
+            "url": "https://example.com/hybride",
+            "label": "Vergelijk hybride pompen",
+            "trackingId": "aff-hybride"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_isolatie",
+        "title": "Eerst isoleren, daarna warmtepomp",
+        "body": {
+          "summary": "Je isolatie is matig. We raden aan eerst te isoleren.",
+          "checklist": ["Spouwmuurisolatie", "Dakisolatie", "HR++ glas"]
+        },
+        "ctas": [
+          {
+            "id": "cta-isolatie",
+            "type": "external",
+            "url": "https://example.com/isolatie",
+            "label": "Isolatie-advies",
+            "trackingId": "ext-isolatie"
+          }
+        ]
+      }
+    ]
+  }
+}

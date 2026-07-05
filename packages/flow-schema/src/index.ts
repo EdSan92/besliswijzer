@@ -85,6 +85,78 @@ export const flowSnapshotSchema = z.object({
   results: z.array(flowResultSchema),
 })
 
+/** Portable flow definition for JSON import/export (no database IDs). */
+export const flowDefinitionNodeSchema = flowNodeSchema.omit({ id: true })
+export const flowDefinitionRuleSchema = flowRuleSchema.omit({ id: true })
+export const flowDefinitionResultSchema = flowResultSchema.omit({ id: true })
+
+export const flowDefinitionSchema = z.object({
+  slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+  title: z.string().min(1),
+  categorySlug: z.string().min(2).regex(/^[a-z0-9-]+$/).optional().nullable(),
+  seo: seoMetaSchema.optional(),
+  nodes: z.array(flowDefinitionNodeSchema).min(1),
+  rules: z.array(flowDefinitionRuleSchema).default([]),
+  results: z.array(flowDefinitionResultSchema).default([]),
+})
+
+export const flowImportRequestSchema = z.object({
+  publish: z.boolean().default(false),
+  overwrite: z.boolean().default(false),
+  flow: flowDefinitionSchema,
+})
+
+export type FlowDefinition = z.infer<typeof flowDefinitionSchema>
+export type FlowImportRequest = z.infer<typeof flowImportRequestSchema>
+
+export function validateFlowDefinition(flow: FlowDefinition): string[] {
+  const errors: string[] = []
+  const nodeKeys = new Set(flow.nodes.map((node) => node.nodeKey))
+  const resultKeys = new Set(flow.results.map((result) => result.resultKey))
+
+  if (nodeKeys.size !== flow.nodes.length) {
+    errors.push('Node keys must be unique')
+  }
+  if (resultKeys.size !== flow.results.length) {
+    errors.push('Result keys must be unique')
+  }
+
+  const entryNodes = flow.nodes.filter((node) => node.isEntry)
+  if (entryNodes.length === 0) {
+    errors.push('At least one node must have isEntry: true')
+  }
+  if (entryNodes.length > 1) {
+    errors.push('Only one node may have isEntry: true')
+  }
+
+  for (const node of flow.nodes) {
+    const optionKeys = new Set(node.options.map((option) => option.optionKey))
+    if (optionKeys.size !== node.options.length) {
+      errors.push(`Duplicate option keys on node "${node.nodeKey}"`)
+    }
+  }
+
+  for (const rule of flow.rules) {
+    if (rule.fromNodeKey !== '*' && !nodeKeys.has(rule.fromNodeKey)) {
+      errors.push(`Rule references unknown fromNodeKey "${rule.fromNodeKey}"`)
+    }
+    if (rule.targetNodeKey && !nodeKeys.has(rule.targetNodeKey)) {
+      errors.push(`Rule references unknown targetNodeKey "${rule.targetNodeKey}"`)
+    }
+    if (rule.targetResultKey && !resultKeys.has(rule.targetResultKey)) {
+      errors.push(`Rule references unknown targetResultKey "${rule.targetResultKey}"`)
+    }
+    if (rule.ruleType === 'branch' && !rule.targetNodeKey) {
+      errors.push(`Branch rule from "${rule.fromNodeKey}" needs targetNodeKey`)
+    }
+    if (rule.ruleType === 'result_map' && !rule.targetResultKey) {
+      errors.push(`Result rule from "${rule.fromNodeKey}" needs targetResultKey`)
+    }
+  }
+
+  return errors
+}
+
 export const stepRequestSchema = z.object({
   sessionId: z.string().uuid(),
   nodeKey: z.string(),

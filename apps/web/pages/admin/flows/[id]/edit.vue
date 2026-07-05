@@ -227,6 +227,57 @@ async function downloadLeads() {
   a.click()
   URL.revokeObjectURL(url)
 }
+
+const importJson = ref('')
+const importPublish = ref(false)
+const importing = ref(false)
+
+async function exportFlowJson() {
+  const definition = await useAdminFetch<Record<string, unknown>>(`/api/v1/admin/flows/${flowId}/export`)
+  const blob = new Blob([JSON.stringify(definition, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${flow?.value?.slug ?? flowId}.json`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function loadImportFile(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = () => {
+    importJson.value = String(reader.result ?? '')
+  }
+  reader.readAsText(file)
+}
+
+async function importDraft() {
+  importing.value = true
+  message.value = ''
+  try {
+    const parsed = JSON.parse(importJson.value) as { flow?: Record<string, unknown> }
+    const flowPayload = parsed.flow ?? parsed
+    const result = await useAdminFetch<{ versionNumber: number | null; published: boolean }>(
+      `/api/v1/admin/flows/${flowId}/import`,
+      {
+        method: 'POST',
+        body: { publish: importPublish.value, flow: flowPayload },
+      },
+    )
+    message.value = result.published
+      ? `Draft vervangen en gepubliceerd als v${result.versionNumber}`
+      : 'Draft vervangen vanuit JSON'
+    importJson.value = ''
+    await Promise.all([refreshNodes(), refreshRules(), refreshResults(), refreshFlow()])
+  } catch {
+    message.value = 'Import mislukt — controleer je JSON'
+  } finally {
+    importing.value = false
+  }
+}
 </script>
 
 <template>
@@ -243,6 +294,7 @@ async function downloadLeads() {
         <p class="slug">/flows/{{ flow?.slug }}</p>
       </div>
       <div class="header-actions">
+        <button class="btn btn-secondary" type="button" @click="exportFlowJson">Export JSON</button>
         <button class="btn btn-secondary" type="button" @click="downloadLeads">Leads export</button>
         <button class="btn" type="button" :disabled="publishing" @click="publish">
           {{ publishing ? 'Publiceren…' : 'Publiceren' }}
@@ -264,6 +316,32 @@ async function downloadLeads() {
         <button class="btn btn-secondary btn-sm" type="button" @click="saveCategory">Opslaan</button>
       </div>
     </div>
+
+    <section class="section card import-section">
+      <h2>JSON import / export</h2>
+      <p class="hint">
+        Exporteer de huidige draft, pas JSON aan (of laat mij een flow schrijven), en importeer terug.
+      </p>
+      <div class="import-row">
+        <div class="form-group">
+          <label>JSON-bestand</label>
+          <input type="file" accept="application/json,.json" @change="loadImportFile" />
+        </div>
+        <label class="checkbox-row">
+          <input v-model="importPublish" type="checkbox" />
+          Direct publiceren na import
+        </label>
+        <button
+          class="btn btn-secondary"
+          type="button"
+          :disabled="importing || !importJson.trim()"
+          @click="importDraft"
+        >
+          {{ importing ? 'Importeren…' : 'Draft vervangen' }}
+        </button>
+      </div>
+      <textarea v-model="importJson" rows="6" placeholder='Plak flow JSON (object "flow" of alleen de flow-definitie)' />
+    </section>
 
     <section class="section">
       <h2>Analytics</h2>
@@ -477,6 +555,35 @@ async function downloadLeads() {
 
 .section {
   margin-top: 2rem;
+}
+
+.import-section textarea {
+  width: 100%;
+  margin-top: 0.75rem;
+  font: inherit;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  resize: vertical;
+}
+
+.import-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.hint {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
 }
 
 .form-row {

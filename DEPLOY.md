@@ -57,7 +57,7 @@ pnpm db:seed
 | `WEB_ORIGIN` | `https://jouw-web.up.railway.app` (vul later aan met echt domein) |
 | `NODE_ENV` | `production` |
 
-4. Deploy → noteer de publieke URL, bijv. `https://besliswijzer-api-production.up.railway.app`
+4. Deploy → noteer de publieke URL, bijv. `https://besliswijzerapi-production.up.railway.app`
 
 5. Test: `https://JOUW-API-URL/health` → `{ "status": "ok" }`
 
@@ -83,7 +83,7 @@ pnpm db:seed
 
 | Variable | Waarde |
 |----------|--------|
-| `NUXT_PUBLIC_API_BASE` | `https://jouw-api.up.railway.app` |
+| `NUXT_PUBLIC_API_BASE` | `https://besliswijzerapi-production.up.railway.app` (jouw echte API-URL, **zonder** trailing slash) |
 | `ADMIN_API_KEY` | zelfde als API |
 | `NUXT_ADMIN_API_KEY` | optioneel, zelfde waarde (Nuxt runtime override) |
 | `NODE_ENV` | `production` |

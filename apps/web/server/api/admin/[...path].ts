@@ -8,7 +8,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const config = useRuntimeConfig()
-  const apiBase = resolveApiBase(config.public.apiBase)
+  const host = getRequestHeader(event, 'host')
+  const apiBase = resolveApiBase(config.public.apiBase as string, host)
   const path = getRouterParam(event, 'path') ?? ''
   const query = getQuery(event)
   const queryString = new URLSearchParams(query as Record<string, string>).toString()

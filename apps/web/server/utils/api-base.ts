@@ -1,13 +1,22 @@
 /** Production API URL — override via API_BASE_URL or NUXT_PUBLIC_API_BASE on Railway. */
-const DEFAULT_PRODUCTION_API_BASE = 'https://besliswijzerapi-production.up.railway.app'
+export const DEFAULT_PRODUCTION_API_BASE =
+  'https://besliswijzerapi-production.up.railway.app'
 
-export function resolveApiBase(configApiBase?: string): string {
+function isProductionRuntime(requestHost?: string): boolean {
+  if (process.env.NODE_ENV === 'production') return true
+  if (process.env.RAILWAY_ENVIRONMENT) return true
+  if (process.env.RAILWAY_PUBLIC_DOMAIN) return true
+  if (requestHost?.includes('railway.app')) return true
+  return false
+}
+
+export function resolveApiBase(configApiBase?: string, requestHost?: string): string {
   for (const key of ['API_BASE_URL', 'NUXT_PUBLIC_API_BASE'] as const) {
     const value = process.env[key]?.trim().replace(/\/$/, '')
-    if (value) return value
+    if (value && !value.includes('localhost')) return value
   }
 
-  if (process.env.NODE_ENV === 'production') {
+  if (isProductionRuntime(requestHost)) {
     return DEFAULT_PRODUCTION_API_BASE
   }
 

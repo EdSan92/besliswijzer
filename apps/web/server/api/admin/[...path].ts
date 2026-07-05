@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
         'error' in data &&
         typeof (data as { error: unknown }).error === 'string'
           ? (data as { error: string }).error
-          : error.statusMessage || 'Backend request failed'
+          : `${error.statusMessage || 'Backend request failed'} (API: ${config.public.apiBase})`
 
       throw createError({
         statusCode,
@@ -45,7 +45,9 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 502,
       statusMessage:
-        error instanceof Error ? error.message : 'Kan API niet bereiken. Check NUXT_PUBLIC_API_BASE.',
+        error instanceof Error
+          ? `${error.message} (API: ${config.public.apiBase})`
+          : `Kan API niet bereiken. Check NUXT_PUBLIC_API_BASE (nu: ${config.public.apiBase}).`,
     })
   }
 })

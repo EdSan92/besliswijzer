@@ -85,6 +85,7 @@ pnpm db:seed
 |----------|--------|
 | `NUXT_PUBLIC_API_BASE` | `https://jouw-api.up.railway.app` |
 | `ADMIN_API_KEY` | zelfde als API |
+| `NUXT_ADMIN_API_KEY` | optioneel, zelfde waarde (Nuxt runtime override) |
 | `NODE_ENV` | `production` |
 
 4. Deploy → noteer web-URL
@@ -134,10 +135,11 @@ psql "postgresql://...neon.../besliswijzer?sslmode=require" -f backup.sql
 
 | Probleem | Oplossing |
 |----------|-----------|
+| Build faalt met Nixpacks / `pnpm --filter @besliswijzer/api build` | Zet builder op **Dockerfile** via `apps/api/railway.toml`; root directory = repo-root |
 | API start niet | Check `DATABASE_URL` en Neon IP allowlist (meestal open) |
 | Web kan API niet bereiken | `NUXT_PUBLIC_API_BASE` moet HTTPS API-URL zijn; rebuild web |
 | CORS errors | `WEB_ORIGIN` moet exacte web-URL bevatten |
-| Admin 401 | `ADMIN_API_KEY` moet identiek zijn op web én API |
+| Admin 401 / kan niet inloggen | `ADMIN_API_KEY` identiek op **web én API**; web opnieuw deployen na wijziging; login via **HTTPS**-URL (cookie `secure`) |
 | Lege database | `pnpm db:migrate` + `pnpm db:seed` tegen Neon URL |
 
 ---

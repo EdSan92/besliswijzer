@@ -12,9 +12,10 @@ async function login() {
       method: 'POST',
       body: { password: password.value },
     })
-    await navigateTo('/admin')
+    await navigateTo('/admin', { external: true })
   } catch {
-    error.value = 'Onjuist wachtwoord. Gebruik je ADMIN_API_KEY uit .env'
+    error.value =
+      'Onjuist wachtwoord. Gebruik je ADMIN_API_KEY (Railway: web-service, variabele ADMIN_API_KEY of NUXT_ADMIN_API_KEY).'
   } finally {
     loading.value = false
   }

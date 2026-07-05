@@ -8,7 +8,8 @@ export function isAdminAuthenticated(event: Parameters<typeof getCookie>[0]): bo
 
 export function setAdminSession(event: Parameters<typeof setCookie>[0]) {
   setCookie(event, COOKIE_NAME, '1', {
-    httpOnly: true,
+    // Must be readable by client route middleware after login (not a secret — value is "1").
+    httpOnly: false,
     secure: !process.dev,
     sameSite: 'lax',
     maxAge: MAX_AGE,

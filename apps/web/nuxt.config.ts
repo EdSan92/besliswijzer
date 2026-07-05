@@ -2,7 +2,10 @@ export default defineNuxtConfig({
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
   modules: ['@pinia/nuxt'],
   runtimeConfig: {
-    adminApiKey: process.env.ADMIN_API_KEY ?? 'dev-admin-key',
+    adminApiKey:
+      process.env.NUXT_ADMIN_API_KEY ??
+      process.env.ADMIN_API_KEY ??
+      'dev-admin-key',
     public: {
       apiBase:
         process.env.NUXT_PUBLIC_API_BASE ??

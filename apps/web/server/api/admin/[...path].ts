@@ -1,6 +1,7 @@
 import { FetchError } from 'ofetch'
 import { resolveApiBase } from '~/utils/api-base'
 import { getBackendAdminHeaders, isAdminAuthenticated } from '../../utils/admin-auth'
+import { getAdminApiKey } from '../../utils/runtime-config'
 
 export default defineEventHandler(async (event) => {
   if (!isAdminAuthenticated(event)) {
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
     return await $fetch(target, {
       method,
       body,
-      headers: getBackendAdminHeaders(config),
+      headers: getBackendAdminHeaders({ adminApiKey: getAdminApiKey(config.adminApiKey as string) }),
       responseType: path.endsWith('/leads') ? 'text' : 'json',
     })
   } catch (error) {

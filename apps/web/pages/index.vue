@@ -13,7 +13,7 @@ type CategoryItem = {
 const { data } = await useAsyncData('home-categories', () =>
   $fetch<{ categories: CategoryItem[]; uncategorized: FlowItem[] }>(
     `${apiBase}/api/v1/public/categories`,
-  ),
+  ).catch(() => ({ categories: [], uncategorized: [] })),
 )
 
 useSeoMeta({

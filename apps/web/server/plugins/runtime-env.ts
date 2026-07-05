@@ -1,4 +1,4 @@
-import { resolveApiBase } from '../utils/api-base'
+import { resolveApiBase } from '~/utils/api-base'
 
 export default defineNitroPlugin(() => {
   const config = useRuntimeConfig()

@@ -1,5 +1,5 @@
 import { FetchError } from 'ofetch'
-import { resolveApiBase } from '../../utils/api-base'
+import { resolveApiBase } from '~/utils/api-base'
 import { getBackendAdminHeaders, isAdminAuthenticated } from '../../utils/admin-auth'
 
 export default defineEventHandler(async (event) => {

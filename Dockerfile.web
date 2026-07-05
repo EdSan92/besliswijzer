@@ -21,7 +21,6 @@ ARG NUXT_PUBLIC_API_BASE=https://besliswijzerapi-production.up.railway.app
 WORKDIR /app
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
-ENV PORT=3000
 ENV NUXT_PUBLIC_API_BASE=$NUXT_PUBLIC_API_BASE
 
 COPY --from=build /app/apps/web/.output ./.output

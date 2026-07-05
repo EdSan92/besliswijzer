@@ -21,5 +21,7 @@ export function resolveApiBase(configApiBase?: string, requestHost?: string): st
   }
 
   const fromConfig = configApiBase?.trim().replace(/\/$/, '')
+  if (fromConfig && !fromConfig.includes('localhost')) return fromConfig
+
   return fromConfig || 'http://localhost:3001'
 }

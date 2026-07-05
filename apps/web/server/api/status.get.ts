@@ -1,4 +1,4 @@
-import { DEFAULT_PRODUCTION_API_BASE, resolveApiBase } from '../utils/api-base'
+import { DEFAULT_PRODUCTION_API_BASE, resolveApiBase } from '~/utils/api-base'
 
 export default defineEventHandler((event) => {
   const config = useRuntimeConfig()

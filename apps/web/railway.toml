@@ -6,8 +6,8 @@ dockerfilePath = "Dockerfile.web"
 NUXT_PUBLIC_API_BASE = "https://besliswijzerapi-production.up.railway.app"
 
 [deploy]
-healthcheckPath = "/"
-healthcheckTimeout = 60
+healthcheckPath = "/api/status"
+healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
 
 [env]

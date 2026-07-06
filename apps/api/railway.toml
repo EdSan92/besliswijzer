@@ -8,4 +8,4 @@ healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
 
 [env]
-WEB_ORIGIN = "https://besliswijzerweb-production.up.railway.app"
+WEB_ORIGIN = "https://www.veraio.nl,https://besliswijzerweb-production.up.railway.app"

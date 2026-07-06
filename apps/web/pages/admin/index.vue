@@ -19,13 +19,27 @@ type CategoryItem = {
   flows: unknown[]
 }
 
-const { data: flows, refresh: refreshFlows } = await useAsyncData('admin-flows', () =>
+const { data: flows, error: flowsError, refresh: refreshFlows } = await useAsyncData('admin-flows', () =>
   useAdminFetch<FlowListItem[]>('/api/v1/admin/flows'),
 )
 
-const { data: categories, refresh: refreshCategories } = await useAsyncData('admin-categories', () =>
-  useAdminFetch<CategoryItem[]>('/api/v1/admin/categories'),
+const { data: categories, error: categoriesError, refresh: refreshCategories } = await useAsyncData(
+  'admin-categories',
+  () => useAdminFetch<CategoryItem[]>('/api/v1/admin/categories'),
 )
+
+const loadError = computed(() => {
+  const err = flowsError.value ?? categoriesError.value
+  if (!err) return ''
+  const message = err instanceof Error ? err.message : 'Kon admin-data niet laden'
+  if (message.includes('401') || message.toLowerCase().includes('ingelogd')) {
+    return 'Sessie verlopen — log opnieuw in.'
+  }
+  if (message.includes('502') || message.includes('Kan API niet bereiken')) {
+    return 'Web kan de API niet bereiken. Check NUXT_PUBLIC_API_BASE en ADMIN_API_KEY op Railway.'
+  }
+  return message
+})
 
 const newFlow = reactive({ slug: '', title: '', categoryId: '' as string | '' })
 const newCategory = reactive({ slug: '', title: '', description: '' })
@@ -166,6 +180,7 @@ async function importFlow() {
 <template>
   <AdminLayout>
     <h1>Flows & categorieën</h1>
+    <p v-if="loadError" class="load-error">{{ loadError }}</p>
     <p class="intro">Organiseer keuzehulpen in categorieën zoals Energie, Subsidie of Verbouwen.</p>
 
     <div class="admin-grid">
@@ -331,6 +346,14 @@ async function importFlow() {
   color: var(--color-muted);
   margin-top: -0.5rem;
   margin-bottom: 1.5rem;
+}
+
+.load-error {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background: #fef2f2;
+  border-radius: 8px;
+  color: #b91c1c;
 }
 
 .admin-grid {

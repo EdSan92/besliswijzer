@@ -7,6 +7,7 @@ function isProductionRuntime(requestHost?: string): boolean {
   if (process.env.RAILWAY_ENVIRONMENT) return true
   if (process.env.RAILWAY_PUBLIC_DOMAIN) return true
   if (requestHost?.includes('railway.app')) return true
+  if (requestHost?.includes('veraio.nl')) return true
   return false
 }
 

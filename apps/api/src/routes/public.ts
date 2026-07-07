@@ -23,8 +23,10 @@ import {
 } from '../services/analytics-service.js'
 import {
   getCategoryWithFlows,
+  listPopularPublishedFlows,
   listPublishedFlowsByCategory,
   listUncategorizedPublishedFlows,
+  searchPublishedFlows,
 } from '../services/category-service.js'
 
 export async function registerPublicRoutes(app: FastifyInstance) {
@@ -33,6 +35,28 @@ export async function registerPublicRoutes(app: FastifyInstance) {
     const uncategorized = await listUncategorizedPublishedFlows(app.db)
     return { categories, uncategorized }
   })
+
+  app.get<{ Querystring: { limit?: string } }>('/api/v1/public/flows/popular', async (request) => {
+    const parsed = Number(request.query.limit ?? 6)
+    const limit = Math.min(Math.max(Number.isFinite(parsed) ? parsed : 6, 1), 12)
+    const flows = await listPopularPublishedFlows(app.db, limit)
+    return { flows }
+  })
+
+  app.get<{ Querystring: { q?: string; limit?: string } }>(
+    '/api/v1/public/flows/search',
+    async (request, reply) => {
+      const query = (request.query.q ?? '').trim().slice(0, 100)
+      if (query.length < 2) {
+        return reply.status(400).send({ error: 'Query must be at least 2 characters' })
+      }
+
+      const parsed = Number(request.query.limit ?? 8)
+      const limit = Math.min(Math.max(Number.isFinite(parsed) ? parsed : 8, 1), 20)
+      const flows = await searchPublishedFlows(app.db, query, limit)
+      return { flows, query }
+    },
+  )
 
   app.get<{ Params: { slug: string } }>('/api/v1/public/categories/:slug', async (request, reply) => {
     const category = await getCategoryWithFlows(app.db, request.params.slug)

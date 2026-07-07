@@ -101,38 +101,84 @@ export function calculateProgress(snapshot: FlowSnapshot, answeredKeys: string[]
   return Math.min(100, Math.round((answered / questionNodes.length) * 100))
 }
 
+export function prepareAnswer(node: FlowNode, answer: unknown): unknown {
+  if (node.type === 'lead_capture') {
+    if (answer === null || answer === undefined) {
+      return ''
+    }
+    if (typeof answer === 'string') {
+      return answer.trim()
+    }
+    return answer
+  }
+
+  return answer
+}
+
 export function validateAnswer(node: FlowNode, answer: unknown): boolean {
+  const value = prepareAnswer(node, answer)
+
   if (node.type === 'info') {
     return true
   }
 
   if (node.type === 'lead_capture') {
-    return typeof answer === 'string' && answer.includes('@')
+    if (value === '') {
+      return true
+    }
+    return typeof value === 'string' && value.includes('@')
   }
 
   const inputType = node.content.inputType ?? 'single'
 
   switch (inputType) {
     case 'single':
-      return node.options.some((opt) => opt.value === answer || opt.optionKey === answer)
+      return node.options.some((opt) => opt.value === value || opt.optionKey === value)
     case 'multi':
       return (
-        Array.isArray(answer) &&
-        answer.every((val) => node.options.some((opt) => opt.value === val || opt.optionKey === val))
+        Array.isArray(value) &&
+        value.every((val) => node.options.some((opt) => opt.value === val || opt.optionKey === val))
       )
     case 'slider':
-      return typeof answer === 'number'
+      return typeof value === 'number'
     case 'text':
-      return typeof answer === 'string' && answer.trim().length > 0
+      return typeof value === 'string' && value.trim().length > 0
     default:
       return false
   }
 }
 
-export function normalizeAnswer(node: FlowNode, answer: unknown): unknown {
-  if (node.content.inputType === 'single') {
-    const option = node.options.find((opt) => opt.optionKey === answer || opt.value === answer)
-    return option?.value ?? answer
+export function getAnswerValidationError(node: FlowNode, answer: unknown): string | null {
+  if (validateAnswer(node, answer)) {
+    return null
   }
-  return answer
+
+  if (node.type === 'lead_capture') {
+    return 'Vul een geldig e-mailadres in, of klik op Overslaan.'
+  }
+
+  const inputType = node.content.inputType ?? 'single'
+
+  if (inputType === 'single' || node.options.length > 0) {
+    return 'Kies een optie om verder te gaan.'
+  }
+  if (inputType === 'multi') {
+    return 'Selecteer minimaal één optie.'
+  }
+  if (inputType === 'text') {
+    return 'Vul een antwoord in om verder te gaan.'
+  }
+
+  return 'Dit antwoord is niet geldig.'
+}
+
+export function normalizeAnswer(node: FlowNode, answer: unknown): unknown {
+  const value = prepareAnswer(node, answer)
+
+  if (node.content.inputType === 'single') {
+    const option = node.options.find((opt) => opt.optionKey === value || opt.value === value)
+    return option?.value ?? value
+  }
+
+  return value
 }

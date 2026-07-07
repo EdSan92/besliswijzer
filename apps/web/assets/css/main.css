@@ -61,6 +61,11 @@ a {
   background: var(--color-primary-hover);
 }
 
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .btn-secondary {
   background: white;
   color: var(--color-text);

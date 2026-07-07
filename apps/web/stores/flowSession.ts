@@ -2,9 +2,14 @@ import { defineStore } from 'pinia'
 import type { FlowNode, FlowResult } from '@besliswijzer/flow-schema'
 
 function createSessionId(): string {
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
   if (import.meta.client) {
     const stored = localStorage.getItem('de_session_id')
-    if (stored) return stored
+    if (stored && uuidPattern.test(stored)) {
+      return stored
+    }
     const id = crypto.randomUUID()
     localStorage.setItem('de_session_id', id)
     return id

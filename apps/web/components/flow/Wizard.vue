@@ -2,7 +2,9 @@
 import type { PublicFlowResponse } from '@besliswijzer/flow-schema'
 import {
   calculateProgress,
+  getAnswerValidationError,
   normalizeAnswer,
+  prepareAnswer,
   resolveNext,
 } from '@besliswijzer/flow-engine'
 
@@ -54,19 +56,36 @@ watch(
 
 async function submitAnswer(answer: unknown) {
   if (!store.currentNode || submitting.value) return
+
+  const node = store.currentNode
+  const nodeKey = node.nodeKey
+  const preparedAnswer = prepareAnswer(node, answer)
+  const validationError = getAnswerValidationError(node, answer)
+
+  if (validationError) {
+    store.error = validationError
+    return
+  }
+
   submitting.value = true
   store.error = null
-
-  const nodeKey = store.currentNode.nodeKey
-  store.answers[nodeKey] = answer
+  store.answers[nodeKey] = preparedAnswer
 
   try {
     track(props.flow.flowId, props.flow.versionId, store.sessionId, 'step_complete', nodeKey, {
-      answer,
+      answer: preparedAnswer,
     })
 
+    if (
+      node.type === 'lead_capture' &&
+      typeof preparedAnswer === 'string' &&
+      preparedAnswer.includes('@')
+    ) {
+      await submitLead(preparedAnswer)
+    }
+
     if (props.previewSnapshot) {
-      const normalized = normalizeAnswer(store.currentNode, answer)
+      const normalized = normalizeAnswer(node, preparedAnswer)
       store.answers[nodeKey] = normalized
       const next = resolveNext(props.previewSnapshot, store.answers, nodeKey)
       store.progress = calculateProgress(props.previewSnapshot, Object.keys(store.answers))
@@ -91,7 +110,7 @@ async function submitAnswer(answer: unknown) {
         body: {
           sessionId: store.sessionId,
           nodeKey,
-          answer,
+          answer: preparedAnswer,
           answers: store.answers,
         },
       })
@@ -115,7 +134,7 @@ async function submitAnswer(answer: unknown) {
       }
     }
   } catch (err) {
-    store.error = (err as Error).message ?? 'Er ging iets mis'
+    store.error = toUserFacingFetchError(err)
   } finally {
     submitting.value = false
   }
@@ -153,6 +172,7 @@ async function submitLead(email: string) {
     <FlowQuestionRenderer
       v-else-if="store.currentNode"
       :node="store.currentNode"
+      :submitting="submitting"
       v-model="currentAnswer"
       @submit="submitAnswer"
     />

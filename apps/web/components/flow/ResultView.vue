@@ -10,6 +10,18 @@ const props = defineProps<{
 
 const { track } = useFlowAnalytics()
 
+const whyText = computed(() => {
+  const why = props.result.body.why
+  return typeof why === 'string' && why.trim() ? why : null
+})
+
+const modelExamples = computed(() => {
+  const models = props.result.body.voorbeeldmodellen
+  return Array.isArray(models)
+    ? models.filter((model): model is string => typeof model === 'string' && model.trim().length > 0)
+    : []
+})
+
 function onCtaClick(cta: FlowResult['ctas'][number]) {
   track(props.flowId, props.versionId, props.sessionId, 'cta_click', undefined, {
     ctaId: cta.id,
@@ -24,9 +36,24 @@ function onCtaClick(cta: FlowResult['ctas'][number]) {
     <h1>{{ result.title }}</h1>
     <p v-if="result.body.summary">{{ result.body.summary }}</p>
 
-    <ul v-if="Array.isArray(result.body.checklist)" class="checklist">
-      <li v-for="(item, index) in result.body.checklist" :key="index">{{ item }}</li>
-    </ul>
+    <section v-if="whyText" class="result-section">
+      <h2 class="section-title">Waarom dit advies?</h2>
+      <p>{{ whyText }}</p>
+    </section>
+
+    <section v-if="Array.isArray(result.body.checklist)" class="result-section">
+      <h2 class="section-title">Waar op letten</h2>
+      <ul class="checklist">
+        <li v-for="(item, index) in result.body.checklist" :key="index">{{ item }}</li>
+      </ul>
+    </section>
+
+    <section v-if="modelExamples.length" class="result-section">
+      <h2 class="section-title">Voorbeeldmodellen</h2>
+      <ul class="model-list">
+        <li v-for="(model, index) in modelExamples" :key="index">{{ model }}</li>
+      </ul>
+    </section>
 
     <div class="cta-row">
       <a
@@ -46,8 +73,23 @@ function onCtaClick(cta: FlowResult['ctas'][number]) {
 </template>
 
 <style scoped>
-.checklist {
+.result-section {
+  margin-top: 1.5rem;
+}
+
+.section-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+}
+
+.checklist,
+.model-list {
+  margin: 0;
   padding-left: 1.25rem;
+}
+
+.model-list {
+  list-style: disc;
 }
 
 .cta-row {

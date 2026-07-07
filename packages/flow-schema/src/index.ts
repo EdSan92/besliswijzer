@@ -230,3 +230,19 @@ export type AnalyticsSummary = {
   ctaClicks: number
   leadSubmissions: number
 }
+
+export type PopularFlowItem = {
+  id: string
+  slug: string
+  title: string
+  category: string
+  starts: number
+}
+
+export type FlowSearchResult = {
+  id: string
+  slug: string
+  title: string
+  category: string
+  description: string | null
+}

@@ -1,8 +1,7 @@
 import type { EventType } from '@besliswijzer/flow-schema'
 
 export function useFlowAnalytics() {
-  const config = useRuntimeConfig()
-  const apiBase = config.public.apiBase as string
+  const apiBase = useApiBase()
 
   const queue: Array<{
     flowId: string

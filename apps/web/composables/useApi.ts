@@ -3,11 +3,12 @@ import { resolveApiBase } from '~/utils/api-base'
 
 export function useApiBase() {
   const config = useRuntimeConfig()
-  if (import.meta.server) {
-    const host = useRequestHeaders()['host']
-    return resolveApiBase(config.public.apiBase as string, host)
+  if (import.meta.client) {
+    // Same-origin proxy (/api/v1/public/*) — avoids CORS from veraio.nl to Railway API.
+    return ''
   }
-  return config.public.apiBase as string
+  const host = useRequestHeaders()['host']
+  return resolveApiBase(config.public.apiBase as string, host)
 }
 
 export function useAdminFetch<T>(url: string, options: Parameters<typeof $fetch<T>>[1] = {}) {

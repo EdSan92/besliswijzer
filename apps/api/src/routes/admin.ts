@@ -223,6 +223,16 @@ export async function registerAdminRoutes(app: FastifyInstance) {
     return updated
   })
 
+  app.delete<{ Params: { id: string } }>('/api/v1/admin/flows/:id', async (request, reply) => {
+    const [deleted] = await app.db
+      .delete(flows)
+      .where(eq(flows.id, request.params.id))
+      .returning({ id: flows.id })
+
+    if (!deleted) return reply.status(404).send({ error: 'Flow not found' })
+    return reply.status(204).send()
+  })
+
   app.get<{ Params: { id: string } }>('/api/v1/admin/flows/:id/export', async (request, reply) => {
     try {
       const definition = await exportFlowDefinition(app.db, request.params.id)

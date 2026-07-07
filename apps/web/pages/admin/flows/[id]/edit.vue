@@ -278,6 +278,25 @@ async function importDraft() {
     importing.value = false
   }
 }
+
+const deleting = ref(false)
+
+async function deleteFlow() {
+  if (
+    !confirm(
+      `Flow "${flow.value?.title}" definitief verwijderen? Alle versies, analytics en leads worden ook verwijderd.`,
+    )
+  ) {
+    return
+  }
+  deleting.value = true
+  try {
+    await useAdminFetch(`/api/v1/admin/flows/${flowId}`, { method: 'DELETE' })
+    await navigateTo('/admin')
+  } finally {
+    deleting.value = false
+  }
+}
 </script>
 
 <template>
@@ -497,6 +516,17 @@ async function importDraft() {
         </li>
       </ul>
     </section>
+
+    <section class="section danger-zone card">
+      <h2>Flow verwijderen</h2>
+      <p class="hint">
+        Verwijdert deze flow permanent, inclusief alle versies, analytics en leads. De live URL
+        <code>/flows/{{ flow?.slug }}</code> werkt daarna niet meer.
+      </p>
+      <button class="btn btn-danger" type="button" :disabled="deleting" @click="deleteFlow">
+        {{ deleting ? 'Verwijderen…' : 'Flow definitief verwijderen' }}
+      </button>
+    </section>
   </AdminLayout>
 </template>
 
@@ -667,5 +697,36 @@ async function importDraft() {
 .btn-sm {
   padding: 0.4rem 0.85rem;
   font-size: 0.875rem;
+}
+
+.danger-zone {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.danger-zone h2 {
+  color: #b91c1c;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+  border: none;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.danger-zone code {
+  font-size: 0.875rem;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
 }
 </style>

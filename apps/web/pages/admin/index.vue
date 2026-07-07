@@ -125,6 +125,18 @@ async function deleteCategory(id: string) {
   await refreshFlows()
 }
 
+async function deleteFlow(flow: FlowListItem) {
+  if (
+    !confirm(
+      `Flow "${flow.title}" definitief verwijderen? Alle versies, analytics en leads worden ook verwijderd.`,
+    )
+  ) {
+    return
+  }
+  await useAdminFetch(`/api/v1/admin/flows/${flow.id}`, { method: 'DELETE' })
+  await refreshFlows()
+}
+
 const importJson = ref('')
 const importPublish = ref(false)
 const importOverwrite = ref(true)
@@ -333,6 +345,9 @@ async function importFlow() {
                 Bewerken
               </NuxtLink>
               <NuxtLink class="btn btn-sm" :to="`/flows/${flow.slug}`" target="_blank">Live</NuxtLink>
+              <button class="btn btn-secondary btn-sm" type="button" @click="deleteFlow(flow)">
+                Verwijderen
+              </button>
             </td>
           </tr>
         </tbody>

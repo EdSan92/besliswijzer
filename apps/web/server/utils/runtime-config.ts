@@ -12,3 +12,12 @@ export function getAdminApiKey(fallback?: string): string {
     'dev-admin-key'
   )
 }
+
+export function getGeminiApiKey(fallback?: string): string {
+  return (
+    process.env.NUXT_GEMINI_API_KEY?.trim() ||
+    process.env.GEMINI_API_KEY?.trim() ||
+    fallback?.trim() ||
+    ''
+  )
+}

@@ -12,6 +12,7 @@ async function logout() {  await $fetch('/api/admin/logout', { method: 'POST' })
       <h2>Besliswijzer</h2>
       <nav>
         <NuxtLink to="/admin">Flows</NuxtLink>
+        <NuxtLink to="/admin/opportunities">Opportunities</NuxtLink>
         <slot name="nav" />
         <NuxtLink to="/" target="_blank">Site bekijken</NuxtLink>
       </nav>      <button v-if="!isDev" class="logout-btn" type="button" @click="logout">

@@ -7,30 +7,21 @@ const { register } = useRevealOnScroll()
 </script>
 
 <template>
-  <section id="start" class="landing-section landing-cta">
+  <section id="start" class="landing-cta">
     <div class="landing-container">
       <div
-        :ref="(el) => register(el as Element)"
-        class="landing-reveal landing-cta__frame"
+        :ref="(el) => register(el)"
+        class="landing-reveal landing-cta__panel"
       >
-        <div class="landing-cta__orb landing-cta__orb--1" aria-hidden="true" />
-        <div class="landing-cta__orb landing-cta__orb--2" aria-hidden="true" />
-
-        <div class="landing-cta__inner">
-          <h2 class="landing-cta__title">
-            Klaar om de <span class="landing-gradient-text">juiste keuze</span> te maken?
-          </h2>
-          <p class="landing-cta__text">
-            Start vandaag nog met een keuzehulp en ontdek welk product het beste bij jou past.
-          </p>
-          <NuxtLink :to="ctaHref" class="landing-btn landing-btn--large landing-btn--gradient">
-            Start keuzehulp
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-              <path d="M4 9h10M10 5l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </NuxtLink>
-          <p class="landing-cta__footnote">Gratis · Geen registratie vereist</p>
-        </div>
+        <span class="landing-badge">Gratis · Geen account</span>
+        <h2 class="landing-heading">Stop met twijfelen. Start met zekerheid.</h2>
+        <p class="landing-body landing-cta__text">
+          Vertel Veraio wat je nodig hebt en ontvang één aanbeveling
+          met uitleg — in ongeveer 2 minuten.
+        </p>
+        <NuxtLink :to="ctaHref" class="landing-btn landing-btn--large landing-cta__btn">
+          Ontvang jouw advies
+        </NuxtLink>
       </div>
     </div>
   </section>
@@ -38,79 +29,31 @@ const { register } = useRevealOnScroll()
 
 <style scoped>
 .landing-cta {
-  padding-bottom: 5rem;
+  padding: 3rem 0 6rem;
+  background: var(--veraio-bg);
 }
 
-.landing-cta__frame {
-  position: relative;
-  padding: 1px;
-  border-radius: calc(var(--veraio-radius-lg) + 2px);
-  background: linear-gradient(
-    135deg,
-    rgba(99, 102, 241, 0.4) 0%,
-    rgba(139, 92, 246, 0.2) 35%,
-    rgba(0, 0, 0, 0.06) 70%,
-    rgba(99, 102, 241, 0.25) 100%
-  );
-  box-shadow: var(--veraio-shadow-glow);
-  overflow: hidden;
-}
-
-.landing-cta__orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  pointer-events: none;
-}
-
-.landing-cta__orb--1 {
-  width: 300px;
-  height: 300px;
-  top: -100px;
-  right: -60px;
-  background: rgba(99, 102, 241, 0.15);
-}
-
-.landing-cta__orb--2 {
-  width: 240px;
-  height: 240px;
-  bottom: -80px;
-  left: -40px;
-  background: rgba(139, 92, 246, 0.12);
-}
-
-.landing-cta__inner {
-  position: relative;
+.landing-cta__panel {
   text-align: center;
-  padding: 5rem 2rem;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  background: linear-gradient(145deg, rgba(31, 107, 92, 0.06) 0%, rgba(217, 164, 65, 0.05) 100%);
+  border: 1px solid rgba(31, 107, 92, 0.15);
   border-radius: var(--veraio-radius-lg);
-  background:
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 55%),
-    var(--veraio-surface);
+  box-shadow: var(--veraio-shadow);
 }
 
-.landing-cta__title {
-  font-size: clamp(2rem, 4vw, 2.875rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-  line-height: 1.12;
-  margin: 0 0 1rem;
-  max-width: 540px;
-  margin-left: auto;
-  margin-right: auto;
+.landing-cta__panel .landing-badge {
+  margin-bottom: 1.25rem;
 }
 
 .landing-cta__text {
-  font-size: 1.125rem;
-  color: var(--veraio-muted);
-  line-height: 1.65;
-  max-width: 440px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1.75rem;
+  max-width: 420px;
 }
 
-.landing-cta__footnote {
-  margin: 1.25rem 0 0;
-  font-size: 0.8125rem;
-  color: var(--veraio-muted);
+.landing-cta__btn {
+  min-width: 220px;
 }
 </style>

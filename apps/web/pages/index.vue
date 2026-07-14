@@ -38,32 +38,29 @@ const popularFlows = computed(() =>
 )
 
 const primaryCtaHref = computed(() => {
-  const mostPopular = popularFlows.value[0]
-  if (mostPopular) return `/flows/${mostPopular.slug}`
-
-  return '#populair'
+  const first = popularFlows.value[0]
+  if (first) return `/flows/${first.slug}`
+  return '/flows/robotmaaiers'
 })
 
 useSeoMeta({
-  title: 'Veraio — Vind het product dat écht bij jou past',
-  description: 'Beantwoord een paar vragen en krijg een persoonlijke aanbeveling. Gratis, zonder account.',
-  ogTitle: 'Veraio — Persoonlijke productadviezen',
-  ogDescription: 'Beantwoord een paar vragen en krijg een persoonlijke aanbeveling.',
+  title: 'Veraio — De juiste keuze, zonder uren uitzoeken',
+  description:
+    'Vertel wat je nodig hebt. Veraio analyseert de opties en geeft één persoonlijk advies met transparante uitleg. Gratis, geen account nodig.',
+  ogTitle: 'Veraio — Jouw persoonlijke aankoopadviseur',
+  ogDescription:
+    'Geen productlijst. Eén duidelijke aanbeveling die past bij jouw situatie.',
 })
 </script>
 
 <template>
   <div>
     <LandingNav />
-    <LandingHero :cta-href="primaryCtaHref" :popular-flows="popularFlows" />
-    <LandingPopularFlows :flows="popularFlows" />
-    <LandingTrustBar />
+    <LandingHero :cta-href="primaryCtaHref" />
+    <LandingSampleAdvice />
+    <LandingProblem />
     <LandingHowItWorks />
-    <LandingExamples
-      :popular-flows="popularFlows"
-      :categories="data?.categories ?? []"
-      :uncategorized="data?.uncategorized ?? []"
-    />
+    <LandingCategories :flows="popularFlows" />
     <LandingWhy />
     <LandingCta :cta-href="primaryCtaHref" />
     <LandingFooter />

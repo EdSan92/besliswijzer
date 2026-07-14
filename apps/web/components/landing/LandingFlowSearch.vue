@@ -8,7 +8,7 @@ const props = withDefaults(
   }>(),
   {
     variant: 'hero',
-    placeholder: 'Zoek een keuzehulp, bijv. robotmaaier of warmtepomp…',
+    placeholder: 'Zoek advies, bijv. robotmaaier of warmtepomp…',
   },
 )
 
@@ -89,7 +89,7 @@ onUnmounted(() => {
     role="search"
   >
     <label class="flow-search__label" :for="listboxId + '-input'">
-      <span class="sr-only">Zoek keuzehulpen</span>
+      <span class="sr-only">Zoek persoonlijk advies</span>
       <div class="flow-search__field">
         <svg class="flow-search__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
           <circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/>
@@ -144,7 +144,7 @@ onUnmounted(() => {
         </li>
 
         <li v-else-if="!loading && !hasResults" class="flow-search__status" role="status">
-          Geen keuzehulpen gevonden voor "{{ query.trim() }}"
+          Geen advies gevonden voor "{{ query.trim() }}"
         </li>
 
         <li
@@ -206,26 +206,25 @@ onUnmounted(() => {
 
 .flow-search__input {
   width: 100%;
-  padding: 1rem 3rem 1rem 3rem;
+  padding: 0.875rem 2.75rem 0.875rem 2.75rem;
   border: 1px solid var(--veraio-border);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
+  border-radius: var(--veraio-radius);
+  background: var(--veraio-surface);
   font: inherit;
   font-size: 1rem;
   color: var(--veraio-text);
-  box-shadow: var(--veraio-shadow-sm);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .flow-search__input::placeholder {
-  color: #a3a3a3;
+  color: var(--veraio-muted);
+  opacity: 0.7;
 }
 
 .flow-search__input:focus {
   outline: none;
-  border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), var(--veraio-shadow-md);
+  border-color: var(--veraio-primary);
+  box-shadow: 0 0 0 3px var(--veraio-primary-soft);
 }
 
 .flow-search--compact .flow-search__input {
@@ -265,26 +264,25 @@ onUnmounted(() => {
   right: 1rem;
   width: 18px;
   height: 18px;
-  border: 2px solid rgba(99, 102, 241, 0.15);
-  border-top-color: var(--veraio-accent);
+  border: 2px solid var(--veraio-border);
+  border-top-color: var(--veraio-primary);
   border-radius: 50%;
   animation: flow-search-spin 0.7s linear infinite;
 }
 
 .flow-search__results {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + 0.375rem);
   left: 0;
   right: 0;
   z-index: 50;
   margin: 0;
-  padding: 0.5rem;
+  padding: 0.375rem;
   list-style: none;
   border-radius: var(--veraio-radius);
   border: 1px solid var(--veraio-border);
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(16px);
-  box-shadow: var(--veraio-shadow-md);
+  background: var(--veraio-surface);
+  box-shadow: var(--veraio-shadow);
   max-height: 320px;
   overflow-y: auto;
 }
@@ -309,7 +307,7 @@ onUnmounted(() => {
 
 .flow-search__result:hover,
 .flow-search__result--active {
-  background: var(--veraio-accent-soft);
+  background: var(--veraio-primary-soft);
 }
 
 .flow-search__result-main {
@@ -338,11 +336,7 @@ onUnmounted(() => {
 .flow-search__result-category {
   flex-shrink: 0;
   font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--veraio-accent);
-  padding: 0.25rem 0.625rem;
-  border-radius: 999px;
-  background: var(--veraio-accent-soft);
+  color: var(--veraio-muted);
   white-space: nowrap;
 }
 

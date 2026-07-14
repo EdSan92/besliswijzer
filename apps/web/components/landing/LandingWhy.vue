@@ -1,187 +1,183 @@
 <script setup lang="ts">
 const { register } = useRevealOnScroll()
 
-const reasons = [
+const points = [
   {
-    title: 'Gebaseerd op jouw situatie',
-    description: 'Geen generieke top-10 lijstjes. Elke aanbeveling is afgestemd op wat jij invult.',
-    icon: 'user',
+    title: 'Afgestemd op jouw situatie',
+    description: 'Geen standaard best-of lijst. Jouw antwoorden bepalen welke producten in aanmerking komen.',
   },
   {
-    title: 'Onafhankelijk en transparant',
-    description: 'We leggen uit waarom een product past — zodat jij met vertrouwen kiest.',
-    icon: 'shield',
+    title: 'Transparante uitleg',
+    description: 'Elk advies komt met redenen. Je ziet precies waarom Veraio dit product aanbeveelt.',
   },
   {
-    title: 'Snel en eenvoudig',
-    description: 'Binnen enkele minuten klaar. Geen account, geen nieuwsbrieven, geen gedoe.',
-    icon: 'zap',
+    title: 'Onafhankelijk advies',
+    description: 'Veraio verkoopt geen producten. Jij houdt de regie over waar en wanneer je koopt.',
   },
-  {
-    title: 'Altijd actueel',
-    description: 'Keuzehulpen worden continu bijgewerkt met de nieuwste producten en inzichten.',
-    icon: 'refresh',
-  },
+]
+
+const sources = [
+  'Jouw antwoorden over situatie, budget en wensen',
+  'Productspecificaties en expertcriteria',
+  'Onafhankelijke bronnen — geen verkopers',
 ]
 </script>
 
 <template>
-  <section id="waarom" class="landing-section">
-    <div class="landing-container landing-why__layout">
+  <section id="waarom" class="landing-why">
+    <div class="landing-container">
       <div
-        :ref="(el) => register(el as Element)"
-        class="landing-reveal landing-why__header"
+        :ref="(el) => register(el)"
+        class="landing-reveal landing-why__grid"
       >
-        <span class="landing-label">Waarom Veraio</span>
-        <h2 class="landing-heading">
-          Keuzes maken hoeft niet <span class="landing-gradient-text">moeilijk</span> te zijn
-        </h2>
-        <p class="landing-subheading">
-          Veraio combineert expertise met een eenvoudige ervaring — zodat jij sneller de juiste beslissing neemt.
-        </p>
+        <div class="landing-why__intro">
+          <p class="landing-eyebrow">Vertrouwen</p>
+          <h2 class="landing-heading">
+            Advies dat je kunt volgen — en uitleggen
+          </h2>
+          <p class="landing-body">
+            Veraio is gebouwd voor mensen die zekerheid willen bij een aankoop.
+            Geen mysterie, geen verborgen agenda.
+          </p>
 
-        <div class="landing-why__highlight" aria-hidden="true">
-          <span class="landing-why__highlight-value">4.9</span>
-          <div>
-            <span class="landing-why__highlight-stars">★★★★★</span>
-            <span class="landing-why__highlight-label">Gemiddelde beoordeling</span>
+          <div class="landing-why__sources">
+            <p class="landing-why__sources-title">Waarop baseren we adviezen?</p>
+            <ul class="landing-why__sources-list">
+              <li v-for="source in sources" :key="source">{{ source }}</li>
+            </ul>
           </div>
         </div>
-      </div>
 
-      <div class="landing-why__grid">
-        <article
-          v-for="(reason, index) in reasons"
-          :key="reason.title"
-          :ref="(el) => register(el as Element)"
-          class="landing-reveal landing-why__item"
-          :style="{ transitionDelay: `${index * 0.08}s` }"
-        >
-          <div class="landing-why__icon" aria-hidden="true">
-            <svg v-if="reason.icon === 'user'" width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            <svg v-else-if="reason.icon === 'shield'" width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M10 2l6 2.5V10c0 3.5-2.5 5.5-6 7-3.5-1.5-6-3.5-6-7V4.5L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-              <path d="M7.5 10l2 2 3.5-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <svg v-else-if="reason.icon === 'zap'" width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M11 2L5 11h5l-1 7 7-10h-5l1-6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-            </svg>
-            <svg v-else width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M16 10a6 6 0 11-2.2-4.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M16 4v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <h3 class="landing-why__title">{{ reason.title }}</h3>
-          <p class="landing-why__desc">{{ reason.description }}</p>
-        </article>
+        <ul class="landing-why__list">
+          <li
+            v-for="(point, index) in points"
+            :key="point.title"
+            :ref="(el) => register(el)"
+            class="landing-reveal landing-why__item"
+            :style="{ transitionDelay: `${index * 0.05}s` }"
+          >
+            <span class="landing-why__icon" aria-hidden="true">✓</span>
+            <div>
+              <h3 class="landing-why__title">{{ point.title }}</h3>
+              <p class="landing-why__desc">{{ point.description }}</p>
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
   </section>
 </template>
 
 <style scoped>
-.landing-why__layout {
-  background:
-    radial-gradient(ellipse 50% 40% at 0% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 60%);
-}
-
-.landing-why__header {
-  position: relative;
-}
-
-.landing-why__highlight {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 2.5rem;
-  padding: 1rem 1.5rem;
-  border-radius: var(--veraio-radius);
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid var(--veraio-border);
-  box-shadow: var(--veraio-shadow-sm);
-}
-
-.landing-why__highlight-value {
-  font-size: 2rem;
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  background: var(--veraio-gradient-text);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.landing-why__highlight-stars {
-  display: block;
-  font-size: 0.875rem;
-  letter-spacing: 0.1em;
-  color: #f59e0b;
-  margin-bottom: 0.125rem;
-}
-
-.landing-why__highlight-label {
-  font-size: 0.8125rem;
-  color: var(--veraio-muted);
+.landing-why {
+  padding: 5.5rem 0;
+  border-top: 1px solid var(--veraio-border);
+  background: var(--veraio-surface-muted);
 }
 
 .landing-why__grid {
+  display: grid;
+  gap: 3rem;
+}
+
+.landing-why__intro .landing-body {
+  margin-top: 1rem;
+  max-width: 440px;
+}
+
+.landing-why__sources {
+  margin-top: 1.75rem;
+  padding: 1.25rem 1.375rem;
+  background: var(--veraio-surface);
+  border-radius: var(--veraio-radius);
+  border: 1px solid rgba(31, 107, 92, 0.12);
+}
+
+.landing-why__sources-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--veraio-primary);
+  margin: 0 0 0.625rem;
+}
+
+.landing-why__sources-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.375rem;
+}
+
+.landing-why__sources-list li {
+  font-size: 0.8125rem;
+  color: var(--veraio-muted);
+  padding-left: 1rem;
+  position: relative;
+  line-height: 1.45;
+}
+
+.landing-why__sources-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--veraio-gold);
+}
+
+.landing-why__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
   gap: 1.25rem;
 }
 
 .landing-why__item {
-  padding: 1.75rem;
+  display: grid;
+  grid-template-columns: 2.25rem 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: 1.25rem;
+  background: var(--veraio-surface);
   border-radius: var(--veraio-radius);
-  border: 1px solid transparent;
-  transition: border-color 0.25s ease, background 0.25s ease;
-}
-
-.landing-why__item:hover {
-  border-color: var(--veraio-border);
-  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--veraio-border);
 }
 
 .landing-why__icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--veraio-accent-soft);
-  color: var(--veraio-accent);
-  margin-bottom: 1rem;
-  border: 1px solid rgba(99, 102, 241, 0.12);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--veraio-primary-soft);
+  color: var(--veraio-primary);
+  font-size: 0.875rem;
+  font-weight: 700;
 }
 
 .landing-why__title {
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.375rem;
+  color: var(--veraio-text);
 }
 
 .landing-why__desc {
   font-size: 0.9375rem;
   color: var(--veraio-muted);
-  line-height: 1.65;
+  line-height: 1.6;
   margin: 0;
 }
 
-@media (min-width: 768px) {
-  .landing-why__layout {
-    display: grid;
-    grid-template-columns: 1fr 1.15fr;
-    align-items: start;
-    gap: 4rem;
-  }
-
+@media (min-width: 900px) {
   .landing-why__grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem 1.5rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
   }
 }
 </style>

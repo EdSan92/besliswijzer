@@ -26,3 +26,14 @@ export function resolveApiBase(configApiBase?: string, requestHost?: string): st
 
   return fromConfig || 'http://localhost:3001'
 }
+
+/** Opportunity Engine — aparte service, niet de Besliswijzer API. */
+export function resolveOpportunityApiBase(configApiBase?: string): string {
+  for (const key of ['OPPORTUNITY_API_BASE', 'NUXT_OPPORTUNITY_API_BASE'] as const) {
+    const value = process.env[key]?.trim().replace(/\/$/, '')
+    if (value) return value
+  }
+
+  const fromConfig = configApiBase?.trim().replace(/\/$/, '')
+  return fromConfig || 'http://localhost:3002'
+}

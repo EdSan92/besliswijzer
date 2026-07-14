@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["opportunity"]
+}
+
+enum OpportunityStatus {
+  NEW
+  FLOW_GENERATED
+  PUBLISHED
+  REJECTED
+
+  @@schema("opportunity")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  isSeed      Boolean  @default(false) @map("is_seed")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  keywords      Keyword[]
+  opportunities Opportunity[]
+
+  @@map("oe_categories")
+  @@schema("opportunity")
+}
+
+model Keyword {
+  id               String   @id @default(cuid())
+  term             String
+  categoryId       String?  @map("category_id")
+  searchVolume     Int?     @map("search_volume")
+  competition      Float?   @map("competition")
+  cpcLow           Float?   @map("cpc_low")
+  cpcHigh          Float?   @map("cpc_high")
+  relatedQuestions Json?    @map("related_questions")
+  source           String   @default("google_keyword_insight")
+  lastScoredAt     DateTime? @map("last_scored_at")
+  cachedScore      Json?     @map("cached_score")
+  metricsHash      String?   @map("metrics_hash")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  category      Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  opportunities Opportunity[]
+
+  @@unique([term, categoryId])
+  @@index([term])
+  @@map("oe_keywords")
+  @@schema("opportunity")
+}
+
+model Opportunity {
+  id                  String            @id @default(cuid())
+  keywordId           String            @map("keyword_id")
+  categoryId          String?           @map("category_id")
+  keywordTerm         String            @map("keyword_term")
+  categoryName        String            @map("category_name")
+  score               Float
+  confidence          Float
+  estimatedCommission Float?            @map("estimated_commission")
+  reasons             Json
+  status              OpportunityStatus @default(NEW)
+  flowDefinition      Json?             @map("flow_definition")
+  rejectedReason      String?           @map("rejected_reason")
+  discoveredAt        DateTime          @default(now()) @map("discovered_at")
+  updatedAt           DateTime          @updatedAt @map("updated_at")
+
+  keyword  Keyword   @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@unique([keywordTerm, categoryName])
+  @@index([status])
+  @@index([score])
+  @@map("oe_opportunities")
+  @@schema("opportunity")
+}
+
+model PromptLog {
+  id         String   @id @default(cuid())
+  promptName String   @map("prompt_name")
+  promptHash String   @map("prompt_hash")
+  input      Json?
+  output     Json?
+  model      String?
+  success    Boolean  @default(true)
+  error      String?
+  durationMs Int?     @map("duration_ms")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  aiCalls AiCall[]
+
+  @@index([promptName])
+  @@map("oe_prompt_logs")
+  @@schema("opportunity")
+}
+
+model AiCall {
+  id           String   @id @default(cuid())
+  provider     String
+  model        String
+  operation    String
+  promptLogId  String?  @map("prompt_log_id")
+  inputTokens  Int?     @map("input_tokens")
+  outputTokens Int?     @map("output_tokens")
+  latencyMs    Int      @map("latency_ms")
+  retryCount   Int      @default(0) @map("retry_count")
+  success      Boolean  @default(true)
+  error        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  promptLog PromptLog? @relation(fields: [promptLogId], references: [id], onDelete: SetNull)
+
+  @@index([provider, model])
+  @@index([createdAt])
+  @@map("oe_ai_calls")
+  @@schema("opportunity")
+}
+
+model DiscoveryRun {
+  id                  String   @id @default(cuid())
+  seedCategories      Int      @map("seed_categories")
+  keywordsCollected   Int      @map("keywords_collected")
+  opportunitiesFound  Int      @map("opportunities_found")
+  opportunitiesStored Int      @map("opportunities_stored")
+  durationMs          Int      @map("duration_ms")
+  errors              Json?
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  @@map("oe_discovery_runs")
+  @@schema("opportunity")
+}

@@ -157,6 +157,8 @@ export function validateFlowDefinition(flow: FlowDefinition): string[] {
   return errors
 }
 
+export { mergeFlowDefinitions } from './merge-flow-definitions.js'
+
 export const stepRequestSchema = z.object({
   sessionId: z.string().uuid(),
   nodeKey: z.string(),

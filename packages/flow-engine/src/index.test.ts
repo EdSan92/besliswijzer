@@ -5,6 +5,7 @@ import {
   getAnswerValidationError,
   getEntryNode,
   normalizeAnswer,
+  normalizeJsonLogicCondition,
   resolveNext,
   validateAnswer,
 } from './index.js'
@@ -328,5 +329,80 @@ describe('getAnswerValidationError', () => {
       title: 'E-mail',
     })
     expect(getAnswerValidationError(node, 'bad')).toContain('e-mailadres')
+  })
+})
+
+describe('normalizeJsonLogicCondition', () => {
+  it('converts AI shorthand value conditions', () => {
+    expect(normalizeJsonLogicCondition({ value: 'mid' }, 'budget')).toEqual({
+      '==': [{ var: 'answers.budget' }, 'mid'],
+    })
+  })
+
+  it('converts multi-key shorthand to and', () => {
+    expect(normalizeJsonLogicCondition({ budget: 'high', gebruik: 'reizen' }, 'gebruik')).toEqual({
+      and: [
+        { '==': [{ var: 'answers.budget' }, 'high'] },
+        { '==': [{ var: 'answers.gebruik' }, 'reizen'] },
+      ],
+    })
+  })
+
+  it('normalizes nested shorthand inside and', () => {
+    expect(
+      normalizeJsonLogicCondition({ and: [{ value: 'mid' }, { budget: 'high' }] }, 'budget'),
+    ).toEqual({
+      and: [
+        { '==': [{ var: 'answers.budget' }, 'mid'] },
+        { '==': [{ var: 'answers.budget' }, 'high'] },
+      ],
+    })
+  })
+})
+
+describe('resolveNext with AI shorthand rules', () => {
+  it('does not throw on malformed imported conditions', () => {
+    const snapshot: FlowSnapshot = {
+      ...baseSnapshot,
+      nodes: [
+        {
+          nodeKey: 'budget',
+          type: 'question',
+          title: 'Budget',
+          content: { inputType: 'single' },
+          sortOrder: 0,
+          isEntry: true,
+          options: [
+            { optionKey: 'mid', label: 'Mid', value: 'mid', sortOrder: 0 },
+            { optionKey: 'high', label: 'High', value: 'high', sortOrder: 1 },
+          ],
+        },
+        {
+          nodeKey: 'gebruik',
+          type: 'question',
+          title: 'Gebruik',
+          content: { inputType: 'single' },
+          sortOrder: 1,
+          isEntry: false,
+          options: [{ optionKey: 'thuis', label: 'Thuis', value: 'thuis', sortOrder: 0 }],
+        },
+      ],
+      rules: [
+        {
+          fromNodeKey: 'budget',
+          ruleType: 'branch',
+          condition: { value: 'mid' },
+          targetNodeKey: 'gebruik',
+          priority: 10,
+        },
+      ],
+      results: [],
+    }
+
+    const next = resolveNext(snapshot, { budget: 'mid' }, 'budget')
+    expect(next.type).toBe('node')
+    if (next.type === 'node') {
+      expect(next.nodeKey).toBe('gebruik')
+    }
   })
 })

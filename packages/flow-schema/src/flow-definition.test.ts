@@ -53,8 +53,8 @@ describe('validateFlowDefinition', () => {
     const errors = validateFlowDefinition({
       ...minimalFlow,
       results: [
-        { resultKey: 'a', title: 'A', body: {} },
-        { resultKey: 'a', title: 'A2', body: {} },
+        { resultKey: 'a', title: 'A', body: {}, ctas: [] },
+        { resultKey: 'a', title: 'A2', body: {}, ctas: [] },
       ],
     })
     expect(errors).toContain('Result keys must be unique')
@@ -135,7 +135,7 @@ describe('validateFlowDefinition', () => {
 
     const resultErrors = validateFlowDefinition({
       ...minimalFlow,
-      results: [{ resultKey: 'r1', title: 'R', body: {} }],
+      results: [{ resultKey: 'r1', title: 'R', body: {}, ctas: [] }],
       rules: [
         {
           fromNodeKey: '*',

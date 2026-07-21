@@ -1,6 +1,45 @@
 import jsonLogic from 'json-logic-js'
 import type { FlowNode, FlowSnapshot, NextStep } from '@besliswijzer/flow-schema'
 
+const JSON_LOGIC_OPERATORS = new Set([
+  '==',
+  '===',
+  '!=',
+  '!==',
+  '>',
+  '>=',
+  '<',
+  '<=',
+  'and',
+  'or',
+  'if',
+  '?:',
+  'var',
+  '!',
+  '!!',
+  'in',
+  'cat',
+  'substr',
+  '+',
+  '*',
+  '-',
+  '/',
+  'min',
+  'max',
+  'merge',
+  'missing',
+  'missing_some',
+  'missing_all',
+  'filter',
+  'map',
+  'reduce',
+  'all',
+  'none',
+  'some',
+  'log',
+  '%',
+])
+
 function sortRulesByPriority<T extends { priority: number }>(rules: T[]): T[] {
   return [...rules].sort((a, b) => b.priority - a.priority)
 }
@@ -13,12 +52,75 @@ function getApplicableRules(snapshot: FlowSnapshot, currentNodeKey: string) {
   )
 }
 
+export function normalizeJsonLogicCondition(
+  condition: Record<string, unknown>,
+  fromNodeKey: string,
+): Record<string, unknown> {
+  if (!condition || Object.keys(condition).length === 0) {
+    return { '>=': [{ var: `answers.${fromNodeKey}` }, ''] }
+  }
+
+  const keys = Object.keys(condition)
+  const usesJsonLogic = keys.some((key) => JSON_LOGIC_OPERATORS.has(key))
+
+  if (!usesJsonLogic) {
+    if (keys.length === 1 && keys[0] === 'value') {
+      return { '==': [{ var: `answers.${fromNodeKey}` }, condition.value] }
+    }
+
+    if (keys.length === 1) {
+      const key = keys[0]
+      return { '==': [{ var: `answers.${key}` }, condition[key]] }
+    }
+
+    return {
+      and: keys.map((key) => ({
+        '==': [{ var: `answers.${key}` }, condition[key]],
+      })),
+    }
+  }
+
+  const cloned = JSON.parse(JSON.stringify(condition)) as Record<string, unknown>
+  return normalizeJsonLogicTree(cloned, fromNodeKey) as Record<string, unknown>
+}
+
+function normalizeJsonLogicTree(node: unknown, fromNodeKey: string): unknown {
+  if (Array.isArray(node)) {
+    return node.map((item) => normalizeJsonLogicTree(item, fromNodeKey))
+  }
+
+  if (!node || typeof node !== 'object') {
+    return node
+  }
+
+  const record = node as Record<string, unknown>
+  const keys = Object.keys(record)
+  const usesJsonLogic = keys.some((key) => JSON_LOGIC_OPERATORS.has(key))
+
+  if (!usesJsonLogic) {
+    return normalizeJsonLogicCondition(record, fromNodeKey)
+  }
+
+  const normalized: Record<string, unknown> = {}
+  for (const key of keys) {
+    normalized[key] = normalizeJsonLogicTree(record[key], fromNodeKey)
+  }
+  return normalized
+}
+
+function toJsonLogicData(answers: Record<string, unknown>): { answers: Record<string, unknown> } {
+  return JSON.parse(JSON.stringify({ answers })) as { answers: Record<string, unknown> }
+}
+
 function evaluateCondition(
   condition: Record<string, unknown>,
   answers: Record<string, unknown>,
+  fromNodeKey: string,
 ): boolean {
   try {
-    return Boolean(jsonLogic.apply(condition, { answers }))
+    const normalized = normalizeJsonLogicCondition(condition, fromNodeKey)
+    const data = toJsonLogicData(answers)
+    return Boolean(jsonLogic.apply(normalized, data))
   } catch {
     return false
   }
@@ -53,7 +155,7 @@ export function resolveNext(
   const rules = getApplicableRules(snapshot, currentNodeKey)
 
   for (const rule of rules.filter((r) => r.ruleType === 'result_map')) {
-    if (rule.targetResultKey && evaluateCondition(rule.condition, answers)) {
+    if (rule.targetResultKey && evaluateCondition(rule.condition, answers, rule.fromNodeKey)) {
       const result = getResultByKey(snapshot, rule.targetResultKey)
       if (result) {
         return { type: 'result', resultKey: result.resultKey, result }
@@ -62,7 +164,7 @@ export function resolveNext(
   }
 
   for (const rule of rules.filter((r) => r.ruleType === 'branch' || r.ruleType === 'skip')) {
-    if (rule.targetNodeKey && evaluateCondition(rule.condition, answers)) {
+    if (rule.targetNodeKey && evaluateCondition(rule.condition, answers, rule.fromNodeKey)) {
       const node = getNodeByKey(snapshot, rule.targetNodeKey)
       if (node) {
         return { type: 'node', nodeKey: node.nodeKey, node }
@@ -81,7 +183,7 @@ export function resolveNext(
   for (const rule of sortRulesByPriority(
     snapshot.rules.filter((r) => r.ruleType === 'result_map' && r.fromNodeKey === '*'),
   )) {
-    if (rule.targetResultKey && evaluateCondition(rule.condition, answers)) {
+    if (rule.targetResultKey && evaluateCondition(rule.condition, answers, rule.fromNodeKey)) {
       const result = getResultByKey(snapshot, rule.targetResultKey)
       if (result) {
         return { type: 'result', resultKey: result.resultKey, result }

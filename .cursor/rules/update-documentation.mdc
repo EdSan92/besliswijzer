@@ -1,0 +1,47 @@
+---
+description: Update project docs when adding or changing features
+alwaysApply: true
+---
+
+# Documentatie bij features
+
+Bij nieuwe features, endpoints, schema's, workflows of config: **update documentatie in dezelfde wijziging**. Geen aparte doc-PR tenzij de gebruiker dat vraagt.
+
+## Bron van waarheid
+
+| Document | Wanneer |
+|----------|---------|
+| `AI_CONTEXT.md` | Architectuur, domein, API, frontend, OE, workflows, bestandsindex |
+| `.env.example` | Nieuwe of gewijzigde environment variabelen |
+| `README.md` | Alleen quick start, scripts of projectstructuur |
+| `DEPLOY.md` | Deploy, infra, productie-env |
+| `apps/opportunity-engine/README.md` | Alleen OE-specifieke wijzigingen |
+
+Gebruik `@AI_CONTEXT.md` als referentie voor structuur en conventies.
+
+## Secties in `AI_CONTEXT.md`
+
+| Wijziging | Sectie |
+|-----------|--------|
+| API-endpoint | §7 API Reference + §14 Bestandsindex |
+| Database / schema | §4 Domeinmodel + §5 Database |
+| Shared package / content block | §6 Shared packages + §14 Bestandsindex |
+| Frontend pagina / composable | §8 Frontend + §14 Bestandsindex |
+| Opportunity pipeline / agent | §9 + §10 Kernworkflows |
+| Env var / dev command | §12 + §13 |
+| Architectuur | §3 + eventueel canvas |
+
+Content blocks: eerst type in `packages/product-schema`, dan component + registry — documenteer in §6 en §14.
+
+## Checklist (afvinken in PR/samenvatting)
+
+1. Relevante `AI_CONTEXT.md`-secties bijgewerkt
+2. `.env.example` bijgewerkt indien config wijzigt
+3. `README.md` / `DEPLOY.md` alleen indien nodig
+4. Datum onderaan `AI_CONTEXT.md` aangepast
+
+## Scope
+
+- Documenteer **gedrag en contracten**, geen line-by-line code dumps
+- Geen nieuwe markdown-bestanden tenzij de gebruiker dat vraagt
+- Verouderde info verwijderen of corrigeren, niet stapelen

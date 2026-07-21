@@ -23,7 +23,16 @@ async function main() {
     }),
   )
 
-  app.use('/api', createApiRouter(container.opportunityController, container.statisticsController))
+  app.use(
+    '/api',
+    createApiRouter(
+      container.opportunityController,
+      container.statisticsController,
+      container.productPageController,
+      container.productKeywordsController,
+      container.productFlowController,
+    ),
+  )
 
   app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     const { status, message } = formatError(error)

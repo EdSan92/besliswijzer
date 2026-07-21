@@ -28,5 +28,34 @@ export interface AIProvider {
 export function extractJsonFromText(text: string): unknown {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i)
   const candidate = fenced?.[1]?.trim() ?? text.trim()
-  return JSON.parse(candidate)
+
+  try {
+    return JSON.parse(candidate)
+  } catch {
+    const objectStart = candidate.indexOf('{')
+    const arrayStart = candidate.indexOf('[')
+    const start =
+      objectStart === -1
+        ? arrayStart
+        : arrayStart === -1
+          ? objectStart
+          : Math.min(objectStart, arrayStart)
+
+    if (start === -1) {
+      throw new Error('No JSON object found in AI response')
+    }
+
+    const slice = candidate.slice(start)
+    for (let end = slice.length; end > 0; end--) {
+      const fragment = slice.slice(0, end).trimEnd()
+      if (!fragment) continue
+      try {
+        return JSON.parse(fragment)
+      } catch {
+        // Try a shorter prefix when Gemini appends trailing text.
+      }
+    }
+
+    throw new Error('Failed to parse JSON from AI response')
+  }
 }

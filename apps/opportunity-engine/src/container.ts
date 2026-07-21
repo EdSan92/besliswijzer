@@ -6,6 +6,9 @@ import type { AIProvider } from './providers/ai/ai-provider.interface.js'
 import { GoogleKeywordInsightProvider } from './providers/keywords/google-keyword-insight.provider.js'
 import type { KeywordProvider } from './providers/keywords/keyword-provider.interface.js'
 import { OpportunityController } from './api/controllers/opportunity.controller.js'
+import { ProductFlowController } from './api/controllers/product-flow.controller.js'
+import { ProductKeywordsController } from './api/controllers/product-keywords.controller.js'
+import { ProductPageController } from './api/controllers/product-page.controller.js'
 import { StatisticsController } from './api/controllers/statistics.controller.js'
 import { AiCallRepository } from './repositories/ai-call.repository.js'
 import { CategoryRepository } from './repositories/category.repository.js'
@@ -16,13 +19,20 @@ import { PromptLogRepository } from './repositories/prompt-log.repository.js'
 import { DiscoveryService } from './services/discovery.service.js'
 import { OpportunityScorer } from './services/opportunity-scorer.service.js'
 import { OpportunityService } from './services/opportunity.service.js'
+import { ProductFlowAgent } from './services/product-flow.agent.js'
+import { ProductKeywordsService } from './services/product-keywords.service.js'
+import { ProductPageContentAgent } from './services/product-page-content.agent.js'
 import { PromptBuilder } from './services/prompt-builder.service.js'
 import { StatisticsService } from './services/statistics.service.js'
+import { BesliswijzerApiClient } from './clients/besliswijzer-api.client.js'
 
 export type AppContainer = {
   aiProvider: AIProvider
   keywordProvider: KeywordProvider
   opportunityController: OpportunityController
+  productPageController: ProductPageController
+  productKeywordsController: ProductKeywordsController
+  productFlowController: ProductFlowController
   statisticsController: StatisticsController
   discoveryService: DiscoveryService
 }
@@ -46,6 +56,10 @@ export function createContainer(): AppContainer {
 
   const opportunityScorer = new OpportunityScorer(aiProvider, promptBuilder, keywordRepo)
   const opportunityService = new OpportunityService(opportunityRepo, keywordRepo, categoryRepo)
+  const besliswijzerClient = new BesliswijzerApiClient()
+  const productPageAgent = new ProductPageContentAgent(aiProvider, promptBuilder, besliswijzerClient)
+  const productKeywordsService = new ProductKeywordsService(opportunityRepo, besliswijzerClient)
+  const productFlowAgent = new ProductFlowAgent(aiProvider, promptBuilder)
   const discoveryService = new DiscoveryService(
     categoryRepo,
     keywordRepo,
@@ -67,11 +81,17 @@ export function createContainer(): AppContainer {
     keywordRepo,
   )
   const statisticsController = new StatisticsController(statisticsService)
+  const productPageController = new ProductPageController(productPageAgent)
+  const productKeywordsController = new ProductKeywordsController(productKeywordsService)
+  const productFlowController = new ProductFlowController(productFlowAgent)
 
   return {
     aiProvider,
     keywordProvider,
     opportunityController,
+    productPageController,
+    productKeywordsController,
+    productFlowController,
     statisticsController,
     discoveryService,
   }

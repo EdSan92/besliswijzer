@@ -17,6 +17,7 @@
     "generate": "drizzle-kit generate",
     "migrate": "tsx src/migrate.ts",
     "seed": "tsx src/seed.ts",
+    "seed:product-page": "tsx src/seed-product-page.ts",
     "studio": "drizzle-kit studio",
     "lint": "tsc --noEmit"
   },

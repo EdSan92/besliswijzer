@@ -15,6 +15,13 @@
       "when": 1782764885591,
       "tag": "0001_tan_molten_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784752000000,
+      "tag": "0002_product_pages",
+      "breakpoints": true
     }
   ]
 }

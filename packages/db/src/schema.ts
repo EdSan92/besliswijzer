@@ -22,6 +22,7 @@ export const eventTypeEnum = pgEnum('event_type', [
   'cta_click',
   'lead_submit',
 ])
+export const pageStatusEnum = pgEnum('page_status', ['draft', 'published', 'archived'])
 
 export const flowCategories = pgTable('flow_categories', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -140,6 +141,48 @@ export const leadSubmissions = pgTable('lead_submissions', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
 
+export const products = pgTable('products', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  slug: text('slug').notNull().unique(),
+  canonicalName: text('canonical_name').notNull(),
+  title: text('title').notNull(),
+  categoryId: uuid('category_id').references(() => flowCategories.id, { onDelete: 'set null' }),
+  primaryFlowId: uuid('primary_flow_id').references(() => flows.id, { onDelete: 'set null' }),
+  status: pageStatusEnum('status').notNull().default('draft'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const productPages = pgTable('product_pages', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  productId: uuid('product_id')
+    .notNull()
+    .references(() => products.id, { onDelete: 'cascade' }),
+  slug: text('slug').notNull().unique(),
+  title: text('title').notNull(),
+  seoMeta: jsonb('seo_meta').notNull().default({}),
+  layout: jsonb('layout').notNull().default({ blockOrder: [] }),
+  blocks: jsonb('blocks').notNull().default([]),
+  status: pageStatusEnum('status').notNull().default('draft'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const productKeywords = pgTable(
+  'product_keywords',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    productId: uuid('product_id')
+      .notNull()
+      .references(() => products.id, { onDelete: 'cascade' }),
+    term: text('term').notNull(),
+    source: text('source').notNull().default('manual'),
+    opportunityId: text('opportunity_id'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex('product_keywords_product_term_idx').on(table.productId, table.term)],
+)
+
 export const flowsRelations = relations(flows, ({ many, one }) => ({
   versions: many(flowVersions),
   category: one(flowCategories, {
@@ -180,4 +223,31 @@ export const flowRulesRelations = relations(flowRules, ({ one }) => ({
 
 export const flowResultsRelations = relations(flowResults, ({ one }) => ({
   version: one(flowVersions, { fields: [flowResults.flowVersionId], references: [flowVersions.id] }),
+}))
+
+export const productsRelations = relations(products, ({ one, many }) => ({
+  category: one(flowCategories, {
+    fields: [products.categoryId],
+    references: [flowCategories.id],
+  }),
+  primaryFlow: one(flows, {
+    fields: [products.primaryFlowId],
+    references: [flows.id],
+  }),
+  pages: many(productPages),
+  keywords: many(productKeywords),
+}))
+
+export const productPagesRelations = relations(productPages, ({ one }) => ({
+  product: one(products, {
+    fields: [productPages.productId],
+    references: [products.id],
+  }),
+}))
+
+export const productKeywordsRelations = relations(productKeywords, ({ one }) => ({
+  product: one(products, {
+    fields: [productKeywords.productId],
+    references: [products.id],
+  }),
 }))

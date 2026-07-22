@@ -14,6 +14,16 @@ const emit = defineEmits<{
 
 const localValue = ref(props.modelValue)
 
+const multiLocalValue = computed<unknown[]>({
+  get() {
+    return Array.isArray(localValue.value) ? localValue.value : []
+  },
+  set(value) {
+    localValue.value = value
+    emit('update:modelValue', value)
+  },
+})
+
 const canSubmit = computed(() => {
   if (props.node.type === 'lead_capture' || props.node.type === 'info') {
     return true
@@ -69,8 +79,7 @@ function skipLead() {
     <FlowOptionMulti
       v-else-if="node.content.inputType === 'multi'"
       :options="node.options"
-      v-model="localValue"
-      @update:model-value="emit('update:modelValue', $event)"
+      v-model="multiLocalValue"
     />
 
     <div v-else-if="node.content.inputType === 'slider'" class="slider-wrap">

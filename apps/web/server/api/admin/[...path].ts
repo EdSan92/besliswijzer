@@ -1,4 +1,4 @@
-import { FetchError } from 'ofetch'
+import { FetchError, ofetch } from 'ofetch'
 import { resolveApiBase } from '~/utils/api-base'
 import { getBackendAdminHeaders, isAdminAuthenticated } from '../../utils/admin-auth'
 import { getAdminApiKey } from '../../utils/runtime-config'
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   const body = hasBody ? await readBody(event).catch(() => undefined) : undefined
 
   try {
-    return await $fetch(target, {
+    return await ofetch(target, {
       method,
       body,
       headers: getBackendAdminHeaders({ adminApiKey: getAdminApiKey(config.adminApiKey as string) }),

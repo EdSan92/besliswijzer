@@ -1,6 +1,6 @@
-import { FetchError } from 'ofetch'
+import { FetchError, ofetch } from 'ofetch'
 import { resolveOpportunityApiBase } from '~/utils/api-base'
-import { isAdminAuthenticated } from '../utils/admin-auth'
+import { isAdminAuthenticated } from '../../utils/admin-auth'
 
 export default defineEventHandler(async (event) => {
   if (!isAdminAuthenticated(event)) {
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   const body = hasBody ? await readBody(event).catch(() => undefined) : undefined
 
   try {
-    return await $fetch(target, { method, body })
+    return await ofetch(target, { method, body })
   } catch (error) {
     if (error instanceof FetchError) {
       const statusCode = error.statusCode ?? 502

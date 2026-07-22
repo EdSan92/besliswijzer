@@ -1,4 +1,4 @@
-import { FetchError } from 'ofetch'
+import { FetchError, ofetch } from 'ofetch'
 import { resolveApiBase } from '~/utils/api-base'
 
 export default defineEventHandler(async (event) => {
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const body = hasBody ? await readBody(event).catch(() => undefined) : undefined
 
   try {
-    return await $fetch(target, { method, body })
+    return await ofetch(target, { method, body })
   } catch (error) {
     if (error instanceof FetchError) {
       const statusCode = error.statusCode ?? 502

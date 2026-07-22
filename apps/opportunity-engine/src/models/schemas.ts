@@ -1,4 +1,9 @@
 import { z } from 'zod'
+import {
+  normalizeProductPageContentRaw,
+  PRODUCT_PAGE_FAQ_MAX,
+  PRODUCT_PAGE_FAQ_MIN,
+} from './product-page-content.js'
 
 export const keywordDataSchema = z.object({
   term: z.string().min(1),
@@ -69,10 +74,23 @@ export const flowDefinitionSchema = z.object({
 
 export type FlowDefinition = z.infer<typeof flowDefinitionSchema>
 
+export const faqItemSchema = z.object({
+  question: z.string().min(5),
+  answer: z.string().min(20),
+})
+
+export type FaqItem = z.infer<typeof faqItemSchema>
+
+export const routeOpportunityRequestSchema = z.object({
+  pageSlug: z.string().min(2),
+  faqItem: faqItemSchema,
+})
+
 export const discoverRequestSchema = z.object({
   seedCategories: z.array(z.string().min(1)).optional(),
   maxKeywordsPerCategory: z.number().int().min(1).max(50).default(10),
   autoGenerateFlows: z.number().int().min(0).max(20).optional(),
+  autoRouteFaq: z.number().int().min(0).max(20).optional(),
 })
 
 export const generateFlowsRequestSchema = z.object({
@@ -81,8 +99,77 @@ export const generateFlowsRequestSchema = z.object({
 })
 
 export const listOpportunitiesQuerySchema = z.object({
-  status: z.enum(['NEW', 'FLOW_GENERATED', 'PUBLISHED', 'REJECTED']).optional(),
+  status: z
+    .enum(['NEW', 'FLOW_GENERATED', 'PUBLISHED', 'REJECTED', 'ROUTED_TO_PRODUCT'])
+    .optional(),
   minScore: z.coerce.number().min(0).max(100).optional(),
   limit: z.coerce.number().int().min(1).max(100).default(20),
   offset: z.coerce.number().int().min(0).default(0),
 })
+
+const productPageContentObjectSchema = z.object({
+  pageTitle: z.string().min(1),
+  pageSlug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+  seo: z.object({
+    title: z.string().min(1),
+    description: z.string().min(1),
+  }),
+  hero: z.object({
+    headline: z.string().min(1),
+    subheadline: z.string().optional(),
+    badges: z.array(z.string()).optional(),
+  }),
+  intro: z.object({
+    title: z.string().optional(),
+    body: z.string().min(1),
+  }),
+  faqItems: z.array(faqItemSchema).min(PRODUCT_PAGE_FAQ_MIN).max(PRODUCT_PAGE_FAQ_MAX),
+})
+
+export const productPageContentSchema = z.preprocess(
+  normalizeProductPageContentRaw,
+  productPageContentObjectSchema,
+)
+
+export type ProductPageContent = z.infer<typeof productPageContentSchema>
+
+export const contentKeywordSchema = z.object({
+  term: z.string().min(1),
+  opportunityId: z.string().optional(),
+  score: z.number().optional(),
+  categoryName: z.string().optional(),
+})
+
+export type ContentKeyword = z.infer<typeof contentKeywordSchema>
+
+export const generateProductPageRequestSchema = z.object({
+  productSlug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+  productTitle: z.string().min(1),
+  canonicalName: z.string().min(1),
+  categoryTitle: z.string().min(1),
+  categoryId: z.string().uuid().optional(),
+  flowId: z.string().uuid(),
+  flowSlug: z.string().min(2),
+  flowTitle: z.string().min(1),
+  pageSlug: z.string().min(2).regex(/^[a-z0-9-]+$/).optional(),
+  seedKeywords: z.array(z.string().min(1)).optional(),
+  contentKeywords: z.array(contentKeywordSchema).optional(),
+  publish: z.boolean().default(false),
+})
+
+export const regenerateProductPageRequestSchema = generateProductPageRequestSchema.extend({
+  pageSlug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+})
+
+export type RegenerateProductPageRequest = z.infer<typeof regenerateProductPageRequestSchema>
+
+export const generateProductFlowRequestSchema = z.object({
+  productSlug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+  productTitle: z.string().min(1),
+  canonicalName: z.string().min(1),
+  categoryTitle: z.string().min(1),
+  flowSlug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+  keywords: z.array(z.string().min(1)).min(1),
+})
+
+export type GenerateProductFlowRequest = z.infer<typeof generateProductFlowRequestSchema>

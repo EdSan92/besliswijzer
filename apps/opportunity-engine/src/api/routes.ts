@@ -34,6 +34,18 @@ export function createApiRouter(
     opportunityController.generateFlow(req, res).catch(next)
   })
 
+  router.post('/opportunities/:id/publish', (req, res, next) => {
+    opportunityController.publish(req, res).catch(next)
+  })
+
+  router.post('/opportunities/:id/generate-faq', (req, res, next) => {
+    opportunityController.generateFaq(req, res).catch(next)
+  })
+
+  router.post('/opportunities/:id/route', (req, res, next) => {
+    opportunityController.markRouted(req, res).catch(next)
+  })
+
   router.get('/statistics', (req, res, next) => {
     statisticsController.get(req, res).catch(next)
   })

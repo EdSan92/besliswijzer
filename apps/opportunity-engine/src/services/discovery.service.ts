@@ -12,6 +12,7 @@ import { FlowStepTracker } from '../utils/flow-step-tracker.js'
 import type { FlowStep } from '../utils/flow-step-tracker.js'
 import type { OpportunityScorer } from './opportunity-scorer.service.js'
 import type { OpportunityService } from './opportunity.service.js'
+import type { ProductRouterService } from './product-router.service.js'
 import type { PromptBuilder } from './prompt-builder.service.js'
 
 const seedKeywordsSchema = z.object({
@@ -24,6 +25,8 @@ export type DiscoveryResult = {
   opportunitiesFound: number
   opportunitiesStored: number
   flowsGenerated: number
+  faqsRouted: number
+  faqsSkipped: number
   scoresFromCache: number
   scoresFromApi: number
   apiBatches: number
@@ -42,12 +45,14 @@ export class DiscoveryService {
     private readonly promptBuilder: PromptBuilder,
     private readonly aiProvider: AIProvider,
     private readonly discoveryRunRepo: DiscoveryRunRepository,
+    private readonly productRouter: ProductRouterService,
   ) {}
 
   async discover(options?: {
     seedCategories?: string[]
     maxKeywordsPerCategory?: number
     autoGenerateFlows?: number
+    autoRouteFaq?: number
   }): Promise<DiscoveryResult> {
     const start = Date.now()
     const errors: string[] = []
@@ -130,13 +135,42 @@ export class DiscoveryService {
 
     tracker.complete('store-opportunities', `${stored} nieuwe opportunities opgeslagen`)
 
+    const autoRouteLimit = options?.autoRouteFaq ?? getConfig().DISCOVERY_AUTO_ROUTE_FAQ
+    let faqsRouted = 0
+    let faqsSkipped = 0
+
+    tracker.start('route-faq', 'FAQ naar productpagina\'s routeren')
+
+    if (autoRouteLimit > 0 && createdOpportunities.length > 0) {
+      const topIds = createdOpportunities
+        .sort((a, b) => b.score - a.score)
+        .slice(0, autoRouteLimit)
+        .map((item) => item.id)
+
+      const routeResult = await this.productRouter.routeBatch(
+        topIds,
+        this.aiProvider,
+        this.promptBuilder,
+      )
+      faqsRouted = routeResult.routed
+      faqsSkipped = routeResult.skipped
+      errors.push(...routeResult.errors.map((e) => `Route ${e}`))
+    }
+
+    tracker.complete(
+      'route-faq',
+      autoRouteLimit > 0
+        ? `${faqsRouted} FAQ's gerouteerd · ${faqsSkipped} overgeslagen (top ${autoRouteLimit})`
+        : 'Overgeslagen (auto-routering uit)',
+    )
+
     const autoGenerateLimit =
       options?.autoGenerateFlows ?? getConfig().DISCOVERY_AUTO_GENERATE_FLOWS
     let flowsGenerated = 0
 
-    tracker.start('generate-flows', 'Beslis-flows genereren')
-
     if (autoGenerateLimit > 0 && createdOpportunities.length > 0) {
+      tracker.start('generate-flows', 'Beslis-flows genereren (legacy)')
+
       const topIds = createdOpportunities
         .sort((a, b) => b.score - a.score)
         .slice(0, autoGenerateLimit)
@@ -149,14 +183,12 @@ export class DiscoveryService {
       )
       flowsGenerated = flowResult.generated
       errors.push(...flowResult.errors.map((e) => `Flow ${e}`))
-    }
 
-    tracker.complete(
-      'generate-flows',
-      autoGenerateLimit > 0
-        ? `${flowsGenerated} flows gegenereerd (top ${autoGenerateLimit})`
-        : 'Overgeslagen (auto-generatie uit)',
-    )
+      tracker.complete(
+        'generate-flows',
+        `${flowsGenerated} flows gegenereerd (top ${autoGenerateLimit})`,
+      )
+    }
 
     tracker.start('save-run', 'Discovery-run opslaan')
 
@@ -166,6 +198,8 @@ export class DiscoveryService {
       opportunitiesFound: scores.length,
       opportunitiesStored: stored,
       flowsGenerated,
+      faqsRouted,
+      faqsSkipped,
       scoresFromCache: scoreResult.fromCache,
       scoresFromApi: scoreResult.fromApi,
       apiBatches: scoreResult.apiBatches,

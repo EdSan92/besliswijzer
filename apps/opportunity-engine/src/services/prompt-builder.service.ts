@@ -1,4 +1,5 @@
 import { buildDiscoverSeedPrompt } from '../prompts/discover-seed.prompt.js'
+import { buildGenerateFaqPrompt } from '../prompts/generate-faq.prompt.js'
 import { buildGenerateFlowPrompt } from '../prompts/generate-flow.prompt.js'
 import {
   buildGenerateProductFlowPrompt,
@@ -27,6 +28,10 @@ export class PromptBuilder {
 
   generateFlow(opportunity: Parameters<typeof buildGenerateFlowPrompt>[0]): string {
     return buildGenerateFlowPrompt(opportunity)
+  }
+
+  generateFaq(opportunity: Parameters<typeof buildGenerateFaqPrompt>[0]): string {
+    return buildGenerateFaqPrompt(opportunity)
   }
 
   generateProductPage(input: ProductPagePromptInput): string {

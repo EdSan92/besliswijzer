@@ -9,6 +9,7 @@ describe('opportunity request schemas', () => {
   it('applies discover defaults', () => {
     const parsed = discoverRequestSchema.parse({})
     expect(parsed.maxKeywordsPerCategory).toBe(10)
+    expect(parsed.autoRouteFaq).toBeUndefined()
   })
 
   it('validates generate flows request defaults', () => {

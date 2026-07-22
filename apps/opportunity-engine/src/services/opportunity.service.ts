@@ -1,6 +1,6 @@
 import type { Opportunity, OpportunityStatus } from '@prisma/client'
 import type { FlowDefinition, OpportunityScore } from '../models/schemas.js'
-import { flowDefinitionSchema } from '../models/schemas.js'
+import { flowDefinitionSchema, faqItemSchema } from '../models/schemas.js'
 import type { AIProvider } from '../providers/ai/ai-provider.interface.js'
 import { logger } from '../utils/logger.js'
 import type { CategoryRepository } from '../repositories/category.repository.js'
@@ -80,6 +80,44 @@ export class OpportunityService {
     })
 
     return this.opportunityRepo.saveFlowDefinition(id, data as FlowDefinition)
+  }
+
+  async generateFaqItem(
+    id: string,
+    aiProvider: AIProvider,
+    promptBuilder: PromptBuilder,
+  ): Promise<Opportunity> {
+    const opportunity = await this.opportunityRepo.findById(id)
+    if (!opportunity) throw new Error('Opportunity not found')
+
+    const existingFaq = opportunity.faqItem as { question?: string; answer?: string } | null
+    if (existingFaq?.question && existingFaq?.answer) {
+      return opportunity
+    }
+
+    const score: OpportunityScore = {
+      keyword: opportunity.keywordTerm,
+      category: opportunity.categoryName,
+      score: opportunity.score,
+      reasons: opportunity.reasons as string[],
+      estimatedCommission: opportunity.estimatedCommission ?? 0,
+      confidence: opportunity.confidence,
+    }
+
+    const prompt = promptBuilder.generateFaq(score)
+    const { data } = await aiProvider.generateObject(faqItemSchema, prompt, {
+      promptName: 'generate-faq',
+    })
+
+    return this.opportunityRepo.saveFaqItem(id, data)
+  }
+
+  async markRoutedToProduct(
+    id: string,
+    faqItem: { question: string; answer: string },
+    pageSlug: string,
+  ): Promise<Opportunity> {
+    return this.opportunityRepo.saveFaqRouting(id, faqItem, pageSlug)
   }
 
   async generateFlowsBatch(

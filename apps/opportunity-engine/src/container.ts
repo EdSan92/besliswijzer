@@ -22,6 +22,7 @@ import { OpportunityService } from './services/opportunity.service.js'
 import { ProductFlowAgent } from './services/product-flow.agent.js'
 import { ProductKeywordsService } from './services/product-keywords.service.js'
 import { ProductPageContentAgent } from './services/product-page-content.agent.js'
+import { ProductRouterService } from './services/product-router.service.js'
 import { PromptBuilder } from './services/prompt-builder.service.js'
 import { StatisticsService } from './services/statistics.service.js'
 import { BesliswijzerApiClient } from './clients/besliswijzer-api.client.js'
@@ -57,6 +58,7 @@ export function createContainer(): AppContainer {
   const opportunityScorer = new OpportunityScorer(aiProvider, promptBuilder, keywordRepo)
   const opportunityService = new OpportunityService(opportunityRepo, keywordRepo, categoryRepo)
   const besliswijzerClient = new BesliswijzerApiClient()
+  const productRouter = new ProductRouterService(besliswijzerClient, opportunityService)
   const productPageAgent = new ProductPageContentAgent(aiProvider, promptBuilder, besliswijzerClient)
   const productKeywordsService = new ProductKeywordsService(opportunityRepo, besliswijzerClient)
   const productFlowAgent = new ProductFlowAgent(aiProvider, promptBuilder)
@@ -69,6 +71,7 @@ export function createContainer(): AppContainer {
     promptBuilder,
     aiProvider,
     discoveryRunRepo,
+    productRouter,
   )
   const statisticsService = new StatisticsService(opportunityRepo, aiCallRepo, discoveryRunRepo)
 

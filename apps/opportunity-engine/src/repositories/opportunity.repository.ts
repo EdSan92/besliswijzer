@@ -74,6 +74,30 @@ export class OpportunityRepository {
     })
   }
 
+  async saveFaqRouting(
+    id: string,
+    faqItem: { question: string; answer: string },
+    pageSlug: string,
+  ): Promise<Opportunity> {
+    return prisma.opportunity.update({
+      where: { id },
+      data: {
+        faqItem: faqItem as Prisma.InputJsonValue,
+        routedPageSlug: pageSlug,
+        status: 'ROUTED_TO_PRODUCT',
+      },
+    })
+  }
+
+  async saveFaqItem(id: string, faqItem: { question: string; answer: string }): Promise<Opportunity> {
+    return prisma.opportunity.update({
+      where: { id },
+      data: {
+        faqItem: faqItem as Prisma.InputJsonValue,
+      },
+    })
+  }
+
   async findNewWithoutFlow(limit: number): Promise<Opportunity[]> {
     return prisma.opportunity.findMany({
       where: { status: 'NEW' },
@@ -92,6 +116,7 @@ export class OpportunityRepository {
       FLOW_GENERATED: 0,
       PUBLISHED: 0,
       REJECTED: 0,
+      ROUTED_TO_PRODUCT: 0,
       ...Object.fromEntries(groups.map((g) => [g.status, g._count._all])),
     } as Record<OpportunityStatus, number>
   }

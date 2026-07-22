@@ -33,7 +33,10 @@ const envSchema = z.object({
     .default('true'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   OPPORTUNITY_MIN_SCORE: z.coerce.number().default(60),
-  DISCOVERY_AUTO_GENERATE_FLOWS: z.coerce.number().default(5),
+  DISCOVERY_AUTO_ROUTE_FAQ: z.coerce.number().default(5),
+  DISCOVERY_AUTO_GENERATE_FLOWS: z.coerce.number().default(0),
+  BESLIJSWIJZER_API_BASE: z.string().url().default('http://localhost:3101'),
+  ADMIN_API_KEY: z.string().default('dev-admin-key'),
   SCORE_BATCH_SIZE: z.coerce.number().default(15),
   SCORE_CACHE_TTL_DAYS: z.coerce.number().default(30),
 })

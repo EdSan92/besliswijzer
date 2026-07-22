@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { discoverRequestSchema, generateFlowsRequestSchema, listOpportunitiesQuerySchema } from '../../models/schemas.js'
+import { discoverRequestSchema, generateFlowsRequestSchema, listOpportunitiesQuerySchema, routeOpportunityRequestSchema } from '../../models/schemas.js'
 import type { DiscoveryService } from '../../services/discovery.service.js'
 import type { OpportunityScorer } from '../../services/opportunity-scorer.service.js'
 import type { OpportunityService } from '../../services/opportunity.service.js'
@@ -83,5 +83,32 @@ export class OpportunityController {
     )
 
     res.json(result)
+  }
+
+  publish = async (req: Request, res: Response): Promise<void> => {
+    const id = String(req.params.id)
+    const opportunity = await this.opportunityService.markPublished(id)
+    res.json({ opportunity })
+  }
+
+  generateFaq = async (req: Request, res: Response): Promise<void> => {
+    const id = String(req.params.id)
+    const opportunity = await this.opportunityService.generateFaqItem(
+      id,
+      this.aiProvider,
+      this.promptBuilder,
+    )
+    res.json({ opportunity })
+  }
+
+  markRouted = async (req: Request, res: Response): Promise<void> => {
+    const id = String(req.params.id)
+    const body = routeOpportunityRequestSchema.parse(req.body ?? {})
+    const opportunity = await this.opportunityService.markRoutedToProduct(
+      id,
+      body.faqItem,
+      body.pageSlug,
+    )
+    res.json({ opportunity })
   }
 }

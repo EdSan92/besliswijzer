@@ -28,8 +28,31 @@ import {
   listUncategorizedPublishedFlows,
   searchPublishedFlows,
 } from '../services/category-service.js'
+import {
+  buildFlowToProductPageSlugMap,
+  getPublishedProductPage,
+  listPublishedProductPageSlugs,
+} from '../services/product-page-service.js'
 
 export async function registerPublicRoutes(app: FastifyInstance) {
+  app.get('/api/v1/public/flows/page-links', async () => {
+    const links = await buildFlowToProductPageSlugMap(app.db)
+    return { links }
+  })
+
+  app.get('/api/v1/public/pages', async () => {
+    const slugs = await listPublishedProductPageSlugs(app.db)
+    return { pages: slugs }
+  })
+
+  app.get<{ Params: { slug: string } }>('/api/v1/public/pages/:slug', async (request, reply) => {
+    const page = await getPublishedProductPage(app.db, request.params.slug)
+    if (!page) {
+      return reply.status(404).send({ error: 'Page not found' })
+    }
+    return page
+  })
+
   app.get('/api/v1/public/categories', async () => {
     const categories = await listPublishedFlowsByCategory(app.db)
     const uncategorized = await listUncategorizedPublishedFlows(app.db)

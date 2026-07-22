@@ -9,6 +9,7 @@ import {
   flowRules,
   flowCategories,
   flows,
+  products,
 } from '@besliswijzer/db'
 import {
   flowNodeSchema,
@@ -19,6 +20,7 @@ import {
   flowDefinitionSchema,
   seoMetaSchema,
 } from '@besliswijzer/flow-schema'
+import { contentBlockSchema, type ContentBlock } from '@besliswijzer/product-schema'
 import {
   ensureDraftVersion,
   getDraftVersion,
@@ -34,6 +36,24 @@ import {
   exportLeadsCsv,
   getAnalyticsSummary,
 } from '../services/analytics-service.js'
+import {
+  appendFaqToProductPage,
+  matchProductForOpportunity,
+} from '../services/product-router-service.js'
+import {
+  createProductPage,
+  generateProductPageForProductSlug,
+  getAdminProductPage,
+  listAdminProductPages,
+  listAdminProducts,
+  publishProductPage,
+  regenerateProductPageViaOpportunity,
+  unpublishProductPage,
+  updateProductPage,
+  syncProductKeywords,
+  type UpdateProductPageInput,
+} from '../services/product-page-service.js'
+import { isArchivedFlow } from '../services/flow-admin-service.js'
 
 async function verifyAdminKey(request: FastifyRequest, reply: FastifyReply): Promise<boolean> {
   const key = request.headers['x-admin-key']
@@ -42,6 +62,19 @@ async function verifyAdminKey(request: FastifyRequest, reply: FastifyReply): Pro
     return false
   }
   return true
+}
+
+function parseAdminBody<T>(
+  schema: z.ZodType<T>,
+  body: unknown,
+  reply: FastifyReply,
+): T | null {
+  const parsed = schema.safeParse(body)
+  if (!parsed.success) {
+    reply.status(400).send({ error: 'Validation error', details: parsed.error.flatten() })
+    return null
+  }
+  return parsed.data
 }
 
 async function createAdminToken(jwtSecret: string) {
@@ -98,6 +131,7 @@ export async function registerAdminRoutes(app: FastifyInstance) {
       seo: flow.seoMeta,
       currentPublishedVersionId: flow.currentPublishedVersionId,
       publishedVersionNumber: flow.currentPublishedVersion?.versionNumber ?? null,
+      archived: isArchivedFlow(flow),
       createdAt: flow.createdAt,
     }))
   })
@@ -107,6 +141,272 @@ export async function registerAdminRoutes(app: FastifyInstance) {
       orderBy: (c, { asc }) => [asc(c.sortOrder), asc(c.title)],
       with: { flows: true },
     })
+  })
+
+  app.get<{ Querystring: { keyword?: string; category?: string } }>(
+    '/api/v1/admin/products/match',
+    async (request, reply) => {
+      const keyword = (request.query.keyword ?? '').trim()
+      if (keyword.length < 2) {
+        return reply.status(400).send({ error: 'keyword is required' })
+      }
+
+      try {
+        const match = await matchProductForOpportunity(
+          app.db,
+          keyword,
+          request.query.category?.trim(),
+        )
+        return { match: match ?? null }
+      } catch (error) {
+        request.log.error({ error, keyword }, 'Product match query failed')
+        const message = error instanceof Error ? error.message : 'Product match failed'
+        return reply.status(500).send({ error: message, keyword })
+      }
+    },
+  )
+
+  app.get('/api/v1/admin/product-pages', async () => {
+    const pages = await listAdminProductPages(app.db)
+    return { pages }
+  })
+
+  app.get('/api/v1/admin/products', async () => {
+    const products = await listAdminProducts(app.db)
+    return { products }
+  })
+
+  app.post<{ Params: { slug: string } }>(
+    '/api/v1/admin/products/:slug/generate-page',
+    async (request, reply) => {
+      const opportunityApiBase = process.env.OPPORTUNITY_API_BASE
+      if (!opportunityApiBase) {
+        return reply.status(500).send({ error: 'OPPORTUNITY_API_BASE is not configured' })
+      }
+
+      try {
+        const result = await generateProductPageForProductSlug(
+          app.db,
+          request.params.slug,
+          opportunityApiBase,
+        )
+        return result
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Generate failed'
+        const status = message.includes('al een productpagina') ? 409 : 400
+        return reply.status(status).send({ error: message })
+      }
+    },
+  )
+
+  app.get<{ Params: { slug: string } }>(
+    '/api/v1/admin/product-pages/:slug',
+    async (request, reply) => {
+      const page = await getAdminProductPage(app.db, request.params.slug)
+      if (!page) {
+        return reply.status(404).send({ error: 'Product page not found' })
+      }
+      return page
+    },
+  )
+
+  app.post<{ Params: { slug: string } }>(
+    '/api/v1/admin/product-pages/:slug/publish',
+    async (request, reply) => {
+      try {
+        const result = await publishProductPage(app.db, request.params.slug)
+        return result
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Publish failed'
+        return reply.status(400).send({ error: message })
+      }
+    },
+  )
+
+  app.post<{ Params: { slug: string } }>(
+    '/api/v1/admin/product-pages/:slug/unpublish',
+    async (request, reply) => {
+      try {
+        const result = await unpublishProductPage(app.db, request.params.slug)
+        return result
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unpublish failed'
+        return reply.status(400).send({ error: message })
+      }
+    },
+  )
+
+  app.put<{ Params: { slug: string } }>(
+    '/api/v1/admin/products/:slug/keywords',
+    async (request, reply) => {
+      const body = z
+        .object({
+          productId: z.string().uuid(),
+          keywords: z.array(
+            z.object({
+              term: z.string().min(1),
+              opportunityId: z.string().optional(),
+              score: z.number().optional(),
+            }),
+          ),
+        })
+        .parse(request.body)
+
+      const product = await app.db.query.products.findFirst({
+        where: eq(products.slug, request.params.slug),
+        columns: { id: true },
+      })
+
+      if (!product || product.id !== body.productId) {
+        return reply.status(404).send({ error: 'Product not found' })
+      }
+
+      const synced = await syncProductKeywords(
+        app.db,
+        product.id,
+        body.keywords.map((keyword) => ({
+          term: keyword.term,
+          opportunityId: keyword.opportunityId ?? null,
+        })),
+      )
+
+      return { synced }
+    },
+  )
+
+  app.post<{ Params: { slug: string } }>(
+    '/api/v1/admin/product-pages/:slug/regenerate',
+    async (request, reply) => {
+      const opportunityApiBase = process.env.OPPORTUNITY_API_BASE
+      if (!opportunityApiBase) {
+        return reply.status(500).send({ error: 'OPPORTUNITY_API_BASE is not configured' })
+      }
+
+      try {
+        const result = await regenerateProductPageViaOpportunity(
+          app.db,
+          request.params.slug,
+          opportunityApiBase,
+        )
+        return result
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Regenerate failed'
+        return reply.status(400).send({ error: message })
+      }
+    },
+  )
+
+  app.patch<{ Params: { slug: string } }>(
+    '/api/v1/admin/product-pages/:slug',
+    async (request, reply) => {
+      const body = parseAdminBody(
+        z.object({
+          page: z.object({
+            title: z.string().min(1).optional(),
+            seoMeta: z
+              .object({
+                title: z.string().min(1),
+                description: z.string().min(1),
+                twitterCard: z.enum(['summary', 'summary_large_image']).optional(),
+              })
+              .optional(),
+            layout: z.object({ blockOrder: z.array(z.string()) }).optional(),
+            blocks: z.array(contentBlockSchema).optional(),
+          }),
+        }),
+        request.body,
+        reply,
+      )
+      if (!body) return
+
+      try {
+        const pageInput: UpdateProductPageInput = {
+          ...(body.page.title !== undefined ? { title: body.page.title } : {}),
+          ...(body.page.seoMeta !== undefined ? { seoMeta: body.page.seoMeta } : {}),
+          ...(body.page.layout !== undefined ? { layout: body.page.layout } : {}),
+          ...(body.page.blocks !== undefined
+            ? {
+                blocks: body.page.blocks.map((block) =>
+                  contentBlockSchema.parse(block),
+                ) as ContentBlock[],
+              }
+            : {}),
+        }
+        const result = await updateProductPage(app.db, request.params.slug, pageInput)
+        return result
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Update failed'
+        return reply.status(400).send({ error: message })
+      }
+    },
+  )
+
+  app.post<{ Params: { slug: string } }>(
+    '/api/v1/admin/product-pages/:slug/faq-items',
+    async (request, reply) => {
+      const body = z
+        .object({
+          opportunityId: z.string().min(1),
+          keywordTerm: z.string().min(1),
+          question: z.string().min(5),
+          answer: z.string().min(20),
+        })
+        .parse(request.body)
+
+      try {
+        const result = await appendFaqToProductPage(app.db, request.params.slug, body)
+        return result
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Failed to append FAQ'
+        return reply.status(400).send({ error: message })
+      }
+    },
+  )
+
+  app.post('/api/v1/admin/product-pages', async (request, reply) => {
+    const body = parseAdminBody(
+      z.object({
+        product: z.object({
+          slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+          title: z.string().min(1),
+          canonicalName: z.string().min(1),
+          categoryId: z.string().uuid().nullable().optional(),
+          primaryFlowId: z.string().uuid(),
+        }),
+        page: z.object({
+          slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+          title: z.string().min(1),
+          seoMeta: z.object({
+            title: z.string().min(1),
+            description: z.string().min(1),
+            twitterCard: z.enum(['summary', 'summary_large_image']).optional(),
+          }),
+          layout: z.object({
+            blockOrder: z.array(z.string()),
+          }),
+          blocks: z.array(contentBlockSchema),
+          status: z.enum(['draft', 'published']).default('draft'),
+        }),
+      }),
+      request.body,
+      reply,
+    )
+    if (!body) return
+
+    try {
+      const result = await createProductPage(app.db, {
+        product: body.product,
+        page: {
+          ...body.page,
+          blocks: body.page.blocks.map((block) => contentBlockSchema.parse(block)) as ContentBlock[],
+        },
+      })
+      return result
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create product page'
+      const status = message.includes('already exists') ? 409 : 400
+      return reply.status(status).send({ error: message })
+    }
   })
 
   app.post('/api/v1/admin/categories', async (request) => {

@@ -1,8 +1,13 @@
 import { eq, isNotNull, sql } from 'drizzle-orm'
 import { analyticsEvents, flows, flowCategories, type Database } from '@besliswijzer/db'
 import type { FlowSearchResult, PopularFlowItem } from '@besliswijzer/flow-schema'
+import {
+  filterFlowsForPublicCatalog,
+  loadVisiblePublishedFlowSlugs,
+} from './flow-catalog-service.js'
 
 export async function listPublishedFlowsByCategory(db: Database) {
+  const visibleSlugs = await loadVisiblePublishedFlowSlugs(db)
   const categories = await db.query.flowCategories.findMany({
     orderBy: (c, { asc: ascFn }) => [ascFn(c.sortOrder), ascFn(c.title)],
     with: {
@@ -18,16 +23,20 @@ export async function listPublishedFlowsByCategory(db: Database) {
     slug: category.slug,
     title: category.title,
     description: category.description,
-    flows: category.flows.map((flow) => ({
-      id: flow.id,
-      slug: flow.slug,
-      title: flow.title,
-      seo: flow.seoMeta,
-    })),
+    flows: filterFlowsForPublicCatalog(
+      category.flows.map((flow) => ({
+        id: flow.id,
+        slug: flow.slug,
+        title: flow.title,
+        seo: flow.seoMeta,
+      })),
+      visibleSlugs,
+    ),
   }))
 }
 
 export async function getCategoryWithFlows(db: Database, slug: string) {
+  const visibleSlugs = await loadVisiblePublishedFlowSlugs(db)
   const category = await db.query.flowCategories.findFirst({
     where: eq(flowCategories.slug, slug),
     with: {
@@ -45,32 +54,40 @@ export async function getCategoryWithFlows(db: Database, slug: string) {
     slug: category.slug,
     title: category.title,
     description: category.description,
-    flows: category.flows.map((flow) => ({
-      id: flow.id,
-      slug: flow.slug,
-      title: flow.title,
-      seo: flow.seoMeta,
-    })),
+    flows: filterFlowsForPublicCatalog(
+      category.flows.map((flow) => ({
+        id: flow.id,
+        slug: flow.slug,
+        title: flow.title,
+        seo: flow.seoMeta,
+      })),
+      visibleSlugs,
+    ),
   }
 }
 
 export async function listUncategorizedPublishedFlows(db: Database) {
+  const visibleSlugs = await loadVisiblePublishedFlowSlugs(db)
   const allFlows = await db.query.flows.findMany({
     where: isNotNull(flows.currentPublishedVersionId),
     orderBy: (f, { asc: ascFn }) => [ascFn(f.title)],
   })
 
-  return allFlows
-    .filter((flow) => !flow.categoryId)
-    .map((flow) => ({
-      id: flow.id,
-      slug: flow.slug,
-      title: flow.title,
-      seo: flow.seoMeta,
-    }))
+  return filterFlowsForPublicCatalog(
+    allFlows
+      .filter((flow) => !flow.categoryId)
+      .map((flow) => ({
+        id: flow.id,
+        slug: flow.slug,
+        title: flow.title,
+        seo: flow.seoMeta,
+      })),
+    visibleSlugs,
+  )
 }
 
 export async function listPopularPublishedFlows(db: Database, limit = 6): Promise<PopularFlowItem[]> {
+  const visibleSlugs = await loadVisiblePublishedFlowSlugs(db)
   const publishedFlows = await db.query.flows.findMany({
     where: isNotNull(flows.currentPublishedVersionId),
     with: { category: true },
@@ -91,6 +108,7 @@ export async function listPopularPublishedFlows(db: Database, limit = 6): Promis
   const startsByFlowId = new Map(startCounts.map((row) => [row.flowId, row.starts]))
 
   return publishedFlows
+    .filter((flow) => visibleSlugs.has(flow.slug))
     .map((flow) => ({
       id: flow.id,
       slug: flow.slug,
@@ -107,6 +125,7 @@ export async function searchPublishedFlows(
   query: string,
   limit = 8,
 ): Promise<FlowSearchResult[]> {
+  const visibleSlugs = await loadVisiblePublishedFlowSlugs(db)
   const term = query.trim()
   if (term.length < 2) return []
 
@@ -147,7 +166,9 @@ export async function searchPublishedFlows(
     LIMIT ${limit}
   `)
 
-  return rows.map((row) => ({
+  return rows
+    .filter((row) => visibleSlugs.has(row.slug))
+    .map((row) => ({
     id: row.id,
     slug: row.slug,
     title: row.title,

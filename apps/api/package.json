@@ -15,6 +15,7 @@
     "@besliswijzer/db": "workspace:*",
     "@besliswijzer/flow-engine": "workspace:*",
     "@besliswijzer/flow-schema": "workspace:*",
+    "@besliswijzer/product-schema": "workspace:*",
     "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^10.0.2",
     "@fastify/rate-limit": "^10.2.0",

@@ -9,6 +9,7 @@ import {
   type Database,
 } from '@besliswijzer/db'
 import type { FlowNode, FlowResult, FlowRule, FlowSnapshot, SeoMeta } from '@besliswijzer/flow-schema'
+import { normalizeJsonLogicCondition } from '@besliswijzer/flow-engine'
 
 function mapNode(
   node: typeof flowNodes.$inferSelect & { options?: (typeof flowOptions.$inferSelect)[] },
@@ -69,7 +70,10 @@ export async function loadFlowSnapshot(
         id: rule.id,
         fromNodeKey: rule.fromNodeKey,
         ruleType: rule.ruleType,
-        condition: rule.condition as Record<string, unknown>,
+        condition: normalizeJsonLogicCondition(
+          rule.condition as Record<string, unknown>,
+          rule.fromNodeKey,
+        ),
         targetNodeKey: rule.targetNodeKey,
         targetResultKey: rule.targetResultKey,
         priority: rule.priority,

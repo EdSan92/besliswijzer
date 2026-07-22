@@ -30,11 +30,6 @@ await app.register(cors, {
   credentials: true,
 })
 
-await app.register(rateLimit, {
-  max: 100,
-  timeWindow: '1 minute',
-})
-
 app.decorate('db', db)
 app.decorate('config', {
   adminApiKey: process.env.ADMIN_API_KEY ?? 'dev-admin-key',
@@ -42,11 +37,34 @@ app.decorate('config', {
   jwtSecret: process.env.JWT_SECRET ?? 'dev-jwt-secret',
 })
 
+await app.register(async (publicApp) => {
+  await publicApp.register(rateLimit, {
+    max: 100,
+    timeWindow: '1 minute',
+  })
+  await registerPublicRoutes(publicApp)
+})
+
 app.get('/health', async () => ({ status: 'ok' }))
 
+function isZodError(error: unknown): error is ZodError {
+  return error instanceof ZodError || (error as { name?: string }).name === 'ZodError'
+}
+
 app.setErrorHandler((error, _request, reply) => {
-  if (error instanceof ZodError) {
-    return reply.status(400).send({ error: 'Validation error', details: error.flatten() })
+  if (isZodError(error)) {
+    const zodError = error as ZodError
+    return reply.status(400).send({
+      error: 'Validation error',
+      details: typeof zodError.flatten === 'function' ? zodError.flatten() : zodError.message,
+    })
+  }
+
+  const statusCode = (error as { statusCode?: number }).statusCode
+  if (statusCode === 429) {
+    return reply.status(429).send({
+      error: error instanceof Error ? error.message : 'Rate limit exceeded',
+    })
   }
 
   const pgCode = (error as { code?: string }).code
@@ -61,7 +79,6 @@ app.setErrorHandler((error, _request, reply) => {
   return reply.status(500).send({ error: 'Internal server error' })
 })
 
-await registerPublicRoutes(app)
 await registerAdminRoutes(app)
 await registerPreviewRoutes(app)
 

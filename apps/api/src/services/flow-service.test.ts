@@ -31,7 +31,7 @@ describe('stripRulesFromSnapshot', () => {
           priority: 0,
         },
       ],
-      results: [{ resultKey: 'r1', title: 'Result', body: {} }],
+      results: [{ resultKey: 'r1', title: 'Result', body: {}, ctas: [] }],
     }
 
     const stripped = stripRulesFromSnapshot(snapshot)

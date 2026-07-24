@@ -13,6 +13,7 @@ enum OpportunityStatus {
   FLOW_GENERATED
   PUBLISHED
   REJECTED
+  ROUTED_TO_PRODUCT
 
   @@schema("opportunity")
 }
@@ -34,20 +35,20 @@ model Category {
 }
 
 model Keyword {
-  id               String   @id @default(cuid())
+  id               String    @id @default(cuid())
   term             String
-  categoryId       String?  @map("category_id")
-  searchVolume     Int?     @map("search_volume")
-  competition      Float?   @map("competition")
-  cpcLow           Float?   @map("cpc_low")
-  cpcHigh          Float?   @map("cpc_high")
-  relatedQuestions Json?    @map("related_questions")
-  source           String   @default("google_keyword_insight")
+  categoryId       String?   @map("category_id")
+  searchVolume     Int?      @map("search_volume")
+  competition      Float?    @map("competition")
+  cpcLow           Float?    @map("cpc_low")
+  cpcHigh          Float?    @map("cpc_high")
+  relatedQuestions Json?     @map("related_questions")
+  source           String    @default("google_keyword_insight")
   lastScoredAt     DateTime? @map("last_scored_at")
   cachedScore      Json?     @map("cached_score")
   metricsHash      String?   @map("metrics_hash")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
 
   category      Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   opportunities Opportunity[]
@@ -70,6 +71,8 @@ model Opportunity {
   reasons             Json
   status              OpportunityStatus @default(NEW)
   flowDefinition      Json?             @map("flow_definition")
+  faqItem             Json?             @map("faq_item")
+  routedPageSlug      String?           @map("routed_page_slug")
   rejectedReason      String?           @map("rejected_reason")
   discoveredAt        DateTime          @default(now()) @map("discovered_at")
   updatedAt           DateTime          @updatedAt @map("updated_at")

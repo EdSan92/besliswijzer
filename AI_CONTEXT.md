@@ -540,11 +540,11 @@ GOOGLE_KEYWORD_INSIGHT_MOCK=true
 pnpm install                          # Dependencies
 docker compose up -d postgres         # PostgreSQL
 pnpm db:migrate                       # Drizzle migrations (public schema)
-pnpm db:seed                          # Demo flow seeden
+pnpm db:seed                          # Warmtepomp + robotmaaier referentieflow + productpagina
 pnpm dev                              # API + Web parallel
 pnpm dev:opportunity                  # Opportunity Engine apart
 pnpm test                             # Alle unit tests
-pnpm db:seed:product-page             # Demo productpagina seeden
+pnpm db:seed:product-page             # Alleen robot productpagina (flow moet bestaan)
 pnpm migrate:merge-product-flows      # Product flow merge migratie
 ```
 
@@ -553,6 +553,8 @@ pnpm migrate:merge-product-flows      # Product flow merge migratie
 - API: http://localhost:3101 (of 3001)
 - OE: http://localhost:3002
 - Demo flow: http://localhost:3000/flows/warmtepomp-keuzehulp
+- Robotmaaier SEO-pagina: http://localhost:3000/robotmaaier-kiezen
+- Robotmaaier flow: http://localhost:3000/flows/robotmaaiers
 - Admin: http://localhost:3000/admin (geen login in dev)
 
 ---

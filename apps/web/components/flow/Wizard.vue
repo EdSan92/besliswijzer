@@ -167,6 +167,7 @@ async function submitLead(email: string) {
       :flow-id="store.flowId"
       :version-id="store.versionId"
       :session-id="store.sessionId"
+      :flow-slug="flow.slug"
     />
 
     <FlowQuestionRenderer

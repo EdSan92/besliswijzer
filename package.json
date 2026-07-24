@@ -15,6 +15,7 @@
     "db:generate": "pnpm --filter @besliswijzer/db generate",
     "db:migrate": "pnpm --filter @besliswijzer/db migrate",
     "db:seed": "pnpm --filter @besliswijzer/db seed",
+    "db:seed:product-page": "pnpm --filter @besliswijzer/db seed:product-page",
     "flow:import": "pnpm --filter @besliswijzer/api flow:import",
     "migrate:merge-product-flows": "pnpm --filter @besliswijzer/api migrate:merge-product-flows",
     "lint": "pnpm run -r lint"

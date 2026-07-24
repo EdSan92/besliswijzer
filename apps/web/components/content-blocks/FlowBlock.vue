@@ -10,7 +10,7 @@ const props = defineProps<{
 const apiBase = useApiBase()
 const flowSlug = computed(() => props.block.data.flowSlug)
 
-const { data: flow, error } = await useAsyncData(
+const { data: flow, error, pending } = await useAsyncData(
   `flow-embed-${flowSlug.value}`,
   () =>
     $fetch<PublicFlowResponse>(`${apiBase}/api/v1/public/flows/${flowSlug.value}`).catch(
@@ -32,7 +32,8 @@ const { data: flow, error } = await useAsyncData(
       <p class="flow-block__hint">Persoonlijk advies op basis van jouw antwoorden</p>
     </header>
 
-    <p v-if="error" class="flow-block__error">De keuzehulp kon niet geladen worden.</p>
+    <p v-if="pending" class="flow-block__loading">Keuzehulp laden…</p>
+    <p v-else-if="error" class="flow-block__error">De keuzehulp kon niet geladen worden.</p>
     <p v-else-if="!flow" class="flow-block__error">
       De keuzehulp is nog niet gepubliceerd. Publiceer de flow in Admin → Flows.
     </p>
@@ -53,6 +54,11 @@ const { data: flow, error } = await useAsyncData(
   margin: 0;
   color: var(--color-muted, #64748b);
   font-size: 0.95rem;
+}
+
+.flow-block__loading {
+  color: var(--color-muted, #64748b);
+  margin: 0;
 }
 
 .flow-block__error {

@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { sortContentBlocks } from '@besliswijzer/product-schema'
-import { validateProductPageForPublish } from './product-page-service.js'
+import { buildFlowToProductPageSlugMap, validateProductPageForPublish } from './product-page-service.js'
 describe('product page blocks', () => {
   it('orders blocks by layout blockOrder', () => {
     const blocks = [
@@ -51,5 +51,45 @@ describe('validateProductPageForPublish', () => {
       seoMeta: { title: 'SEO titel', description: 'SEO beschrijving' },
     })
     expect(errors).toEqual([])
+  })
+})
+
+describe('buildFlowToProductPageSlugMap', () => {
+  it('maps robotmaaiers to the published robot product page', async () => {
+    const db = {
+      query: {
+        products: {
+          findMany: vi.fn().mockResolvedValue([
+            {
+              slug: 'robotmaaier',
+              canonicalName: 'robotmaaier',
+              primaryFlow: { slug: 'robotmaaiers' },
+              pages: [{ slug: 'robotmaaier-kiezen', status: 'published' }],
+            },
+          ]),
+        },
+        productPages: {
+          findMany: vi.fn().mockResolvedValue([
+            {
+              slug: 'robotmaaier-kiezen',
+              blocks: [
+                {
+                  type: 'flow',
+                  data: { flowSlug: 'robotmaaiers' },
+                },
+              ],
+            },
+          ]),
+        },
+        flows: {
+          findMany: vi.fn().mockResolvedValue([
+            { id: 'flow-1', slug: 'robotmaaiers', title: 'Robotmaaier keuzehulp' },
+          ]),
+        },
+      },
+    }
+
+    const map = await buildFlowToProductPageSlugMap(db as never)
+    expect(map.robotmaaiers).toBe('robotmaaier-kiezen')
   })
 })

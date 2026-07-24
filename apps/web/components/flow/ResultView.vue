@@ -6,9 +6,15 @@ const props = defineProps<{
   flowId: string
   versionId: string
   sessionId: string
+  flowSlug?: string
 }>()
 
 const { track } = useFlowAnalytics()
+const { links } = useFlowPageLinks()
+
+const productPageHref = computed(() =>
+  props.flowSlug ? resolveProductPageLink(props.flowSlug, links.value) : null,
+)
 
 const whyText = computed(() => {
   const why = props.result.body.why
@@ -68,6 +74,13 @@ function onCtaClick(cta: FlowResult['ctas'][number]) {
       >
         {{ cta.label }}
       </a>
+      <NuxtLink
+        v-if="productPageHref"
+        :to="productPageHref"
+        class="btn btn-secondary"
+      >
+        Meer over robotmaaiers
+      </NuxtLink>
     </div>
   </div>
 </template>

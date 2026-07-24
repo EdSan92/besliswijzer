@@ -6,6 +6,7 @@ const slug = route.params.slug as string
 const resultKey = route.params.key as string
 const versionQuery = route.query.v as string | undefined
 const apiBase = useApiBase()
+const { flowHref } = useFlowPageLinks()
 
 const query = versionQuery ? `?v=${versionQuery}` : ''
 
@@ -36,8 +37,9 @@ useSeoMeta({
         :flow-id="data.flowId"
         :version-id="data.versionId"
         session-id="ssr"
+        :flow-slug="slug"
       />
-      <NuxtLink :to="`/flows/${slug}`" class="btn btn-secondary" style="margin-top: 1.5rem">
+      <NuxtLink :to="flowHref(slug)" class="btn btn-secondary" style="margin-top: 1.5rem">
         Opnieuw starten
       </NuxtLink>
     </div>

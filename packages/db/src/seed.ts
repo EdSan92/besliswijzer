@@ -66,12 +66,22 @@ async function main() {
         .where(eq(flows.id, existing.id))
       console.log('Assigned warmtepomp flow to Energie category')
     } else {
-      console.log('Seed data already exists, skipping flow seed')
+      console.log('Warmtepomp seed already exists, skipping warmtepomp flow seed')
     }
-    await client.end()
-    return
+  } else {
+    await seedWarmtepompFlow(db, energieCategory)
   }
 
+  const { ensureRobotMaaierReference } = await import('./seed-robot-reference.js')
+  await ensureRobotMaaierReference(db)
+
+  await client.end()
+}
+
+async function seedWarmtepompFlow(
+  db: ReturnType<typeof createDb>['db'],
+  energieCategory: { id: string } | undefined,
+) {
   console.log('Seeding warmtepomp flow...')
 
   const [flow] = await db
@@ -395,7 +405,6 @@ async function main() {
     .where(eq(flows.id, flow!.id))
 
   console.log('Seed complete: warmtepomp-keuzehulp published as v1')
-  await client.end()
 }
 
 main().catch((err) => {

@@ -15,6 +15,8 @@ export type DiscoveryResult = {
   opportunitiesFound: number
   opportunitiesStored: number
   flowsGenerated: number
+  faqsRouted: number
+  faqsSkipped: number
   scoresFromCache: number
   scoresFromApi: number
   apiBatches: number
@@ -30,9 +32,18 @@ export type OpportunityItem = {
   score: number
   confidence: number
   estimatedCommission: number | null
-  status: 'NEW' | 'FLOW_GENERATED' | 'PUBLISHED' | 'REJECTED'
+  status: 'NEW' | 'FLOW_GENERATED' | 'PUBLISHED' | 'REJECTED' | 'ROUTED_TO_PRODUCT'
   flowDefinition?: OpportunityFlowDefinition | null
+  faqItem?: { question: string; answer: string } | null
+  routedPageSlug?: string | null
   discoveredAt: string
+}
+
+export type GenerateProductPageResult = {
+  productId: string
+  pageId: string
+  pageSlug: string
+  status: string
 }
 
 export type OpportunityStatistics = {

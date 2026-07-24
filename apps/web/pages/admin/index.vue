@@ -1,6 +1,10 @@
 <script setup lang="ts">
 definePageMeta({ middleware: 'admin' })
 
+function isArchivedFlow(flow: { title: string; archived?: boolean }): boolean {
+  return flow.archived ?? flow.title.toLowerCase().includes('[archief]')
+}
+
 type FlowListItem = {
   id: string
   slug: string
@@ -8,6 +12,7 @@ type FlowListItem = {
   categoryId: string | null
   category: { id: string; slug: string; title: string } | null
   publishedVersionNumber: number | null
+  archived?: boolean
 }
 
 type CategoryItem = {
@@ -48,6 +53,22 @@ const categorySlugManual = ref(false)
 const creating = ref(false)
 const creatingCategory = ref(false)
 const filterCategoryId = ref<string>('all')
+const showArchived = ref(false)
+
+function activeFlowCountForCategory(categoryId: string): number {
+  return (flows.value ?? []).filter(
+    (flow) => flow.categoryId === categoryId && !isArchivedFlow(flow),
+  ).length
+}
+
+const visibleFlows = computed(() => {
+  const list = flows.value ?? []
+  return showArchived.value ? list : list.filter((flow) => !isArchivedFlow(flow))
+})
+
+const archivedFlowCount = computed(
+  () => (flows.value ?? []).filter((flow) => isArchivedFlow(flow)).length,
+)
 
 watch(
   () => newFlow.title,
@@ -68,7 +89,7 @@ watch(
 )
 
 const filteredFlows = computed(() => {
-  const list = flows.value ?? []
+  const list = visibleFlows.value
   if (filterCategoryId.value === 'all') return list
   if (filterCategoryId.value === 'none') return list.filter((f) => !f.categoryId)
   return list.filter((f) => f.categoryId === filterCategoryId.value)
@@ -137,11 +158,31 @@ async function deleteFlow(flow: FlowListItem) {
   await refreshFlows()
 }
 
+async function publishFlow(flow: FlowListItem) {
+  publishingFlowId.value = flow.id
+  publishMessage.value = ''
+  try {
+    const result = await useAdminFetch<{ versionNumber: number }>(
+      `/api/v1/admin/flows/${flow.id}/publish`,
+      { method: 'POST' },
+    )
+    publishMessage.value = `Flow "${flow.slug}" gepubliceerd als v${result.versionNumber}.`
+    await refreshFlows()
+  } catch (error) {
+    publishMessage.value =
+      error instanceof Error ? error.message : 'Publiceren mislukt — controleer of er een draft is.'
+  } finally {
+    publishingFlowId.value = null
+  }
+}
+
 const importJson = ref('')
 const importPublish = ref(false)
 const importOverwrite = ref(true)
 const importing = ref(false)
 const importMessage = ref('')
+const publishingFlowId = ref<string | null>(null)
+const publishMessage = ref('')
 
 function loadImportFile(event: Event) {
   const input = event.target as HTMLInputElement
@@ -297,7 +338,7 @@ async function importFlow() {
           :class="{ active: filterCategoryId === cat.id }"
           @click="filterCategoryId = cat.id"
         >
-          {{ cat.title }} ({{ cat.flows?.length ?? 0 }})
+          {{ cat.title }} ({{ activeFlowCountForCategory(cat.id) }})
         </button>
         <button
           type="button"
@@ -322,7 +363,14 @@ async function importFlow() {
     </section>
 
     <section class="section">
-      <h2>Flows</h2>
+      <div class="section-head">
+        <h2>Flows</h2>
+        <label v-if="archivedFlowCount" class="archived-toggle">
+          <input v-model="showArchived" type="checkbox" />
+          Toon gearchiveerde flows ({{ archivedFlowCount }})
+        </label>
+      </div>
+      <p v-if="publishMessage" class="import-message">{{ publishMessage }}</p>
       <div v-if="!filteredFlows.length" class="card empty">Geen flows in deze selectie.</div>
       <table v-else class="table card">
         <thead>
@@ -335,16 +383,35 @@ async function importFlow() {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="flow in filteredFlows" :key="flow.id">
-            <td><strong>{{ flow.title }}</strong></td>
+          <tr v-for="flow in filteredFlows" :key="flow.id" :class="{ 'row-archived': isArchivedFlow(flow) }">
+            <td>
+              <strong>{{ flow.title }}</strong>
+              <span v-if="isArchivedFlow(flow)" class="archived-badge">Gearchiveerd</span>
+            </td>
             <td>{{ flow.category?.title ?? '—' }}</td>
             <td><code>/flows/{{ flow.slug }}</code></td>
             <td>v{{ flow.publishedVersionNumber ?? '—' }}</td>
             <td class="actions">
+              <button
+                v-if="!isArchivedFlow(flow)"
+                class="btn btn-sm"
+                type="button"
+                :disabled="publishingFlowId === flow.id"
+                @click="publishFlow(flow)"
+              >
+                {{ publishingFlowId === flow.id ? 'Publiceren…' : 'Publiceren' }}
+              </button>
               <NuxtLink class="btn btn-secondary btn-sm" :to="`/admin/flows/${flow.id}/edit`">
                 Bewerken
               </NuxtLink>
-              <NuxtLink class="btn btn-sm" :to="`/flows/${flow.slug}`" target="_blank">Live</NuxtLink>
+              <NuxtLink
+                v-if="!isArchivedFlow(flow) && flow.publishedVersionNumber"
+                class="btn btn-sm"
+                :to="`/flows/${flow.slug}`"
+                target="_blank"
+              >
+                Live
+              </NuxtLink>
               <button class="btn btn-secondary btn-sm" type="button" @click="deleteFlow(flow)">
                 Verwijderen
               </button>
@@ -478,5 +545,41 @@ code {
   background: #f1f5f9;
   padding: 0.15rem 0.4rem;
   border-radius: 4px;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.section-head h2 {
+  margin: 0;
+}
+
+.archived-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.row-archived td {
+  color: var(--color-muted);
+}
+
+.archived-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
 }
 </style>

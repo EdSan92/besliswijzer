@@ -11,7 +11,7 @@ const pipelineNodes = [
   { id: 'collect-keywords', label: 'Keywords', hint: 'Gemini + mock data' },
   { id: 'score-keywords', label: 'Scoring', hint: 'Batch + cache' },
   { id: 'store-opportunities', label: 'Opslaan', hint: 'Database' },
-  { id: 'generate-flows', label: 'Flows', hint: 'Gemini (top 5)' },
+  { id: 'route-faq', label: 'FAQ routeren', hint: 'Productpagina (top 5)' },
   { id: 'save-run', label: 'Afronden', hint: 'Log + stats' },
 ] as const
 
@@ -27,7 +27,7 @@ function nodeStatus(id: string): FlowStep['status'] {
   <div class="discovery-pipeline">
     <h2 class="discovery-pipeline__title">Discovery pipeline</h2>
     <p class="discovery-pipeline__intro">
-      Van webshop-seedcategorie tot kant-en-klare beslis-flow — elke stap hieronder wordt uitgevoerd
+      Van webshop-seedcategorie tot FAQ op productpagina — elke stap hieronder wordt uitgevoerd
       bij &ldquo;Start discovery&rdquo;.
     </p>
 

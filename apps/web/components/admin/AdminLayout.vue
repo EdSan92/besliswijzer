@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const isDev = import.meta.dev
 
-async function logout() {  await $fetch('/api/admin/logout', { method: 'POST' })
+async function logout() {
+  await $fetch('/api/admin/logout', { method: 'POST' })
   await navigateTo('/admin/login')
 }
 </script>
@@ -13,6 +14,7 @@ async function logout() {  await $fetch('/api/admin/logout', { method: 'POST' })
       <nav>
         <NuxtLink to="/admin">Flows</NuxtLink>
         <NuxtLink to="/admin/opportunities">Opportunities</NuxtLink>
+        <NuxtLink to="/admin/product-pages">Productpagina's</NuxtLink>
         <slot name="nav" />
         <NuxtLink to="/" target="_blank">Site bekijken</NuxtLink>
       </nav>      <button v-if="!isDev" class="logout-btn" type="button" @click="logout">

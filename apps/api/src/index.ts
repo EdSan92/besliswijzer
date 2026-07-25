@@ -39,7 +39,7 @@ app.decorate('config', {
 
 await app.register(async (publicApp) => {
   await publicApp.register(rateLimit, {
-    max: 100,
+    max: process.env.CI === 'true' ? 1000 : 100,
     timeWindow: '1 minute',
   })
   await registerPublicRoutes(publicApp)

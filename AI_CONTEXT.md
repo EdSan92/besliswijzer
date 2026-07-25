@@ -547,7 +547,11 @@ pnpm dev:opportunity                  # Opportunity Engine apart
 pnpm test                             # Alle unit tests
 pnpm db:seed:product-page             # Alleen robot productpagina (flow moet bestaan)
 pnpm migrate:merge-product-flows      # Product flow merge migratie
+pnpm test:e2e                         # Playwright (lokaal; CI=true forceert 1 worker)
+pnpm test:e2e:install                 # Chromium installeren voor E2E
 ```
+
+**CI (GitHub Actions):** workflow `.github/workflows/ci.yml` op push/PR naar `main` — `pnpm lint`, `pnpm test`, `pnpm build`, daarna Playwright E2E met Postgres service container en `CI=true`.
 
 **URLs lokaal:**
 - Web: http://localhost:3000

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { contentBlockSchema, sortContentBlocks } from './content-block.js'
-import { validateProductPageBlocks } from './product-page.js'
+import { pageSeoSchema, validateProductPageBlocks } from './product-page.js'
 
 describe('contentBlockSchema', () => {
   it('parses hero block', () => {
@@ -58,6 +58,35 @@ describe('sortContentBlocks', () => {
   it('orders by blockOrder', () => {
     const sorted = sortContentBlocks(blocks, ['b', 'a'])
     expect(sorted.map((b) => b.id)).toEqual(['b', 'a'])
+  })
+})
+
+describe('pageSeoSchema', () => {
+  it('accepts root-relative canonical URLs', () => {
+    const result = pageSeoSchema.safeParse({
+      title: 'Airfryer kiezen',
+      description: 'Persoonlijk advies',
+      canonicalUrl: '/airfryer-kiezen',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts absolute canonical URLs', () => {
+    const result = pageSeoSchema.safeParse({
+      title: 'Airfryer kiezen',
+      description: 'Persoonlijk advies',
+      canonicalUrl: 'https://example.com/airfryer-kiezen',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects invalid canonical URLs', () => {
+    const result = pageSeoSchema.safeParse({
+      title: 'Airfryer kiezen',
+      description: 'Persoonlijk advies',
+      canonicalUrl: 'not-a-url',
+    })
+    expect(result.success).toBe(false)
   })
 })
 

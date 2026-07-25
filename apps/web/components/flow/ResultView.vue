@@ -16,6 +16,10 @@ const productPageHref = computed(() =>
   props.flowSlug ? resolveProductPageLink(props.flowSlug, links.value) : null,
 )
 
+const productPageLabel = computed(() =>
+  props.flowSlug ? productPageLinkLabel(props.flowSlug) : 'Meer informatie',
+)
+
 const whyText = computed(() => {
   const why = props.result.body.why
   return typeof why === 'string' && why.trim() ? why : null
@@ -79,7 +83,7 @@ function onCtaClick(cta: FlowResult['ctas'][number]) {
         :to="productPageHref"
         class="btn btn-secondary"
       >
-        Meer over robotmaaiers
+        {{ productPageLabel }}
       </NuxtLink>
     </div>
   </div>

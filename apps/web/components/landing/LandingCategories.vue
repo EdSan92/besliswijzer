@@ -6,6 +6,7 @@ const props = defineProps<{
 }>()
 
 const { register } = useRevealOnScroll()
+const { flowHref } = useFlowPageLinks()
 
 type CategoryItem = {
   slug: string
@@ -25,6 +26,15 @@ const catalog: CategoryItem[] = [
     resultHint: 'Bijv. Worx Landroid · 94% match',
     image: 'https://images.unsplash.com/photo-1558904544-1a4561ddfb6e?w=600&q=80',
     imageAlt: 'Robotmaaier op een gazon',
+    minutes: 2,
+  },
+  {
+    slug: 'airfryers',
+    title: 'Airfryers',
+    outcome: 'Vind de airfryer die past bij jouw keuken',
+    resultHint: 'Bijv. Philips Dual Basket · 92% match',
+    image: 'https://images.unsplash.com/photo-1585515320310-259814833e95?w=600&q=80',
+    imageAlt: 'Airfryer op een aanrecht',
     minutes: 2,
   },
   {
@@ -75,7 +85,7 @@ const categories = computed(() => {
 
     return {
       ...item,
-      href: match ? `/flows/${match.slug}` : `/flows/${item.slug}`,
+      href: match ? flowHref(match.slug) : flowHref(item.slug),
     }
   })
 })

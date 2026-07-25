@@ -223,6 +223,7 @@ Belangrijkste exports:
 - `pickBestProductMatch`, `scoreProductMatch`, `normalizeKeywordTerm`
 - `buildProductFlowGroups`, `deriveProductSlugFromKeyword`, `resolveProductFlowSlug`
 - `validateProductPageBlocks`, `sortContentBlocks`
+- `pageSeoSchema`: `canonicalUrl` accepteert absolute URL's of root-relative paden (bijv. `/airfryer-kiezen`)
 
 Locatie: `packages/product-schema/src/`
 
@@ -540,7 +541,7 @@ GOOGLE_KEYWORD_INSIGHT_MOCK=true
 pnpm install                          # Dependencies
 docker compose up -d postgres         # PostgreSQL
 pnpm db:migrate                       # Drizzle migrations (public schema)
-pnpm db:seed                          # Warmtepomp + robotmaaier referentieflow + productpagina
+pnpm db:seed                          # Warmtepomp + robotmaaier + airfryer referentieflows + productpagina's
 pnpm dev                              # API + Web parallel
 pnpm dev:opportunity                  # Opportunity Engine apart
 pnpm test                             # Alle unit tests
@@ -555,6 +556,8 @@ pnpm migrate:merge-product-flows      # Product flow merge migratie
 - Demo flow: http://localhost:3000/flows/warmtepomp-keuzehulp
 - Robotmaaier SEO-pagina: http://localhost:3000/robotmaaier-kiezen
 - Robotmaaier flow: http://localhost:3000/flows/robotmaaiers
+- Airfryer SEO-pagina: http://localhost:3000/airfryer-kiezen
+- Airfryer flow: http://localhost:3000/flows/airfryers
 - Admin: http://localhost:3000/admin (geen login in dev)
 
 ---
@@ -571,6 +574,11 @@ pnpm migrate:merge-product-flows      # Product flow merge migratie
 | `apps/api/src/routes/public.ts` | Publieke flow endpoints |
 | `apps/api/src/routes/admin.ts` | Admin flow CRUD + publish |
 | `apps/web/components/flow/Wizard.vue` | Frontend flow wizard |
+| `flows/examples/airfryer-keuzehulp.json` | Airfryer referentieflow (R1.1) |
+| `packages/flow-engine/src/airfryers-flow.test.ts` | Airfryer routing tests |
+| `packages/db/src/seed-airfryer-reference.ts` | Airfryer seed orchestrator |
+| `packages/db/src/seed-airfryer-product-page.ts` | Airfryer product + SEO-pagina seed |
+| `e2e/airfryer-flow.spec.ts` | Airfryer E2E (flow + embed) |
 
 ### Product & pagina's
 | Bestand | Rol |

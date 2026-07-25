@@ -37,10 +37,12 @@ const popularFlows = computed(() =>
   resolvePopularFlows(popularData.value?.flows, categorySource.value, 6),
 )
 
+const { flowHref } = useFlowPageLinks()
+
 const primaryCtaHref = computed(() => {
   const first = popularFlows.value[0]
-  if (first) return `/flows/${first.slug}`
-  return '/flows/robotmaaiers'
+  if (first) return flowHref(first.slug)
+  return flowHref('robotmaaiers')
 })
 
 useSeoMeta({

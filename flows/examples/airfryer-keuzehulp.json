@@ -1,0 +1,388 @@
+{
+  "publish": true,
+  "overwrite": true,
+  "flow": {
+    "slug": "airfryers",
+    "title": "Airfryer keuzehulp",
+    "categorySlug": null,
+    "seo": {
+      "title": "Welke airfryer past bij jou? (vind het in 2 minuten)",
+      "description": "Beantwoord een paar korte vragen over je huishouden en kookgewoonten en ontdek direct welke airfryer het beste bij jou past."
+    },
+    "nodes": [
+      {
+        "nodeKey": "huishouden",
+        "type": "question",
+        "title": "Voor hoeveel personen kook je meestal?",
+        "content": {
+          "inputType": "single",
+          "description": "Dit bepaalt de ideale inhoud en het type airfryer."
+        },
+        "sortOrder": 0,
+        "isEntry": true,
+        "options": [
+          { "optionKey": "1_2", "label": "1–2 personen", "value": "1_2", "sortOrder": 0 },
+          { "optionKey": "3_4", "label": "3–4 personen", "value": "3_4", "sortOrder": 1 },
+          { "optionKey": "5plus", "label": "5 personen of meer", "value": "5plus", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "gebruik",
+        "type": "question",
+        "title": "Hoe intensief ga je de airfryer gebruiken?",
+        "content": {
+          "inputType": "single",
+          "description": "Dagelijkse gebruikers hebben baat bij snellere modellen en stevigere manden."
+        },
+        "sortOrder": 1,
+        "options": [
+          { "optionKey": "dagelijks", "label": "Bijna elke dag", "value": "dagelijks", "sortOrder": 0 },
+          { "optionKey": "regelmatig", "label": "Een paar keer per week", "value": "regelmatig", "sortOrder": 1 },
+          { "optionKey": "af_en_toe", "label": "Af en toe", "value": "af_en_toe", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "capaciteit",
+        "type": "question",
+        "title": "Welke inhoud lijkt je passend?",
+        "content": {
+          "inputType": "single",
+          "description": "De inhoud in liters bepaalt hoeveel porties je tegelijk kunt bereiden."
+        },
+        "sortOrder": 2,
+        "options": [
+          { "optionKey": "compact", "label": "Compact (3–4 liter)", "value": "compact", "sortOrder": 0 },
+          { "optionKey": "middel", "label": "Middel (5–6 liter)", "value": "middel", "sortOrder": 1 },
+          { "optionKey": "groot", "label": "Groot (7 liter of meer)", "value": "groot", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "manden",
+        "type": "question",
+        "title": "Wil je twee manden tegelijk kunnen gebruiken?",
+        "content": {
+          "inputType": "single",
+          "description": "Met twee manden bak je bijvoorbeeld friet en een snack tegelijk op verschillende temperaturen."
+        },
+        "sortOrder": 3,
+        "options": [
+          { "optionKey": "nee", "label": "Nee, één mand is genoeg", "value": "nee", "sortOrder": 0 },
+          { "optionKey": "ja_twee", "label": "Ja, twee manden tegelijk", "value": "ja_twee", "sortOrder": 1 },
+          { "optionKey": "maakt_niet_uit", "label": "Maakt niet uit", "value": "maakt_niet_uit", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "ruimte",
+        "type": "question",
+        "title": "Hoeveel ruimte heb je op het aanrecht?",
+        "content": {
+          "inputType": "single",
+          "description": "Compacte modellen passen beter in kleine keukens."
+        },
+        "sortOrder": 4,
+        "options": [
+          { "optionKey": "weinig", "label": "Weinig ruimte", "value": "weinig", "sortOrder": 0 },
+          { "optionKey": "gemiddeld", "label": "Gemiddelde ruimte", "value": "gemiddeld", "sortOrder": 1 },
+          { "optionKey": "veel", "label": "Veel ruimte", "value": "veel", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "budget",
+        "type": "question",
+        "title": "Wat is je budget ongeveer?",
+        "content": {
+          "inputType": "single",
+          "description": "Airfryers zijn er van instap tot premium met extra functies."
+        },
+        "sortOrder": 5,
+        "options": [
+          { "optionKey": "tot_75", "label": "Tot €75", "value": "tot_75", "sortOrder": 0 },
+          { "optionKey": "75_150", "label": "€75 – €150", "value": "75_150", "sortOrder": 1 },
+          { "optionKey": "150_250", "label": "€150 – €250", "value": "150_250", "sortOrder": 2 },
+          { "optionKey": "meer_250", "label": "Meer dan €250", "value": "meer_250", "sortOrder": 3 }
+        ]
+      },
+      {
+        "nodeKey": "functies",
+        "type": "question",
+        "title": "Welke functies zijn voor jou belangrijk?",
+        "content": {
+          "inputType": "single",
+          "description": "Sommige modellen zijn vooral voor friet, anderen ook voor grillen of hele maaltijden."
+        },
+        "sortOrder": 6,
+        "options": [
+          { "optionKey": "bakken", "label": "Vooral bakken en frituren", "value": "bakken", "sortOrder": 0 },
+          { "optionKey": "grill", "label": "Grillen en roosteren", "value": "grill", "sortOrder": 1 },
+          { "optionKey": "oven", "label": "Ovenfuncties (pizza, hele maaltijden)", "value": "oven", "sortOrder": 2 },
+          { "optionKey": "alles", "label": "Zoveel mogelijk functies", "value": "alles", "sortOrder": 3 }
+        ]
+      },
+      {
+        "nodeKey": "lead",
+        "type": "lead_capture",
+        "title": "Advies per e-mail ontvangen?",
+        "content": {
+          "description": "Optioneel — ontvang een korte samenvatting met jouw beste match."
+        },
+        "sortOrder": 7
+      }
+    ],
+    "rules": [
+      {
+        "fromNodeKey": "huishouden",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.huishouden" }, ""] },
+        "targetNodeKey": "gebruik",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "gebruik",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.gebruik" }, ""] },
+        "targetNodeKey": "capaciteit",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "capaciteit",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.capaciteit" }, ""] },
+        "targetNodeKey": "manden",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "manden",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.manden" }, ""] },
+        "targetNodeKey": "ruimte",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "ruimte",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.ruimte" }, ""] },
+        "targetNodeKey": "budget",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "budget",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.budget" }, ""] },
+        "targetNodeKey": "functies",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "functies",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.functies" }, ""] },
+        "targetNodeKey": "lead",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.functies" }, "oven"] },
+        "targetResultKey": "advies_oven",
+        "priority": 110
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.budget" }, "meer_250"] },
+        "targetResultKey": "advies_premium",
+        "priority": 105
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": {
+          "and": [
+            { "==": [{ "var": "answers.functies" }, "alles"] },
+            { "==": [{ "var": "answers.budget" }, "150_250"] }
+          ]
+        },
+        "targetResultKey": "advies_premium",
+        "priority": 102
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": {
+          "or": [
+            { "==": [{ "var": "answers.manden" }, "ja_twee"] },
+            { "==": [{ "var": "answers.huishouden" }, "5plus"] }
+          ]
+        },
+        "targetResultKey": "advies_familie",
+        "priority": 100
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": {
+          "and": [
+            { "==": [{ "var": "answers.huishouden" }, "1_2"] },
+            { "==": [{ "var": "answers.budget" }, "tot_75"] }
+          ]
+        },
+        "targetResultKey": "advies_instap",
+        "priority": 95
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": {
+          "and": [
+            { "==": [{ "var": "answers.ruimte" }, "weinig"] },
+            { "==": [{ "var": "answers.capaciteit" }, "compact"] }
+          ]
+        },
+        "targetResultKey": "advies_instap",
+        "priority": 90
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": {
+          "and": [
+            { "==": [{ "var": "answers.huishouden" }, "3_4"] },
+            { "==": [{ "var": "answers.capaciteit" }, "groot"] }
+          ]
+        },
+        "targetResultKey": "advies_familie",
+        "priority": 85
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.functies" }, "alles"] },
+        "targetResultKey": "advies_premium",
+        "priority": 80
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.budget" }, "tot_75"] },
+        "targetResultKey": "advies_instap",
+        "priority": 75
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": { ">=": [{ "var": "answers.functies" }, ""] },
+        "targetResultKey": "advies_familie",
+        "priority": 70
+      }
+    ],
+    "results": [
+      {
+        "resultKey": "advies_instap",
+        "title": "Compacte instap-airfryer",
+        "body": {
+          "summary": "Geschikt voor kleine huishoudens of beperkt budget en weinig aanrechtruimte.",
+          "why": "Je hebt weinig porties nodig en zoekt een eenvoudige, betaalbare airfryer zonder overbodige functies.",
+          "checklist": [
+            "3–4 liter inhoud",
+            "Eén mand is voldoende",
+            "Instapmodellen vanaf circa €50"
+          ],
+          "voorbeeldmodellen": [
+            "Princess Digitale Airfryer",
+            "Tefal Easy Fry",
+            "Inventum GF500HL"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-instap",
+            "type": "affiliate",
+            "url": "https://example.com/airfryer-instap",
+            "label": "Bekijk instap-airfryers",
+            "trackingId": "aff-airfryer-instap"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_familie",
+        "title": "Airfryer voor het hele gezin",
+        "body": {
+          "summary": "Meer capaciteit of twee manden voor gezinnen en regelmatig gebruik.",
+          "why": "Je kookt voor meerdere personen of wilt twee gerechten tegelijk bereiden.",
+          "checklist": [
+            "5–6 liter of dual-basket",
+            "Snellere opwarmtijd bij frequent gebruik",
+            "Vaatwasserbestendige onderdelen"
+          ],
+          "voorbeeldmodellen": [
+            "Philips Airfryer Dual Basket",
+            "Cosori Dual Blaze",
+            "Princess Maxi Airfryer"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-familie",
+            "type": "affiliate",
+            "url": "https://example.com/airfryer-familie",
+            "label": "Bekijk gezinsmodellen",
+            "trackingId": "aff-airfryer-familie"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_oven",
+        "title": "Airfryer-oven voor veelzijdig koken",
+        "body": {
+          "summary": "Ovenmodellen voor pizza, hele maaltijden en meer dan alleen friet.",
+          "why": "Je wilt ovenfuncties en bereidt vaker complete maaltijden met de airfryer.",
+          "checklist": [
+            "Rechthoekige bakruimte of rotisserie",
+            "Meerdere kookprogramma's",
+            "Voldoende hoogte voor pizza of kip"
+          ],
+          "voorbeeldmodellen": [
+            "Ninja Foodi MAX PRO",
+            "Philips Airfryer XXL",
+            "Tefal Easy Fry & Grill"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-oven",
+            "type": "affiliate",
+            "url": "https://example.com/airfryer-oven",
+            "label": "Bekijk airfryer-ovens",
+            "trackingId": "aff-airfryer-oven"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_premium",
+        "title": "Premium airfryer met alle functies",
+        "body": {
+          "summary": "Topmodellen met dual zone, smart functies en maximale capaciteit.",
+          "why": "Je gebruikt de airfryer intensief en wilt het beste uit budget en functies halen.",
+          "checklist": [
+            "Dual zone of XL capaciteit",
+            "App-bediening en recepten",
+            "Grill, bakken en dehydreren"
+          ],
+          "voorbeeldmodellen": [
+            "Ninja Foodi MAX",
+            "Philips 7000 Series",
+            "Cosori TurboBlaze"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-premium",
+            "type": "affiliate",
+            "url": "https://example.com/airfryer-premium",
+            "label": "Bekijk premium modellen",
+            "trackingId": "aff-airfryer-premium"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -2,10 +2,16 @@ import { z } from 'zod'
 import { contentBlockSchema, type ContentBlock } from './content-block.js'
 import { pageStatusSchema, productSchema } from './product.js'
 
+const canonicalUrlSchema = z
+  .string()
+  .refine((value) => value.startsWith('/') || /^https?:\/\//.test(value), {
+    message: 'canonicalUrl must be an absolute URL or root-relative path',
+  })
+
 export const pageSeoSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
-  canonicalUrl: z.string().url().optional(),
+  canonicalUrl: canonicalUrlSchema.optional(),
   ogImage: z.string().optional(),
   twitterCard: z.enum(['summary', 'summary_large_image']).optional(),
   noindex: z.boolean().optional(),

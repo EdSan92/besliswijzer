@@ -75,6 +75,9 @@ async function main() {
   const { ensureRobotMaaierReference } = await import('./seed-robot-reference.js')
   await ensureRobotMaaierReference(db)
 
+  const { ensureAirfryerReference } = await import('./seed-airfryer-reference.js')
+  await ensureAirfryerReference(db)
+
   await client.end()
 }
 

@@ -541,7 +541,7 @@ GOOGLE_KEYWORD_INSIGHT_MOCK=true
 pnpm install                          # Dependencies
 docker compose up -d postgres         # PostgreSQL
 pnpm db:migrate                       # Drizzle migrations (public schema)
-pnpm db:seed                          # Warmtepomp + robotmaaier + airfryer referentieflows + productpagina's
+pnpm db:seed                          # Warmtepomp + robotmaaier + airfryer + robotstofzuiger referentieflows + productpagina's
 pnpm dev                              # API + Web parallel
 pnpm dev:opportunity                  # Opportunity Engine apart
 pnpm test                             # Alle unit tests
@@ -562,6 +562,8 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 - Robotmaaier flow: http://localhost:3000/flows/robotmaaiers
 - Airfryer SEO-pagina: http://localhost:3000/airfryer-kiezen
 - Airfryer flow: http://localhost:3000/flows/airfryers
+- Robotstofzuiger SEO-pagina: http://localhost:3000/robotstofzuiger-kiezen
+- Robotstofzuiger flow: http://localhost:3000/flows/robotstofzuigers
 - Admin: http://localhost:3000/admin (geen login in dev)
 
 ---
@@ -583,6 +585,11 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/db/src/seed-airfryer-reference.ts` | Airfryer seed orchestrator |
 | `packages/db/src/seed-airfryer-product-page.ts` | Airfryer product + SEO-pagina seed |
 | `e2e/airfryer-flow.spec.ts` | Airfryer E2E (flow + embed) |
+| `flows/examples/robotstofzuiger-keuzehulp.json` | Robotstofzuiger referentieflow (R1.6) |
+| `packages/flow-engine/src/robotstofzuigers-flow.test.ts` | Robotstofzuiger routing tests |
+| `packages/db/src/seed-robotstofzuiger-reference.ts` | Robotstofzuiger seed orchestrator |
+| `packages/db/src/seed-robotstofzuiger-product-page.ts` | Robotstofzuiger product + SEO-pagina seed |
+| `e2e/robotstofzuiger-flow.spec.ts` | Robotstofzuiger E2E (flow + embed) |
 
 ### Product & pagina's
 | Bestand | Rol |
@@ -623,4 +630,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: juli 2026 · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 25 juli 2026 · Gebaseerd op de decision-engine monorepo*

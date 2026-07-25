@@ -1,6 +1,7 @@
 const KNOWN_FLOW_PAGE_LINKS: Record<string, string> = {
   robotmaaiers: 'robotmaaier-kiezen',
   airfryers: 'airfryer-kiezen',
+  robotstofzuigers: 'robotstofzuiger-kiezen',
 }
 
 function mergedPageLinks(pageLinks: Record<string, string>): Record<string, string> {
@@ -27,6 +28,7 @@ export function resolveProductPageLink(
 const PRODUCT_PAGE_LINK_LABELS: Record<string, string> = {
   robotmaaiers: 'Meer over robotmaaiers',
   airfryers: 'Meer over airfryers',
+  robotstofzuigers: 'Meer over robotstofzuigers',
 }
 
 export function productPageLinkLabel(flowSlug: string): string {

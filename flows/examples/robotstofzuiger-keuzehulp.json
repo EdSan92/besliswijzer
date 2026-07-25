@@ -1,0 +1,436 @@
+{
+  "publish": true,
+  "overwrite": true,
+  "flow": {
+    "slug": "robotstofzuigers",
+    "title": "Robotstofzuiger keuzehulp",
+    "categorySlug": null,
+    "seo": {
+      "title": "Welke robotstofzuiger past bij jou? (vind het in 2 minuten)",
+      "description": "Beantwoord een paar korte vragen over je woning en woonwensen en ontdek direct welke robotstofzuiger het beste bij jou past."
+    },
+    "nodes": [
+      {
+        "nodeKey": "vloertype",
+        "type": "question",
+        "title": "Welk type vloer heb je voornamelijk?",
+        "content": {
+          "inputType": "single",
+          "description": "Verschillende borstels en zuigkracht werken beter op hard vloer, mix of tapijt."
+        },
+        "sortOrder": 0,
+        "isEntry": true,
+        "options": [
+          { "optionKey": "hard", "label": "Hout, tegels of laminaat", "value": "hard", "sortOrder": 0 },
+          { "optionKey": "mix", "label": "Mix van vloertypes", "value": "mix", "sortOrder": 1 },
+          { "optionKey": "tapijt", "label": "Voornamelijk tapijt", "value": "tapijt", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "huisdieren",
+        "type": "question",
+        "title": "Heb je huisdieren?",
+        "content": {
+          "inputType": "single",
+          "description": "Huisdieren vragen vaak extra zuigkracht en een goede borstel tegen haren."
+        },
+        "sortOrder": 1,
+        "options": [
+          { "optionKey": "nee", "label": "Nee", "value": "nee", "sortOrder": 0 },
+          { "optionKey": "ja", "label": "Ja, huisdieren", "value": "ja", "sortOrder": 1 },
+          { "optionKey": "hond_kat", "label": "Ja, hond of kat", "value": "hond_kat", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "drempels",
+        "type": "question",
+        "title": "Hoe hoog zijn drempels en tapijtranden?",
+        "content": {
+          "inputType": "single",
+          "description": "Hoge drempels vragen modellen met betere klimcapaciteit."
+        },
+        "sortOrder": 2,
+        "options": [
+          { "optionKey": "laag", "label": "Laag (tot 1 cm)", "value": "laag", "sortOrder": 0 },
+          { "optionKey": "middel", "label": "Middel (1–2 cm)", "value": "middel", "sortOrder": 1 },
+          { "optionKey": "hoog", "label": "Hoog (meer dan 2 cm)", "value": "hoog", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "oppervlak",
+        "type": "question",
+        "title": "Hoe groot is het te reinigen oppervlak?",
+        "content": {
+          "inputType": "single",
+          "description": "Grotere woningen vragen langere batterijduur en grotere stofbakken."
+        },
+        "sortOrder": 3,
+        "options": [
+          { "optionKey": "klein", "label": "Klein (tot 80 m²)", "value": "klein", "sortOrder": 0 },
+          { "optionKey": "middel", "label": "Middel (80–150 m²)", "value": "middel", "sortOrder": 1 },
+          { "optionKey": "groot", "label": "Groot (meer dan 150 m²)", "value": "groot", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "verdiepingen",
+        "type": "question",
+        "title": "Moet de robot meerdere verdiepingen kunnen?",
+        "content": {
+          "inputType": "single",
+          "description": "Met meerdere kaarten kun je per verdieping andere zones instellen."
+        },
+        "sortOrder": 4,
+        "options": [
+          { "optionKey": "nee", "label": "Nee, één verdieping", "value": "nee", "sortOrder": 0 },
+          { "optionKey": "ja", "label": "Ja, meerdere verdiepingen", "value": "ja", "sortOrder": 1 }
+        ]
+      },
+      {
+        "nodeKey": "dweilfunctie",
+        "type": "question",
+        "title": "Wil je ook dweilen?",
+        "content": {
+          "inputType": "single",
+          "description": "Combo-modellen stofzuigen én dweilen met een verwisselbare watertank."
+        },
+        "sortOrder": 5,
+        "options": [
+          { "optionKey": "nee", "label": "Nee, alleen stofzuigen", "value": "nee", "sortOrder": 0 },
+          { "optionKey": "ja", "label": "Ja, stofzuigen én dweilen", "value": "ja", "sortOrder": 1 }
+        ]
+      },
+      {
+        "nodeKey": "obstakels",
+        "type": "question",
+        "title": "Hoe belangrijk is slimme obstakelherkenning?",
+        "content": {
+          "inputType": "single",
+          "description": "Premium navigatie herkent schoenen, kabels en speelgoed beter."
+        },
+        "sortOrder": 6,
+        "options": [
+          { "optionKey": "basis", "label": "Basis is voldoende", "value": "basis", "sortOrder": 0 },
+          { "optionKey": "premium", "label": "Premium navigatie gewenst", "value": "premium", "sortOrder": 1 }
+        ]
+      },
+      {
+        "nodeKey": "leegstation",
+        "type": "question",
+        "title": "Wil je een automatisch leegstation?",
+        "content": {
+          "inputType": "single",
+          "description": "Het leegstation zuigt de stofbak leeg zodat je minder vaak hoeft te legen."
+        },
+        "sortOrder": 7,
+        "options": [
+          { "optionKey": "nee", "label": "Nee", "value": "nee", "sortOrder": 0 },
+          { "optionKey": "ja", "label": "Ja, leegstation gewenst", "value": "ja", "sortOrder": 1 }
+        ]
+      },
+      {
+        "nodeKey": "geluid",
+        "type": "question",
+        "title": "Hoe belangrijk is een stille robot?",
+        "content": {
+          "inputType": "single",
+          "description": "Stille modellen zijn handig als de robot 's avonds of tijdens thuiswerken draait."
+        },
+        "sortOrder": 8,
+        "options": [
+          { "optionKey": "normaal", "label": "Normaal geluidsniveau is oké", "value": "normaal", "sortOrder": 0 },
+          { "optionKey": "stil", "label": "Zo stil mogelijk", "value": "stil", "sortOrder": 1 }
+        ]
+      },
+      {
+        "nodeKey": "budget",
+        "type": "question",
+        "title": "Wat is je budget ongeveer?",
+        "content": {
+          "inputType": "single",
+          "description": "Robotstofzuigers zijn er van instap tot premium met leegstation en dweilfunctie."
+        },
+        "sortOrder": 9,
+        "options": [
+          { "optionKey": "tot_300", "label": "Tot €300", "value": "tot_300", "sortOrder": 0 },
+          { "optionKey": "300_500", "label": "€300 – €500", "value": "300_500", "sortOrder": 1 },
+          { "optionKey": "500_plus", "label": "Meer dan €500", "value": "500_plus", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "lead",
+        "type": "lead_capture",
+        "title": "Advies per e-mail ontvangen?",
+        "content": {
+          "description": "Optioneel — ontvang een korte samenvatting met jouw beste match."
+        },
+        "sortOrder": 10
+      }
+    ],
+    "rules": [
+      {
+        "fromNodeKey": "vloertype",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.vloertype" }, ""] },
+        "targetNodeKey": "huisdieren",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "huisdieren",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.huisdieren" }, ""] },
+        "targetNodeKey": "drempels",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "drempels",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.drempels" }, ""] },
+        "targetNodeKey": "oppervlak",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "oppervlak",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.oppervlak" }, ""] },
+        "targetNodeKey": "verdiepingen",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "verdiepingen",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.verdiepingen" }, ""] },
+        "targetNodeKey": "dweilfunctie",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "dweilfunctie",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.dweilfunctie" }, ""] },
+        "targetNodeKey": "obstakels",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "obstakels",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.obstakels" }, ""] },
+        "targetNodeKey": "leegstation",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "leegstation",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.leegstation" }, ""] },
+        "targetNodeKey": "geluid",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "geluid",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.geluid" }, ""] },
+        "targetNodeKey": "budget",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "budget",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.budget" }, ""] },
+        "targetNodeKey": "lead",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": {
+          "and": [
+            { "==": [{ "var": "answers.leegstation" }, "ja"] },
+            { "==": [{ "var": "answers.budget" }, "500_plus"] }
+          ]
+        },
+        "targetResultKey": "advies_leegstation",
+        "priority": 110
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.dweilfunctie" }, "ja"] },
+        "targetResultKey": "advies_dweilen",
+        "priority": 105
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": {
+          "or": [
+            { "==": [{ "var": "answers.huisdieren" }, "ja"] },
+            { "==": [{ "var": "answers.huisdieren" }, "hond_kat"] }
+          ]
+        },
+        "targetResultKey": "advies_huisdieren",
+        "priority": 100
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": {
+          "and": [
+            { "==": [{ "var": "answers.obstakels" }, "premium"] },
+            { "==": [{ "var": "answers.budget" }, "500_plus"] }
+          ]
+        },
+        "targetResultKey": "advies_premium",
+        "priority": 95
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.budget" }, "tot_300"] },
+        "targetResultKey": "advies_basis",
+        "priority": 90
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": { ">=": [{ "var": "answers.budget" }, ""] },
+        "targetResultKey": "advies_basis",
+        "priority": 70
+      }
+    ],
+    "results": [
+      {
+        "resultKey": "advies_basis",
+        "title": "Budget robotstofzuiger",
+        "body": {
+          "summary": "Instapmodellen voor kleinere woningen met eenvoudige navigatie.",
+          "why": "Je zoekt een betaalbare robotstofzuiger zonder premium extras zoals leegstation of dweilfunctie.",
+          "checklist": [
+            "Random of basis navigatie",
+            "Geschikt voor hard vloer en klein oppervlak",
+            "Instapmodellen vanaf circa €150"
+          ],
+          "voorbeeldmodellen": [
+            "Xiaomi Robot Vacuum E10",
+            "Roborock Q5",
+            "Ecovacs Deebot N20"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-basis",
+            "type": "affiliate",
+            "url": "https://example.com/robotstofzuiger-basis",
+            "label": "Bekijk budgetmodellen",
+            "trackingId": "aff-robotstofzuiger-basis"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_huisdieren",
+        "title": "Robotstofzuiger voor huisdieren",
+        "body": {
+          "summary": "Extra zuigkracht en anti-klitborstels voor huisdierenharen.",
+          "why": "Je hebt huisdieren en wilt een robot die haren en vuil betrouwbaar opruimt.",
+          "checklist": [
+            "Rubberen of anti-klitborstel",
+            "Hoge zuigkracht (Pa)",
+            "Grote stofbak of leegstation"
+          ],
+          "voorbeeldmodellen": [
+            "Roborock Qrevo S",
+            "Ecovacs Deebot T30",
+            "Dreame L10s Ultra"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-huisdieren",
+            "type": "affiliate",
+            "url": "https://example.com/robotstofzuiger-huisdieren",
+            "label": "Bekijk modellen voor huisdieren",
+            "trackingId": "aff-robotstofzuiger-huisdieren"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_dweilen",
+        "title": "Robotstofzuiger met dweilfunctie",
+        "body": {
+          "summary": "Combo-modellen die stofzuigen én dweilen met roterende doeken.",
+          "why": "Je wilt één apparaat voor zowel stofzuigen als nat reinigen van hard vloer.",
+          "checklist": [
+            "Roterende of vibrerende dweilmodule",
+            "Automatische doekreiniging (premium)",
+            "Geschikt voor tegels en laminaat"
+          ],
+          "voorbeeldmodellen": [
+            "Roborock S8 MaxV Ultra",
+            "Ecovacs Deebot X2",
+            "Dreame L20 Ultra"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-dweilen",
+            "type": "affiliate",
+            "url": "https://example.com/robotstofzuiger-dweilen",
+            "label": "Bekijk dweil-combo's",
+            "trackingId": "aff-robotstofzuiger-dweilen"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_premium",
+        "title": "Premium robotstofzuiger met slimme navigatie",
+        "body": {
+          "summary": "LiDAR-navigatie, obstakelherkenning en app-bediening voor complexe woningen.",
+          "why": "Je wilt betrouwbare kaarten, slimme routes en herkenning van kabels en speelgoed.",
+          "checklist": [
+            "LiDAR of AI-obstakelherkenning",
+            "Meerdere verdiepingskaarten",
+            "App met zones en planning"
+          ],
+          "voorbeeldmodellen": [
+            "Roborock S8 Pro Ultra",
+            "Ecovacs Deebot X2 Omni",
+            "Dreame X40 Ultra"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-premium",
+            "type": "affiliate",
+            "url": "https://example.com/robotstofzuiger-premium",
+            "label": "Bekijk premium modellen",
+            "trackingId": "aff-robotstofzuiger-premium"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_leegstation",
+        "title": "Robotstofzuiger met leegstation",
+        "body": {
+          "summary": "Automatisch legen voor wekenlang onderhoudsvrij schoonmaken.",
+          "why": "Je wilt minimaal onderhoud en laat het station de stofbak legen.",
+          "checklist": [
+            "Automatisch leegstation",
+            "Grote stofzak (wekenlang)",
+            "Optioneel dweilmodule"
+          ],
+          "voorbeeldmodellen": [
+            "Roborock Qrevo Master",
+            "Ecovacs Deebot T30 Omni",
+            "Dreame L10s Pro Ultra"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-leegstation",
+            "type": "affiliate",
+            "url": "https://example.com/robotstofzuiger-leegstation",
+            "label": "Bekijk modellen met leegstation",
+            "trackingId": "aff-robotstofzuiger-leegstation"
+          }
+        ]
+      }
+    ]
+  }
+}

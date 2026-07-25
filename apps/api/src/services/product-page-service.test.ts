@@ -130,4 +130,42 @@ describe('buildFlowToProductPageSlugMap', () => {
     const map = await buildFlowToProductPageSlugMap(db as never)
     expect(map.airfryers).toBe('airfryer-kiezen')
   })
+
+  it('maps robotstofzuigers to the published robotstofzuiger product page', async () => {
+    const db = {
+      query: {
+        products: {
+          findMany: vi.fn().mockResolvedValue([
+            {
+              slug: 'robotstofzuiger',
+              canonicalName: 'robotstofzuiger',
+              primaryFlow: { slug: 'robotstofzuigers' },
+              pages: [{ slug: 'robotstofzuiger-kiezen', status: 'published' }],
+            },
+          ]),
+        },
+        productPages: {
+          findMany: vi.fn().mockResolvedValue([
+            {
+              slug: 'robotstofzuiger-kiezen',
+              blocks: [
+                {
+                  type: 'flow',
+                  data: { flowSlug: 'robotstofzuigers' },
+                },
+              ],
+            },
+          ]),
+        },
+        flows: {
+          findMany: vi.fn().mockResolvedValue([
+            { id: 'flow-3', slug: 'robotstofzuigers', title: 'Robotstofzuiger keuzehulp' },
+          ]),
+        },
+      },
+    }
+
+    const map = await buildFlowToProductPageSlugMap(db as never)
+    expect(map.robotstofzuigers).toBe('robotstofzuiger-kiezen')
+  })
 })

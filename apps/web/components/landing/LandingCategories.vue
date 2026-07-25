@@ -38,6 +38,15 @@ const catalog: CategoryItem[] = [
     minutes: 2,
   },
   {
+    slug: 'robotstofzuigers',
+    title: 'Robotstofzuigers',
+    outcome: 'Vind de robotstofzuiger die past bij jouw woning',
+    resultHint: 'Bijv. Roborock Qrevo · 93% match',
+    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+    imageAlt: 'Robotstofzuiger op de vloer',
+    minutes: 2,
+  },
+  {
     slug: 'warmtepomp',
     title: 'Warmtepompen',
     outcome: 'Vind de warmtepomp die past bij jouw woning',

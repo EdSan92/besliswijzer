@@ -78,6 +78,9 @@ async function main() {
   const { ensureAirfryerReference } = await import('./seed-airfryer-reference.js')
   await ensureAirfryerReference(db)
 
+  const { ensureRobotstofzuigerReference } = await import('./seed-robotstofzuiger-reference.js')
+  await ensureRobotstofzuigerReference(db)
+
   await client.end()
 }
 

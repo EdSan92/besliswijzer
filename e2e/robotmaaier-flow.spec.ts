@@ -64,7 +64,7 @@ test.describe('Robotmaaier SEO-pagina', () => {
     await page.goto(`/${PAGE_SLUG}`)
 
     await expect(
-      page.getByRole('heading', { name: 'Vind de ideale robotmaaier voor jouw gazon' }),
+      page.getByRole('heading', { name: 'Welke robotmaaier past bij jouw tuin?' }),
     ).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Hoe groot is het gazon?' })).toBeVisible()
   })

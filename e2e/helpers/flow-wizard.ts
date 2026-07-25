@@ -6,6 +6,14 @@ type AnswerFlowQuestionParams = {
   nextQuestion?: string
 }
 
+function isFlowStepResponse(url: string, method: string): boolean {
+  return (
+    method === 'POST' &&
+    url.includes('/api/v1/public/flows/') &&
+    url.includes('/step')
+  )
+}
+
 export async function answerFlowQuestion(
   page: Page,
   { question, option, nextQuestion }: AnswerFlowQuestionParams,
@@ -18,7 +26,12 @@ export async function answerFlowQuestion(
 
   const nextButton = page.getByRole('button', { name: 'Volgende' })
   await expect(nextButton).toBeEnabled()
+
+  const stepCompleted = page.waitForResponse(
+    (response) => isFlowStepResponse(response.url(), response.request().method()) && response.ok(),
+  )
   await nextButton.click()
+  await stepCompleted
 
   if (nextQuestion) {
     await expect(page.getByRole('heading', { name: nextQuestion })).toBeVisible()

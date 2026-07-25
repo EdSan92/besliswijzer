@@ -50,7 +50,15 @@ test.describe('Robotmaaier keuzehulp', () => {
       nextQuestion: 'Advies per e-mail ontvangen?',
     })
 
+    const leadStepCompleted = page.waitForResponse(
+      (response) =>
+        response.request().method() === 'POST' &&
+        response.url().includes('/api/v1/public/flows/') &&
+        response.url().includes('/step') &&
+        response.ok(),
+    )
     await page.getByRole('button', { name: 'Overslaan' }).click()
+    await leadStepCompleted
 
     await expect(page.getByRole('heading', { name: 'Instap robotmaaier' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Bekijk instapmodellen' })).toBeVisible()

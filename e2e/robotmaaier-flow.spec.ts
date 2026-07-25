@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { isFlowPublished, isProductPagePublished } from './helpers/api'
+import { answerFlowQuestion } from './helpers/flow-wizard'
 
 const FLOW_SLUG = 'robotmaaiers'
 const PAGE_SLUG = 'robotmaaier-kiezen'
@@ -13,29 +14,42 @@ test.describe('Robotmaaier keuzehulp', () => {
   test('doorloopt klein-tuin pad tot instap-advies', async ({ page }) => {
     await page.goto(`/flows/${FLOW_SLUG}`)
 
-    await expect(page.getByRole('heading', { name: 'Hoe groot is het gazon?' })).toBeVisible()
+    await answerFlowQuestion(page, {
+      question: 'Hoe groot is het gazon?',
+      option: 'Klein (tot 300 m²)',
+      nextQuestion: 'Hoe steil is het terrein?',
+    })
 
-    await page.getByRole('button', { name: 'Klein (tot 300 m²)' }).click()
-    await page.getByRole('button', { name: 'Volgende' }).click()
+    await answerFlowQuestion(page, {
+      question: 'Hoe steil is het terrein?',
+      option: 'Vlak (tot 10% helling)',
+      nextQuestion: 'Hoe complex is de tuin?',
+    })
 
-    await page.getByRole('button', { name: 'Vlak (tot 10% helling)' }).click()
-    await page.getByRole('button', { name: 'Volgende' }).click()
+    await answerFlowQuestion(page, {
+      question: 'Hoe complex is de tuin?',
+      option: 'Open en overzichtelijk',
+      nextQuestion: 'Wat is voor jou het belangrijkst?',
+    })
 
-    await page.getByRole('button', { name: 'Open en overzichtelijk' }).click()
-    await page.getByRole('button', { name: 'Volgende' }).click()
+    await answerFlowQuestion(page, {
+      question: 'Wat is voor jou het belangrijkst?',
+      option: 'Lage prijs',
+      nextQuestion: 'Heb je stroom in de tuin?',
+    })
 
-    await page.getByRole('button', { name: 'Lage prijs' }).click()
-    await page.getByRole('button', { name: 'Volgende' }).click()
+    await answerFlowQuestion(page, {
+      question: 'Heb je stroom in de tuin?',
+      option: 'Ja, dichtbij het gazon',
+      nextQuestion: 'Wil je zelf kabels leggen?',
+    })
 
-    await page.getByRole('button', { name: 'Ja, dichtbij het gazon' }).click()
-    await page.getByRole('button', { name: 'Volgende' }).click()
+    await answerFlowQuestion(page, {
+      question: 'Wil je zelf kabels leggen?',
+      option: 'Geen probleem',
+      nextQuestion: 'Advies per e-mail ontvangen?',
+    })
 
-    await page.getByRole('button', { name: 'Geen probleem' }).click()
-    await page.getByRole('button', { name: 'Volgende' }).click()
-
-    await expect(
-      page.getByRole('heading', { name: 'Advies per e-mail ontvangen?' }),
-    ).toBeVisible()
     await page.getByRole('button', { name: 'Overslaan' }).click()
 
     await expect(page.getByRole('heading', { name: 'Instap robotmaaier' })).toBeVisible()

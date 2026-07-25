@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { isFlowPublished, isProductPagePublished } from './helpers/api'
-import { answerFlowQuestion } from './helpers/flow-wizard'
+import { answerFlowQuestion, skipLeadCapture } from './helpers/flow-wizard'
 
 const FLOW_SLUG = 'robotmaaiers'
 const PAGE_SLUG = 'robotmaaier-kiezen'
@@ -12,7 +12,9 @@ test.describe('Robotmaaier keuzehulp', () => {
   })
 
   test('doorloopt klein-tuin pad tot instap-advies', async ({ page }) => {
-    await page.goto(`/flows/${FLOW_SLUG}`)
+    await page.goto(`/flows/${FLOW_SLUG}`, { waitUntil: 'networkidle' })
+
+    await expect(page.getByRole('heading', { name: 'Hoe groot is het gazon?' })).toBeVisible()
 
     await answerFlowQuestion(page, {
       question: 'Hoe groot is het gazon?',
@@ -50,17 +52,8 @@ test.describe('Robotmaaier keuzehulp', () => {
       nextQuestion: 'Advies per e-mail ontvangen?',
     })
 
-    const leadStepCompleted = page.waitForResponse(
-      (response) =>
-        response.request().method() === 'POST' &&
-        response.url().includes('/api/v1/public/flows/') &&
-        response.url().includes('/step') &&
-        response.ok(),
-    )
-    await page.getByRole('button', { name: 'Overslaan' }).click()
-    await leadStepCompleted
+    await skipLeadCapture(page, 'Instap robotmaaier')
 
-    await expect(page.getByRole('heading', { name: 'Instap robotmaaier' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Bekijk instapmodellen' })).toBeVisible()
     await expect(page.getByRole('link', { name: 'Meer over robotmaaiers' })).toHaveAttribute(
       'href',

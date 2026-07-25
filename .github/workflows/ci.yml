@@ -62,6 +62,12 @@ jobs:
       - name: Build shared packages
         run: pnpm --filter "./packages/*" build
 
+      - name: Generate Prisma client
+        run: pnpm --filter @veraio/opportunity-engine exec prisma generate
+
+      - name: Prepare Nuxt
+        run: pnpm --filter @besliswijzer/web exec nuxt prepare
+
       - name: Lint
         run: pnpm lint
 

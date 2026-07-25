@@ -4,14 +4,14 @@ import { isApiHealthy } from './helpers/api'
 test.describe('Admin', () => {
   test.beforeEach(async ({ request }) => {
     const healthy = await isApiHealthy(request)
-    test.skip(!healthy, 'API niet bereikbaar — start de API (poort 3001)')
+    test.skip(!healthy, 'API niet bereikbaar — start de API (poort 3101)')
   })
 
   test('toont flowbeheer in development', async ({ page }) => {
     await page.goto('/admin')
 
     await expect(page.getByRole('heading', { name: 'Flows & categorieën' })).toBeVisible()
-    await expect(page.getByText('warmtepomp-keuzehulp')).toBeVisible()
+    await expect(page.getByText('/flows/warmtepomp-keuzehulp')).toBeVisible()
   })
 
   test('loginpagina is bereikbaar', async ({ page }) => {

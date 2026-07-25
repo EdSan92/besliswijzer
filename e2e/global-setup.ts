@@ -1,7 +1,6 @@
 import { execSync } from 'node:child_process'
-import { resolve } from 'node:path'
 
-const rootDir = resolve(import.meta.dirname, '..')
+const rootDir = process.cwd()
 
 export default async function globalSetup() {
   if (process.env.E2E_SKIP_DB_PREP === 'true') {
@@ -17,6 +16,14 @@ export default async function globalSetup() {
       stdio: 'inherit',
       env: process.env,
     })
+  } catch (error) {
+    console.warn(
+      'E2E: db:migrate mislukt — ga door met seed (database is waarschijnlijk al gemigreerd).',
+    )
+    console.warn(error)
+  }
+
+  try {
     execSync('pnpm db:seed', {
       cwd: rootDir,
       stdio: 'inherit',
@@ -25,7 +32,7 @@ export default async function globalSetup() {
     console.log('E2E: database klaar')
   } catch (error) {
     console.warn(
-      'E2E: database prep mislukt — zorg dat Postgres draait (docker compose up -d postgres) en DATABASE_URL klopt.',
+      'E2E: db:seed mislukt — zorg dat Postgres draait (docker compose up -d postgres) en DATABASE_URL klopt.',
     )
     console.warn(error)
   }

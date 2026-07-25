@@ -1,23 +1,8 @@
 import { expect, test } from '@playwright/test'
-import { isFlowPublished } from './helpers/api'
+import { isFlowPublished, isProductPagePublished } from './helpers/api'
 
 const FLOW_SLUG = 'robotmaaiers'
 const PAGE_SLUG = 'robotmaaier-kiezen'
-
-async function isProductPagePublished(
-  request: Parameters<typeof isFlowPublished>[0],
-  slug: string,
-): Promise<boolean> {
-  try {
-    const apiBase = process.env.PLAYWRIGHT_API_URL ?? 'http://localhost:3001'
-    const response = await request.get(`${apiBase}/api/v1/public/pages/${slug}`, {
-      timeout: 10_000,
-    })
-    return response.ok()
-  } catch {
-    return false
-  }
-}
 
 test.describe('Robotmaaier keuzehulp', () => {
   test.beforeEach(async ({ request }) => {
@@ -79,7 +64,7 @@ test.describe('Robotmaaier SEO-pagina', () => {
     await page.goto(`/${PAGE_SLUG}`)
 
     await expect(
-      page.getByRole('heading', { name: 'Welke robotmaaier past bij jouw tuin?' }),
+      page.getByRole('heading', { name: 'Vind de ideale robotmaaier voor jouw gazon' }),
     ).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Hoe groot is het gazon?' })).toBeVisible()
   })

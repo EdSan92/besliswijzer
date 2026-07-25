@@ -6,6 +6,10 @@ loadEnv({ path: resolve(__dirname, '../../.env') })
 
 export default defineNuxtConfig({
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
+  experimental: {
+    // Voorkomt Vite pre-transform errors op #app-manifest bij cold start (o.a. Playwright e2e).
+    appManifest: false,
+  },
   modules: ['@pinia/nuxt'],
   runtimeConfig: {
     geminiApiKey:

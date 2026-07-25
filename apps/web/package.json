@@ -8,6 +8,7 @@
     "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "e2e:dev": "nuxt prepare && nuxt dev --host 127.0.0.1",
     "postinstall": "nuxt prepare",
     "test": "vitest run",
     "lint": "nuxt typecheck"

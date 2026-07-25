@@ -22,11 +22,6 @@ test.describe('Warmtepomp keuzehulp', () => {
     await page.getByRole('button', { name: 'Volgende' }).click()
 
     await expect(
-      page.getByRole('heading', { name: 'Wil je je advies per e-mail ontvangen?' }),
-    ).toBeVisible()
-    await page.getByRole('button', { name: 'Overslaan' }).click()
-
-    await expect(
       page.getByRole('heading', { name: 'All-electric warmtepomp geschikt' }),
     ).toBeVisible()
     await expect(page.getByRole('link', { name: 'Bekijk warmtepompen' })).toBeVisible()

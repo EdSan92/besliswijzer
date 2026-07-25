@@ -41,7 +41,8 @@ export default defineConfig({
       },
     },
     {
-      command: `pnpm --filter @besliswijzer/web exec nuxt dev --host 127.0.0.1 --port ${WEB_PORT}`,
+      command: 'pnpm run e2e:dev',
+      cwd: 'apps/web',
       url: WEB_URL,
       reuseExistingServer: !process.env.CI,
       timeout: 180_000,

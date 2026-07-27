@@ -33,10 +33,25 @@ const modelExamples = computed(() => {
 })
 
 function onCtaClick(cta: FlowResult['ctas'][number]) {
+  if (cta.type === 'affiliate' && props.flowSlug) {
+    return
+  }
+
   track(props.flowId, props.versionId, props.sessionId, 'cta_click', undefined, {
     ctaId: cta.id,
     resultKey: props.result.resultKey,
     trackingId: cta.trackingId,
+    flowSlug: props.flowSlug,
+  })
+}
+
+function affiliateHref(cta: FlowResult['ctas'][number]) {
+  if (cta.type !== 'affiliate' || !props.flowSlug) return cta.url
+  return buildAffiliateClickHref({
+    flowSlug: props.flowSlug,
+    resultKey: props.result.resultKey,
+    ctaId: cta.id,
+    sessionId: props.sessionId,
   })
 }
 </script>
@@ -69,7 +84,7 @@ function onCtaClick(cta: FlowResult['ctas'][number]) {
       <a
         v-for="cta in result.ctas"
         :key="cta.id"
-        :href="cta.url"
+        :href="affiliateHref(cta)"
         class="btn"
         :class="{ 'btn-secondary': cta.type === 'external' }"
         target="_blank"

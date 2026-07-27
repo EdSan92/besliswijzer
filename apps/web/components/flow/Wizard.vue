@@ -33,6 +33,7 @@ onMounted(() => {
   track(props.flow.flowId, props.flow.versionId, store.sessionId, 'flow_start', undefined, {
     referrer: document.referrer,
     utm: Object.fromEntries(new URLSearchParams(window.location.search)),
+    flowSlug: props.flow.slug,
   })
 
   track(
@@ -96,6 +97,7 @@ async function submitAnswer(answer: unknown) {
         store.setResult(next.result)
         track(props.flow.flowId, props.flow.versionId, store.sessionId, 'flow_complete', undefined, {
           resultKey: next.resultKey,
+          flowSlug: props.flow.slug,
         })
       } else {
         store.completed = true
@@ -127,7 +129,10 @@ async function submitAnswer(answer: unknown) {
           store.sessionId,
           'flow_complete',
           undefined,
-          { resultKey: (response.next.result as { resultKey: string }).resultKey },
+          {
+            resultKey: (response.next.result as { resultKey: string }).resultKey,
+            flowSlug: props.flow.slug,
+          },
         )
       } else {
         store.completed = true

@@ -26,6 +26,10 @@ useSeoMeta({
   ogDescription: flow.value.seo.description,
   ogImage: flow.value.seo.ogImage,
 })
+
+useHead({
+  link: [{ rel: 'canonical', href: `/flows/${slug}` }],
+})
 </script>
 
 <template>

@@ -25,6 +25,20 @@ if (error.value) {
 if (!pending.value && !page.value) {
   throw createError({ statusCode: 404, statusMessage: 'Pagina niet gevonden' })
 }
+
+if (import.meta.client && page.value) {
+  const store = useFlowSessionStore()
+  const { trackPageView } = useFlowAnalytics()
+  onMounted(() => {
+    const flowBlock = page.value?.blocks.find((block) => block.type === 'flow')
+    trackPageView(store.sessionId, {
+      pageSlug: slug,
+      route: route.path,
+      categorySlug: page.value?.product.categorySlug ?? null,
+      flowSlug: flowBlock && flowBlock.type === 'flow' ? flowBlock.data.flowSlug : null,
+    })
+  })
+}
 </script>
 
 <template>

@@ -5,11 +5,13 @@ export const inputTypeSchema = z.enum(['single', 'multi', 'slider', 'text'])
 export const ruleTypeSchema = z.enum(['branch', 'result_map', 'skip'])
 export const versionStatusSchema = z.enum(['draft', 'published', 'archived'])
 export const eventTypeSchema = z.enum([
+  'page_view',
   'flow_start',
   'step_view',
   'step_complete',
   'flow_complete',
   'cta_click',
+  'affiliate_click',
   'lead_submit',
 ])
 export const ctaTypeSchema = z.enum(['affiliate', 'download', 'external'])
@@ -166,13 +168,61 @@ export const stepRequestSchema = z.object({
   answers: z.record(z.unknown()).optional(),
 })
 
-export const analyticsEventSchema = z.object({
-  flowId: z.string().uuid(),
-  flowVersionId: z.string().uuid(),
+const flowBoundEventTypes = new Set([
+  'flow_start',
+  'step_view',
+  'step_complete',
+  'flow_complete',
+  'cta_click',
+  'affiliate_click',
+  'lead_submit',
+])
+
+export const analyticsEventSchema = z
+  .object({
+    flowId: z.string().uuid().optional(),
+    flowVersionId: z.string().uuid().optional(),
+    sessionId: z.string().uuid(),
+    eventType: eventTypeSchema,
+    nodeKey: z.string().optional(),
+    metadata: z.record(z.unknown()).default({}),
+  })
+  .superRefine((event, ctx) => {
+    if (event.eventType === 'page_view') {
+      const pageSlug = event.metadata.pageSlug
+      if (typeof pageSlug !== 'string' || pageSlug.trim().length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'pageSlug is required for page_view events',
+          path: ['metadata', 'pageSlug'],
+        })
+      }
+      return
+    }
+
+    if (flowBoundEventTypes.has(event.eventType)) {
+      if (!event.flowId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'flowId is required for flow-bound analytics events',
+          path: ['flowId'],
+        })
+      }
+      if (!event.flowVersionId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'flowVersionId is required for flow-bound analytics events',
+          path: ['flowVersionId'],
+        })
+      }
+    }
+  })
+
+export const affiliateClickQuerySchema = z.object({
+  flowSlug: z.string().min(2),
+  resultKey: z.string().min(1),
+  ctaId: z.string().min(1),
   sessionId: z.string().uuid(),
-  eventType: eventTypeSchema,
-  nodeKey: z.string().optional(),
-  metadata: z.record(z.unknown()).default({}),
 })
 
 export const analyticsBatchSchema = z.object({
@@ -231,6 +281,38 @@ export type AnalyticsSummary = {
   dropOffByNode: Array<{ nodeKey: string; views: number; completes: number; dropOffRate: number }>
   ctaClicks: number
   leadSubmissions: number
+}
+
+export type BetaAnalyticsTotals = {
+  pageViews: number
+  flowStarts: number
+  flowCompletions: number
+  affiliateClicks: number
+  completionRate: number
+  clickThroughRate: number
+}
+
+export type BetaAnalyticsCategoryRow = {
+  categorySlug: string
+  categoryTitle: string
+  pageViews: number
+  flowStarts: number
+  flowCompletions: number
+  affiliateClicks: number
+  completionRate: number
+  clickThroughRate: number
+}
+
+export type BetaAnalyticsProductRow = {
+  trackingId: string
+  affiliateClicks: number
+  productPosition: number | null
+}
+
+export type BetaAnalyticsReport = {
+  totals: BetaAnalyticsTotals
+  byCategory: BetaAnalyticsCategoryRow[]
+  byProduct: BetaAnalyticsProductRow[]
 }
 
 export type PopularFlowItem = {

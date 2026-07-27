@@ -1,16 +1,17 @@
 import type { EventType } from '@besliswijzer/flow-schema'
 
+type AnalyticsPayload = {
+  flowId?: string
+  flowVersionId?: string
+  sessionId: string
+  eventType: EventType
+  nodeKey?: string
+  metadata?: Record<string, unknown>
+}
+
 export function useFlowAnalytics() {
   const apiBase = useApiBase()
-
-  const queue: Array<{
-    flowId: string
-    flowVersionId: string
-    sessionId: string
-    eventType: EventType
-    nodeKey?: string
-    metadata?: Record<string, unknown>
-  }> = []
+  const queue: AnalyticsPayload[] = []
 
   function track(
     flowId: string,
@@ -21,6 +22,11 @@ export function useFlowAnalytics() {
     metadata?: Record<string, unknown>,
   ) {
     queue.push({ flowId, flowVersionId, sessionId, eventType, nodeKey, metadata })
+    flush()
+  }
+
+  function trackPageView(sessionId: string, metadata: Record<string, unknown>) {
+    queue.push({ sessionId, eventType: 'page_view', metadata })
     flush()
   }
 
@@ -51,5 +57,5 @@ export function useFlowAnalytics() {
     window.addEventListener('beforeunload', () => flush())
   }
 
-  return { track, flush }
+  return { track, trackPageView, flush }
 }

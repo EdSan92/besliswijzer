@@ -1,23 +1,142 @@
-import { and, eq, sql } from 'drizzle-orm'
+import { and, eq, inArray, sql } from 'drizzle-orm'
 import { analyticsEvents, leadSubmissions, type Database } from '@besliswijzer/db'
-import type { AnalyticsSummary } from '@besliswijzer/flow-schema'
+import type { AnalyticsSummary, BetaAnalyticsReport } from '@besliswijzer/flow-schema'
 
-export async function ingestAnalyticsEvents(
-  db: Database,
-  events: Array<{
-    flowId: string
-    flowVersionId: string
-    sessionId: string
-    eventType: 'flow_start' | 'step_view' | 'step_complete' | 'flow_complete' | 'cta_click' | 'lead_submit'
-    nodeKey?: string
-    metadata?: Record<string, unknown>
-  }>,
-) {
+type IngestEvent = {
+  flowId?: string
+  flowVersionId?: string
+  sessionId: string
+  eventType:
+    | 'page_view'
+    | 'flow_start'
+    | 'step_view'
+    | 'step_complete'
+    | 'flow_complete'
+    | 'cta_click'
+    | 'affiliate_click'
+    | 'lead_submit'
+  nodeKey?: string
+  metadata?: Record<string, unknown>
+}
+
+type BetaAnalyticsEventRow = {
+  eventType: string
+  categorySlug?: string | null
+  categoryTitle?: string | null
+  productSlug?: string | null
+  flowSlug?: string | null
+  trackingId?: string | null
+  productPosition?: number | null
+}
+
+function rate(numerator: number, denominator: number): number {
+  return denominator > 0 ? Math.round((numerator / denominator) * 100) : 0
+}
+
+export function buildBetaAnalyticsReport(events: BetaAnalyticsEventRow[]): BetaAnalyticsReport {
+  const totals = {
+    pageViews: 0,
+    flowStarts: 0,
+    flowCompletions: 0,
+    affiliateClicks: 0,
+    completionRate: 0,
+    clickThroughRate: 0,
+  }
+
+  const categoryMap = new Map<
+    string,
+    {
+      categorySlug: string
+      categoryTitle: string
+      pageViews: number
+      flowStarts: number
+      flowCompletions: number
+      affiliateClicks: number
+    }
+  >()
+
+  const productMap = new Map<
+    string,
+    { trackingId: string; affiliateClicks: number; productPosition: number | null }
+  >()
+
+  for (const event of events) {
+    const categorySlug = event.categorySlug ?? 'uncategorized'
+    const categoryTitle = event.categoryTitle ?? 'Ongecategoriseerd'
+    const category =
+      categoryMap.get(categorySlug) ??
+      (() => {
+        const row = {
+          categorySlug,
+          categoryTitle,
+          pageViews: 0,
+          flowStarts: 0,
+          flowCompletions: 0,
+          affiliateClicks: 0,
+        }
+        categoryMap.set(categorySlug, row)
+        return row
+      })()
+
+    switch (event.eventType) {
+      case 'page_view':
+        totals.pageViews += 1
+        category.pageViews += 1
+        break
+      case 'flow_start':
+        totals.flowStarts += 1
+        category.flowStarts += 1
+        break
+      case 'flow_complete':
+        totals.flowCompletions += 1
+        category.flowCompletions += 1
+        break
+      case 'affiliate_click':
+      case 'cta_click':
+        totals.affiliateClicks += 1
+        category.affiliateClicks += 1
+        if (event.trackingId) {
+          const product =
+            productMap.get(event.trackingId) ??
+            (() => {
+              const row = {
+                trackingId: event.trackingId as string,
+                affiliateClicks: 0,
+                productPosition: event.productPosition ?? null,
+              }
+              productMap.set(event.trackingId as string, row)
+              return row
+            })()
+          product.affiliateClicks += 1
+        }
+        break
+      default:
+        break
+    }
+  }
+
+  totals.completionRate = rate(totals.flowCompletions, totals.flowStarts)
+  totals.clickThroughRate = rate(totals.affiliateClicks, totals.flowCompletions)
+
+  const byCategory = [...categoryMap.values()]
+    .map((row) => ({
+      ...row,
+      completionRate: rate(row.flowCompletions, row.flowStarts),
+      clickThroughRate: rate(row.affiliateClicks, row.flowCompletions),
+    }))
+    .sort((a, b) => b.pageViews - a.pageViews)
+
+  const byProduct = [...productMap.values()].sort((a, b) => b.affiliateClicks - a.affiliateClicks)
+
+  return { totals, byCategory, byProduct }
+}
+
+export async function ingestAnalyticsEvents(db: Database, events: IngestEvent[]) {
   if (events.length === 0) return
   await db.insert(analyticsEvents).values(
     events.map((event) => ({
-      flowId: event.flowId,
-      flowVersionId: event.flowVersionId,
+      flowId: event.flowId ?? null,
+      flowVersionId: event.flowVersionId ?? null,
       sessionId: event.sessionId,
       eventType: event.eventType,
       nodeKey: event.nodeKey,
@@ -40,7 +159,12 @@ export async function getAnalyticsSummary(db: Database, flowId: string): Promise
   const ctaResult = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(analyticsEvents)
-    .where(and(eq(analyticsEvents.flowId, flowId), eq(analyticsEvents.eventType, 'cta_click')))
+    .where(
+      and(
+        eq(analyticsEvents.flowId, flowId),
+        inArray(analyticsEvents.eventType, ['cta_click', 'affiliate_click']),
+      ),
+    )
 
   const leadsResult = await db
     .select({ count: sql<number>`count(*)::int` })
@@ -83,6 +207,43 @@ export async function getAnalyticsSummary(db: Database, flowId: string): Promise
     ctaClicks: ctaResult[0]?.count ?? 0,
     leadSubmissions: leadsResult[0]?.count ?? 0,
   }
+}
+
+export async function getBetaAnalyticsReport(db: Database): Promise<BetaAnalyticsReport> {
+  const rows = await db.execute<{
+    event_type: string
+    category_slug: string | null
+    category_title: string | null
+    page_slug: string | null
+    flow_slug: string | null
+    tracking_id: string | null
+    product_position: number | null
+  }>(sql`
+    SELECT
+      ae.event_type,
+      fc.slug AS category_slug,
+      fc.title AS category_title,
+      ae.metadata->>'pageSlug' AS page_slug,
+      COALESCE(ae.metadata->>'flowSlug', f.slug) AS flow_slug,
+      ae.metadata->>'trackingId' AS tracking_id,
+      NULLIF(ae.metadata->>'productPosition', '')::int AS product_position
+    FROM analytics_events ae
+    LEFT JOIN flows f ON f.id = ae.flow_id
+    LEFT JOIN flow_categories fc ON fc.id = f.category_id
+    WHERE ae.event_type IN ('page_view', 'flow_start', 'flow_complete', 'affiliate_click', 'cta_click')
+  `)
+
+  return buildBetaAnalyticsReport(
+    rows.map((row) => ({
+      eventType: row.event_type,
+      categorySlug: row.category_slug,
+      categoryTitle: row.category_title,
+      productSlug: row.page_slug,
+      flowSlug: row.flow_slug,
+      trackingId: row.tracking_id,
+      productPosition: row.product_position,
+    })),
+  )
 }
 
 export async function createLeadSubmission(

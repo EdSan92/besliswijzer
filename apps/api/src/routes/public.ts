@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import {
   analyticsBatchSchema,
+  affiliateClickQuerySchema,
   leadSubmissionSchema,
   stepRequestSchema,
 } from '@besliswijzer/flow-schema'
@@ -21,6 +22,7 @@ import {
   createLeadSubmission,
   ingestAnalyticsEvents,
 } from '../services/analytics-service.js'
+import { resolveAffiliateDestination } from '../services/affiliate-click-service.js'
 import {
   getCategoryWithFlows,
   listPopularPublishedFlows,
@@ -213,6 +215,46 @@ export async function registerPublicRoutes(app: FastifyInstance) {
     const body = analyticsBatchSchema.parse(request.body)
     await ingestAnalyticsEvents(app.db, body.events)
     return reply.status(202).send({ accepted: body.events.length })
+  })
+
+  app.get('/api/v1/public/affiliate/click', async (request, reply) => {
+    const query = affiliateClickQuerySchema.parse(request.query)
+    const published = await getPublishedVersion(app.db, query.flowSlug)
+    if (!published) {
+      return reply.status(404).send({ error: 'Flow not found' })
+    }
+
+    const snapshot = await loadFlowSnapshot(app.db, published.flow.id, published.version.id)
+    if (!snapshot) {
+      return reply.status(404).send({ error: 'Flow not found' })
+    }
+
+    const destination = resolveAffiliateDestination(snapshot, query)
+    if (!destination) {
+      return reply.status(404).send({ error: 'Affiliate link not found' })
+    }
+
+    try {
+      await ingestAnalyticsEvents(app.db, [
+        {
+          flowId: destination.flowId,
+          flowVersionId: destination.flowVersionId,
+          sessionId: query.sessionId,
+          eventType: 'affiliate_click',
+          metadata: {
+            ctaId: destination.ctaId,
+            resultKey: destination.resultKey,
+            trackingId: destination.trackingId,
+            flowSlug: query.flowSlug,
+            dedupeKey: `${query.sessionId}:${destination.ctaId}:${destination.resultKey}`,
+          },
+        },
+      ])
+    } catch {
+      // Tracking is secondary; navigation must continue.
+    }
+
+    return reply.redirect(destination.url)
   })
 
   app.post<{ Params: { slug: string } }>(

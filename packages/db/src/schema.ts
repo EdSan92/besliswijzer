@@ -15,11 +15,13 @@ export const versionStatusEnum = pgEnum('version_status', ['draft', 'published',
 export const nodeTypeEnum = pgEnum('node_type', ['question', 'info', 'lead_capture'])
 export const ruleTypeEnum = pgEnum('rule_type', ['branch', 'result_map', 'skip'])
 export const eventTypeEnum = pgEnum('event_type', [
+  'page_view',
   'flow_start',
   'step_view',
   'step_complete',
   'flow_complete',
   'cta_click',
+  'affiliate_click',
   'lead_submit',
 ])
 export const pageStatusEnum = pgEnum('page_status', ['draft', 'published', 'archived'])
@@ -114,12 +116,8 @@ export const flowResults = pgTable(
 
 export const analyticsEvents = pgTable('analytics_events', {
   id: uuid('id').primaryKey().defaultRandom(),
-  flowId: uuid('flow_id')
-    .notNull()
-    .references(() => flows.id, { onDelete: 'cascade' }),
-  flowVersionId: uuid('flow_version_id')
-    .notNull()
-    .references(() => flowVersions.id, { onDelete: 'cascade' }),
+  flowId: uuid('flow_id').references(() => flows.id, { onDelete: 'cascade' }),
+  flowVersionId: uuid('flow_version_id').references(() => flowVersions.id, { onDelete: 'cascade' }),
   sessionId: text('session_id').notNull(),
   eventType: eventTypeEnum('event_type').notNull(),
   nodeKey: text('node_key'),

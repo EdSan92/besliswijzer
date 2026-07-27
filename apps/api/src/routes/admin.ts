@@ -35,6 +35,7 @@ import {
 import {
   exportLeadsCsv,
   getAnalyticsSummary,
+  getBetaAnalyticsReport,
 } from '../services/analytics-service.js'
 import {
   appendFaqToProductPage,
@@ -810,6 +811,10 @@ export async function registerAdminRoutes(app: FastifyInstance) {
       return updated
     },
   )
+
+  app.get('/api/v1/admin/analytics/beta-report', async () => {
+    return getBetaAnalyticsReport(app.db)
+  })
 
   app.get<{ Params: { id: string } }>(
     '/api/v1/admin/flows/:id/analytics',

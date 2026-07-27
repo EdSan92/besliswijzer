@@ -163,7 +163,7 @@ Meerdere opportunity-flows voor één product kunnen worden **gemerged** (`merge
 | `flow_options` | Antwoordkeuzes per node |
 | `flow_rules` | Branching rules (JSON Logic conditions) |
 | `flow_results` | Eindresultaten |
-| `analytics_events` | Funnel events (flow_start, step_view, step_complete, etc.) |
+| `analytics_events` | Funnel + page events (`page_view`, `flow_start`, `flow_complete`, `affiliate_click`, legacy `step_*`/`cta_click`) |
 | `lead_submissions` | Email + answers snapshot |
 | `products` | Productcatalogus |
 | `product_pages` | Block-based pagina's (blocks + layout als JSONB) |
@@ -250,7 +250,8 @@ Geen authenticatie. Aangeroepen via Nuxt proxy: `server/api/v1/public/[...path].
 | GET | `/flows/:slug` | Gepubliceerde flow (entry node + metadata) |
 | POST | `/flows/:slug/step` | Antwoord indienen, volgende node ophalen |
 | GET | `/flows/:slug/results/:resultKey` | Resultaat ophalen |
-| POST | `/analytics/events` | Analytics batch |
+| POST | `/analytics/events` | Analytics batch (flow + page_view) |
+| GET | `/affiliate/click` | Affiliate tracking + redirect (geen vrije URL) |
 | POST | `/flows/:slug/leads` | Lead capture |
 
 Routes: `apps/api/src/routes/public.ts`
@@ -268,6 +269,7 @@ In productie: admin sessie via Nuxt proxy (`server/api/admin/[...path].ts`).
 | POST | `/flows/:id/publish` | Draft publiceren |
 | GET | `/flows/:id/export` | FlowDefinition exporteren |
 | GET | `/flows/:id/analytics` | Funnel statistieken |
+| GET | `/analytics/beta-report` | Publieke bèta rapportage (views, funnel, affiliatekliks) |
 | GET | `/flows/:id/leads` | Leads CSV export |
 | CRUD | `/categories` | Categorie beheer |
 | GET | `/products/match?keyword=&category=` | Keyword → product matching |
@@ -327,6 +329,9 @@ Config: `BESLIJSWIJZER_API_BASE` + `ADMIN_API_KEY`
 | `/admin/opportunities` | `pages/admin/opportunities.vue` | Discovery pipeline |
 | `/admin/flows/:id/edit` | Flow editor |
 | `/admin/flows/:id/preview` | Flow preview |
+| `/admin/analytics` | `pages/admin/analytics/index.vue` | Publieke bèta rapportage |
+| `/sitemap.xml` | `server/routes/sitemap.xml.ts` | Dynamische sitemap (productpagina's + flows) |
+| `/robots.txt` | `server/routes/robots.txt.ts` | Crawlregels + sitemapverwijzing |
 
 ### Belangrijke composables
 
@@ -336,6 +341,7 @@ Config: `BESLIJSWIJZER_API_BASE` + `ADMIN_API_KEY`
 | `useOpportunityEngine()` | `composables/useOpportunityEngine.ts` | Volledige admin pipeline (discover, generate, import, publish, route) |
 | `useFlowPageLinks()` | `composables/useFlowPageLinks.ts` | Flow → productpagina link mapping |
 | `useBlockRegistry()` | `composables/useBlockRegistry.ts` | Content block rendering |
+| `useFlowAnalytics()` | `composables/useFlowAnalytics.ts` | Event batch (`page_view`, flow funnel, sendBeacon) |
 | `useProductPageSeo()` | `composables/useProductPageSeo.ts` | SEO meta voor productpagina's |
 
 ### Content block registry
@@ -604,6 +610,11 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/db/src/seed-thuisbatterij-reference.ts` | Thuisbatterij seed orchestrator |
 | `packages/db/src/seed-thuisbatterij-product-page.ts` | Thuisbatterij product + SEO-pagina seed |
 | `e2e/thuisbatterij-flow.spec.ts` | Thuisbatterij E2E (flow + embed) |
+| `e2e/beta-analytics.spec.ts` | Publieke bèta analytics + sitemap E2E |
+| `apps/api/src/services/analytics-service.ts` | Event ingest + bèta rapportage |
+| `apps/api/src/services/affiliate-click-service.ts` | Affiliate CTA lookup (geen vrije URL) |
+| `apps/web/server/routes/sitemap.xml.ts` | Sitemap generator |
+| `apps/web/server/routes/robots.txt.ts` | robots.txt |
 
 ### Product & pagina's
 | Bestand | Rol |
@@ -644,4 +655,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 27 juli 2026 · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 27 juli 2026 (R2.1 analytics bèta) · Gebaseerd op de decision-engine monorepo*

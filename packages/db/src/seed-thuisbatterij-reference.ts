@@ -2,7 +2,7 @@ import { execSync } from 'node:child_process'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { eq } from 'drizzle-orm'
-import { flows, type createDb } from './index.js'
+import { flowCategories, flows, type createDb } from './index.js'
 import {
   THUISBATTERIJ_FLOW_SLUG,
   seedThuisbatterijProductPage,
@@ -11,6 +11,27 @@ import {
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 
 type Db = ReturnType<typeof createDb>['db']
+
+export async function ensureEnergieCategory(db: Db) {
+  const existing = await db.query.flowCategories.findFirst({
+    where: eq(flowCategories.slug, 'energie'),
+  })
+
+  if (existing) return existing
+
+  const [category] = await db
+    .insert(flowCategories)
+    .values({
+      slug: 'energie',
+      title: 'Energie',
+      description: 'Warmtepomp, thuisbatterij en energiebesparing',
+      sortOrder: 1,
+    })
+    .returning()
+
+  console.log('Seeded category energie')
+  return category!
+}
 
 export async function ensureThuisbatterijFlow(db: Db) {
   const existing = await db.query.flows.findFirst({
@@ -35,6 +56,7 @@ export async function ensureThuisbatterijFlow(db: Db) {
 }
 
 export async function ensureThuisbatterijReference(db: Db) {
+  await ensureEnergieCategory(db)
   await ensureThuisbatterijFlow(db)
   await seedThuisbatterijProductPage(db)
 }

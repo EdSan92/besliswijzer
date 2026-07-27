@@ -81,6 +81,9 @@ async function main() {
   const { ensureRobotstofzuigerReference } = await import('./seed-robotstofzuiger-reference.js')
   await ensureRobotstofzuigerReference(db)
 
+  const { ensureMeshWifiReference } = await import('./seed-mesh-wifi-reference.js')
+  await ensureMeshWifiReference(db)
+
   await client.end()
 }
 

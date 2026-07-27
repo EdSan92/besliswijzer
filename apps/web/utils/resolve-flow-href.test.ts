@@ -18,6 +18,10 @@ describe('resolveFlowHref', () => {
     ).toBe('/robotstofzuiger-kiezen')
   })
 
+  it('links mesh-wifi to the SEO product page', () => {
+    expect(resolveFlowHref('mesh-wifi', { 'mesh-wifi': 'mesh-wifi-kiezen' })).toBe('/mesh-wifi-kiezen')
+  })
+
   it('falls back to flow route when no mapping exists', () => {
     expect(resolveFlowHref('warmtepomp-keuzehulp', {})).toBe('/flows/warmtepomp-keuzehulp')
   })
@@ -28,6 +32,7 @@ describe('productPageLinkLabel', () => {
     expect(productPageLinkLabel('airfryers')).toBe('Meer over airfryers')
     expect(productPageLinkLabel('robotmaaiers')).toBe('Meer over robotmaaiers')
     expect(productPageLinkLabel('robotstofzuigers')).toBe('Meer over robotstofzuigers')
+    expect(productPageLinkLabel('mesh-wifi')).toBe('Meer over mesh wifi')
   })
 
   it('falls back to generic label for unknown flows', () => {

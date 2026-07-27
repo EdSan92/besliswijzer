@@ -1,0 +1,483 @@
+{
+  "publish": true,
+  "overwrite": true,
+  "flow": {
+    "slug": "mesh-wifi",
+    "title": "Mesh wifi keuzehulp",
+    "categorySlug": null,
+    "seo": {
+      "title": "Welk mesh wifi systeem past bij jouw woning?",
+      "description": "Beantwoord een paar vragen over je woning, internetgebruik en budget en ontdek welk mesh wifi systeem het beste bij je past."
+    },
+    "nodes": [
+      {
+        "nodeKey": "woningtype",
+        "type": "question",
+        "title": "Wat voor woning heb je?",
+        "content": {
+          "inputType": "single",
+          "description": "Grotere woningen vragen meestal meer nodes voor volledige dekking."
+        },
+        "sortOrder": 0,
+        "isEntry": true,
+        "options": [
+          { "optionKey": "appartement", "label": "Appartement", "value": "appartement", "sortOrder": 0 },
+          { "optionKey": "rijtjeshuis", "label": "Rijtjeshuis / tussenwoning", "value": "rijtjeshuis", "sortOrder": 1 },
+          { "optionKey": "vrijstaand", "label": "Vrijstaande woning", "value": "vrijstaand", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "oppervlak",
+        "type": "question",
+        "title": "Hoe groot is je woonoppervlak?",
+        "content": {
+          "inputType": "single",
+          "description": "Meer vierkante meters betekent vaak extra mesh nodes."
+        },
+        "sortOrder": 1,
+        "options": [
+          { "optionKey": "klein", "label": "Klein (tot 80 m²)", "value": "klein", "sortOrder": 0 },
+          { "optionKey": "middel", "label": "Middel (80–150 m²)", "value": "middel", "sortOrder": 1 },
+          { "optionKey": "groot", "label": "Groot (meer dan 150 m²)", "value": "groot", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "verdiepingen",
+        "type": "question",
+        "title": "Hoeveel verdiepingen moet wifi dekken?",
+        "content": {
+          "inputType": "single",
+          "description": "Meerdere verdiepingen vragen strategisch geplaatste nodes."
+        },
+        "sortOrder": 2,
+        "options": [
+          { "optionKey": "1", "label": "Één verdieping", "value": "1", "sortOrder": 0 },
+          { "optionKey": "2", "label": "Twee verdiepingen", "value": "2", "sortOrder": 1 },
+          { "optionKey": "3plus", "label": "Drie of meer verdiepingen", "value": "3plus", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "snelheid",
+        "type": "question",
+        "title": "Welke internetsnelheid heb je (of verwacht je)?",
+        "content": {
+          "inputType": "single",
+          "description": "Je mesh systeem moet minstens je abonnementssnelheid kunnen doorgeven."
+        },
+        "sortOrder": 3,
+        "options": [
+          { "optionKey": "tot_100", "label": "Tot 100 Mbps", "value": "tot_100", "sortOrder": 0 },
+          { "optionKey": "100_500", "label": "100 – 500 Mbps", "value": "100_500", "sortOrder": 1 },
+          { "optionKey": "500_plus", "label": "Meer dan 500 Mbps", "value": "500_plus", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "backhaul",
+        "type": "question",
+        "title": "Kun je nodes bekabelen (Ethernet backhaul)?",
+        "content": {
+          "inputType": "single",
+          "description": "Bekabelde backhaul geeft stabielere snelheid tussen nodes dan draadloze backhaul."
+        },
+        "sortOrder": 4,
+        "options": [
+          { "optionKey": "nee", "label": "Nee, alleen draadloos", "value": "nee", "sortOrder": 0 },
+          { "optionKey": "ja", "label": "Ja, op sommige plekken", "value": "ja", "sortOrder": 1 },
+          { "optionKey": "verplicht", "label": "Ja, bekabeling is gewenst/verplicht", "value": "verplicht", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "muren",
+        "type": "question",
+        "title": "Uit welk materiaal bestaan vooral je muren en vloeren?",
+        "content": {
+          "inputType": "single",
+          "description": "Beton en staal dempen wifi sterker dan hout en gipsplaten."
+        },
+        "sortOrder": 5,
+        "options": [
+          { "optionKey": "hout_gips", "label": "Hout en gipsplaten", "value": "hout_gips", "sortOrder": 0 },
+          { "optionKey": "mix", "label": "Mix van materialen", "value": "mix", "sortOrder": 1 },
+          { "optionKey": "beton_staal", "label": "Veel beton of staal", "value": "beton_staal", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "apparaten",
+        "type": "question",
+        "title": "Hoeveel apparaten gebruiken tegelijk wifi?",
+        "content": {
+          "inputType": "single",
+          "description": "Veel smartphones, laptops en slimme apparaten vragen een robuuster systeem."
+        },
+        "sortOrder": 6,
+        "options": [
+          { "optionKey": "weinig", "label": "Tot 10 apparaten", "value": "weinig", "sortOrder": 0 },
+          { "optionKey": "gemiddeld", "label": "10 – 25 apparaten", "value": "gemiddeld", "sortOrder": 1 },
+          { "optionKey": "veel", "label": "Meer dan 25 apparaten", "value": "veel", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "gebruik",
+        "type": "question",
+        "title": "Waarvoor gebruik je internet het meest?",
+        "content": {
+          "inputType": "single",
+          "description": "Gaming en videobellen vragen lage latency en stabiele verbinding."
+        },
+        "sortOrder": 7,
+        "options": [
+          { "optionKey": "basis", "label": "Surfen, mail en streaming", "value": "basis", "sortOrder": 0 },
+          { "optionKey": "gaming_thuiswerk", "label": "Gaming of veel videobellen", "value": "gaming_thuiswerk", "sortOrder": 1 },
+          { "optionKey": "beide", "label": "Combinatie van alles", "value": "beide", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "wifi_standaard",
+        "type": "question",
+        "title": "Welke wifi-generatie heb je nodig?",
+        "content": {
+          "inputType": "single",
+          "description": "Wi-Fi 6 en 6E/7 zijn toekomstbestendiger bij veel gelijktijdige apparaten."
+        },
+        "sortOrder": 8,
+        "options": [
+          { "optionKey": "wifi5_ok", "label": "Wi-Fi 5 is voldoende", "value": "wifi5_ok", "sortOrder": 0 },
+          { "optionKey": "wifi6", "label": "Wi-Fi 6 gewenst", "value": "wifi6", "sortOrder": 1 },
+          { "optionKey": "wifi6e_7", "label": "Wi-Fi 6E of 7", "value": "wifi6e_7", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "ouderlijk_toezicht",
+        "type": "question",
+        "title": "Wil je ouderlijk toezicht of gastnetwerk?",
+        "content": {
+          "inputType": "single",
+          "description": "Sommige systemen bieden ingebouwde filters, schema's en gast-wifi."
+        },
+        "sortOrder": 9,
+        "options": [
+          { "optionKey": "nee", "label": "Nee, niet nodig", "value": "nee", "sortOrder": 0 },
+          { "optionKey": "ja", "label": "Ja, graag", "value": "ja", "sortOrder": 1 }
+        ]
+      },
+      {
+        "nodeKey": "budget",
+        "type": "question",
+        "title": "Wat is je budget ongeveer?",
+        "content": {
+          "inputType": "single",
+          "description": "Mesh sets variëren van compacte duo-packs tot premium tri-band systemen."
+        },
+        "sortOrder": 10,
+        "options": [
+          { "optionKey": "tot_150", "label": "Tot €150", "value": "tot_150", "sortOrder": 0 },
+          { "optionKey": "150_300", "label": "€150 – €300", "value": "150_300", "sortOrder": 1 },
+          { "optionKey": "300_plus", "label": "Meer dan €300", "value": "300_plus", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "lead",
+        "type": "lead_capture",
+        "title": "Advies per e-mail ontvangen?",
+        "content": {
+          "description": "Optioneel — ontvang een korte samenvatting met jouw beste match."
+        },
+        "sortOrder": 11
+      }
+    ],
+    "rules": [
+      {
+        "fromNodeKey": "woningtype",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.woningtype" }, ""] },
+        "targetNodeKey": "oppervlak",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "oppervlak",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.oppervlak" }, ""] },
+        "targetNodeKey": "verdiepingen",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "verdiepingen",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.verdiepingen" }, ""] },
+        "targetNodeKey": "snelheid",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "snelheid",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.snelheid" }, ""] },
+        "targetNodeKey": "backhaul",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "backhaul",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.backhaul" }, ""] },
+        "targetNodeKey": "muren",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "muren",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.muren" }, ""] },
+        "targetNodeKey": "apparaten",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "apparaten",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.apparaten" }, ""] },
+        "targetNodeKey": "gebruik",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "gebruik",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.gebruik" }, ""] },
+        "targetNodeKey": "wifi_standaard",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "wifi_standaard",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.wifi_standaard" }, ""] },
+        "targetNodeKey": "ouderlijk_toezicht",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "ouderlijk_toezicht",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.ouderlijk_toezicht" }, ""] },
+        "targetNodeKey": "budget",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "budget",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.budget" }, ""] },
+        "targetNodeKey": "lead",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": {
+          "or": [
+            { "==": [{ "var": "answers.wifi_standaard" }, "wifi6e_7"] },
+            {
+              "and": [
+                { "==": [{ "var": "answers.gebruik" }, "beide"] },
+                { "==": [{ "var": "answers.budget" }, "300_plus"] }
+              ]
+            }
+          ]
+        },
+        "targetResultKey": "advies_premium",
+        "priority": 110
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": {
+          "or": [
+            { "==": [{ "var": "answers.backhaul" }, "verplicht"] },
+            {
+              "and": [
+                { "==": [{ "var": "answers.backhaul" }, "ja"] },
+                {
+                  "or": [
+                    { "==": [{ "var": "answers.oppervlak" }, "groot"] },
+                    { "==": [{ "var": "answers.verdiepingen" }, "3plus"] }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "targetResultKey": "advies_backhaul",
+        "priority": 105
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": {
+          "or": [
+            { "==": [{ "var": "answers.gebruik" }, "gaming_thuiswerk"] },
+            { "==": [{ "var": "answers.gebruik" }, "beide"] }
+          ]
+        },
+        "targetResultKey": "advies_gaming",
+        "priority": 100
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": {
+          "or": [
+            { "==": [{ "var": "answers.oppervlak" }, "groot"] },
+            { "==": [{ "var": "answers.verdiepingen" }, "3plus"] },
+            { "==": [{ "var": "answers.apparaten" }, "veel"] }
+          ]
+        },
+        "targetResultKey": "advies_groot_bereik",
+        "priority": 95
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.budget" }, "tot_150"] },
+        "targetResultKey": "advies_instap",
+        "priority": 90
+      },
+      {
+        "fromNodeKey": "lead",
+        "ruleType": "result_map",
+        "condition": { ">=": [{ "var": "answers.budget" }, ""] },
+        "targetResultKey": "advies_instap",
+        "priority": 70
+      }
+    ],
+    "results": [
+      {
+        "resultKey": "advies_instap",
+        "title": "Instap mesh wifi-set",
+        "body": {
+          "summary": "Compacte duo- of triopack voor kleinere woningen met basis internetgebruik.",
+          "why": "Je hebt beperkt budget of een klein oppervlak waar een eenvoudige mesh set volstaat.",
+          "checklist": [
+            "Duo-pack voor appartement of klein huis",
+            "Wi-Fi 5 of instap Wi-Fi 6",
+            "Eenvoudige app voor basisbeheer"
+          ],
+          "voorbeeldmodellen": [
+            "TP-Link Deco E4",
+            "Devolo Magic 2 WiFi next",
+            "Google Nest Wifi (2-pack)"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-instap",
+            "type": "affiliate",
+            "url": "https://example.com/mesh-wifi-instap",
+            "label": "Bekijk instap mesh sets",
+            "trackingId": "aff-mesh-wifi-instap"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_groot_bereik",
+        "title": "Mesh wifi voor groot bereik",
+        "body": {
+          "summary": "Meerdere nodes voor brede dekking in grote woningen of over meerdere verdiepingen.",
+          "why": "Je woning is groot, heeft meerdere verdiepingen of veel gelijktijdige apparaten.",
+          "checklist": [
+            "Drie of meer nodes",
+            "Tri-band voor betere backhaul",
+            "Dekking 200 m² of meer"
+          ],
+          "voorbeeldmodellen": [
+            "TP-Link Deco X55 (3-pack)",
+            "ASUS ZenWiFi XD6",
+            "Netgear Orbi RBK753"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-dekking",
+            "type": "affiliate",
+            "url": "https://example.com/mesh-wifi-dekking",
+            "label": "Bekijk sets voor groot bereik",
+            "trackingId": "aff-mesh-wifi-dekking"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_backhaul",
+        "title": "Mesh wifi met bekabelde backhaul",
+        "body": {
+          "summary": "Systemen die optimaal presteren wanneer nodes via Ethernet zijn verbonden.",
+          "why": "Je kunt bekabeling inzetten voor maximale snelheid en stabiliteit tussen nodes.",
+          "checklist": [
+            "Ethernet-poorten op elke node",
+            "Ideaal bij betonnen muren",
+            "Volledige abonnementssnelheid behouden"
+          ],
+          "voorbeeldmodellen": [
+            "ASUS ZenWiFi ET8",
+            "TP-Link Deco XE75 Pro",
+            "Ubiquiti UniFi U6 Mesh"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-backhaul",
+            "type": "affiliate",
+            "url": "https://example.com/mesh-wifi-backhaul",
+            "label": "Bekijk backhaul-vriendelijke sets",
+            "trackingId": "aff-mesh-wifi-backhaul"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_gaming",
+        "title": "Mesh wifi voor gaming en thuiswerken",
+        "body": {
+          "summary": "Lage latency, QoS en stabiele verbinding voor gaming, videobellen en thuiswerk.",
+          "why": "Je gebruikt internet intensief voor gaming, Teams/Zoom of veel gelijktijdige streams.",
+          "checklist": [
+            "QoS of gaming-modus",
+            "Wi-Fi 6 met voldoende bandbreedte",
+            "Preferably tri-band backhaul"
+          ],
+          "voorbeeldmodellen": [
+            "ASUS ROG Rapture GT6",
+            "TP-Link Deco XE5300",
+            "Netgear Orbi RBKE963"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-gaming",
+            "type": "affiliate",
+            "url": "https://example.com/mesh-wifi-gaming",
+            "label": "Bekijk gaming mesh sets",
+            "trackingId": "aff-mesh-wifi-gaming"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_premium",
+        "title": "Toekomstbestendige premium mesh set",
+        "body": {
+          "summary": "Wi-Fi 6E/7, geavanceerd beheer en maximale capaciteit voor veeleisende huishoudens.",
+          "why": "Je wilt de nieuwste wifi-standaard, ouderlijk toezicht of maximale toekomstbestendigheid.",
+          "checklist": [
+            "Wi-Fi 6E of 7",
+            "Geavanceerde app en gastnetwerken",
+            "Premium tri-band of quad-band"
+          ],
+          "voorbeeldmodellen": [
+            "ASUS ZenWiFi Pro ET12",
+            "TP-Link Deco BE85",
+            "Netgear Orbi 970 Series"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-premium",
+            "type": "affiliate",
+            "url": "https://example.com/mesh-wifi-premium",
+            "label": "Bekijk premium mesh sets",
+            "trackingId": "aff-mesh-wifi-premium"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -541,7 +541,7 @@ GOOGLE_KEYWORD_INSIGHT_MOCK=true
 pnpm install                          # Dependencies
 docker compose up -d postgres         # PostgreSQL
 pnpm db:migrate                       # Drizzle migrations (public schema)
-pnpm db:seed                          # Warmtepomp + robotmaaier + airfryer + robotstofzuiger referentieflows + productpagina's
+pnpm db:seed                          # Warmtepomp + robotmaaier + airfryer + robotstofzuiger + mesh wifi referentieflows + productpagina's
 pnpm dev                              # API + Web parallel
 pnpm dev:opportunity                  # Opportunity Engine apart
 pnpm test                             # Alle unit tests
@@ -564,6 +564,8 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 - Airfryer flow: http://localhost:3000/flows/airfryers
 - Robotstofzuiger SEO-pagina: http://localhost:3000/robotstofzuiger-kiezen
 - Robotstofzuiger flow: http://localhost:3000/flows/robotstofzuigers
+- Mesh wifi SEO-pagina: http://localhost:3000/mesh-wifi-kiezen
+- Mesh wifi flow: http://localhost:3000/flows/mesh-wifi
 - Admin: http://localhost:3000/admin (geen login in dev)
 
 ---
@@ -590,6 +592,11 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/db/src/seed-robotstofzuiger-reference.ts` | Robotstofzuiger seed orchestrator |
 | `packages/db/src/seed-robotstofzuiger-product-page.ts` | Robotstofzuiger product + SEO-pagina seed |
 | `e2e/robotstofzuiger-flow.spec.ts` | Robotstofzuiger E2E (flow + embed) |
+| `flows/examples/mesh-wifi-keuzehulp.json` | Mesh wifi referentieflow (R1.7) |
+| `packages/flow-engine/src/mesh-wifi-flow.test.ts` | Mesh wifi routing tests |
+| `packages/db/src/seed-mesh-wifi-reference.ts` | Mesh wifi seed orchestrator |
+| `packages/db/src/seed-mesh-wifi-product-page.ts` | Mesh wifi product + SEO-pagina seed |
+| `e2e/mesh-wifi-flow.spec.ts` | Mesh wifi E2E (flow + embed) |
 
 ### Product & pagina's
 | Bestand | Rol |
@@ -630,4 +637,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 25 juli 2026 · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 27 juli 2026 · Gebaseerd op de decision-engine monorepo*

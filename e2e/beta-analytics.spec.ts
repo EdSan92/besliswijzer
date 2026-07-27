@@ -1,48 +1,52 @@
 import { expect, test } from '@playwright/test'
-import { isFlowPublished } from './helpers/api'
+import { API_BASE, isFlowPublished, isProductPagePublished } from './helpers/api'
 
 const FLOW_SLUG = 'robotstofzuigers'
 const SEO_SLUG = 'robotstofzuiger-kiezen'
+const RESULT_KEY = 'advies_huisdieren'
+const SITEMAP_FLOW_SLUG = 'warmtepomp-keuzehulp'
 
 test.describe('Beta analytics', () => {
   test.beforeEach(async ({ request }) => {
-    const available = await isFlowPublished(request, FLOW_SLUG)
-    test.skip(!available, 'Flow niet beschikbaar — start Postgres en run pnpm db:seed')
+    const flowAvailable = await isFlowPublished(request, FLOW_SLUG)
+    const pageAvailable = await isProductPagePublished(request, SEO_SLUG)
+    test.skip(!flowAvailable || !pageAvailable, 'Seed data niet beschikbaar — run pnpm db:seed')
   })
 
-  test('registreert page view, flow events en affiliateklik zonder navigatie te blokkeren', async ({
+  test('registreert analytics events en affiliateklik zonder navigatie te blokkeren', async ({
     page,
     request,
   }) => {
-    const analyticsRequests: unknown[] = []
+    let analyticsPosts = 0
     page.on('request', (req) => {
-      if (req.url().includes('/api/v1/public/analytics/events')) {
-        analyticsRequests.push(req.postDataJSON())
+      if (req.method() === 'POST' && req.url().includes('/api/v1/public/analytics/events')) {
+        analyticsPosts += 1
       }
     })
 
     await page.goto(`/${SEO_SLUG}`)
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 
-    await page.getByRole('button', { name: /start/i }).click()
-    await page.getByRole('button', { name: 'Volgende' }).click({ timeout: 15000 }).catch(() => {})
+    await page.goto(`/flows/${FLOW_SLUG}`)
+    await expect(page.getByRole('heading').first()).toBeVisible()
 
+    await expect.poll(() => analyticsPosts, { timeout: 15_000 }).toBeGreaterThan(0)
+
+    await page.goto(`/flows/${FLOW_SLUG}/result/${RESULT_KEY}`)
     const affiliateLink = page.locator('a[href*="/api/v1/public/affiliate/click"]').first()
-    if (await affiliateLink.count()) {
-      const href = await affiliateLink.getAttribute('href')
-      expect(href).toContain('flowSlug=')
-      expect(href).not.toContain('url=')
+    await expect(affiliateLink).toBeVisible()
 
-      const popupPromise = page.waitForEvent('popup')
-      await affiliateLink.click()
-      const popup = await popupPromise
-      await expect(popup).toHaveURL(/https?:\/\//)
-    }
+    const href = await affiliateLink.getAttribute('href')
+    expect(href).toContain('flowSlug=')
+    expect(href).not.toMatch(/[?&]url=/)
 
-    await expect.poll(() => analyticsRequests.length, { timeout: 10000 }).toBeGreaterThan(0)
+    const popupPromise = page.waitForEvent('popup')
+    await affiliateLink.click()
+    const popup = await popupPromise
+    await expect(popup).toHaveURL(/https?:\/\//)
 
-    const response = await request.get('/api/v1/admin/analytics/beta-report', {
-      headers: { 'x-admin-key': process.env.ADMIN_API_KEY ?? 'dev-admin-key' },
+    const response = await request.get(`${API_BASE}/api/v1/admin/analytics/beta-report`, {
+      headers: { 'x-admin-key': process.env.ADMIN_API_KEY ?? 'ci-admin-key' },
     })
     expect(response.ok()).toBeTruthy()
   })
@@ -52,7 +56,7 @@ test.describe('Beta analytics', () => {
     expect(sitemap.ok()).toBeTruthy()
     const sitemapBody = await sitemap.text()
     expect(sitemapBody).toContain(`/${SEO_SLUG}`)
-    expect(sitemapBody).toContain(`/flows/${FLOW_SLUG}`)
+    expect(sitemapBody).toContain(`/flows/${SITEMAP_FLOW_SLUG}`)
 
     const robots = await request.get('/robots.txt')
     expect(robots.ok()).toBeTruthy()

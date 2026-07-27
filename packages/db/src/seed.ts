@@ -84,6 +84,9 @@ async function main() {
   const { ensureMeshWifiReference } = await import('./seed-mesh-wifi-reference.js')
   await ensureMeshWifiReference(db)
 
+  const { ensureThuisbatterijReference } = await import('./seed-thuisbatterij-reference.js')
+  await ensureThuisbatterijReference(db)
+
   await client.end()
 }
 

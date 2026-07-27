@@ -22,6 +22,12 @@ describe('resolveFlowHref', () => {
     expect(resolveFlowHref('mesh-wifi', { 'mesh-wifi': 'mesh-wifi-kiezen' })).toBe('/mesh-wifi-kiezen')
   })
 
+  it('links thuisbatterijen to the SEO product page', () => {
+    expect(
+      resolveFlowHref('thuisbatterijen', { thuisbatterijen: 'thuisbatterij-kiezen' }),
+    ).toBe('/thuisbatterij-kiezen')
+  })
+
   it('falls back to flow route when no mapping exists', () => {
     expect(resolveFlowHref('warmtepomp-keuzehulp', {})).toBe('/flows/warmtepomp-keuzehulp')
   })
@@ -33,6 +39,7 @@ describe('productPageLinkLabel', () => {
     expect(productPageLinkLabel('robotmaaiers')).toBe('Meer over robotmaaiers')
     expect(productPageLinkLabel('robotstofzuigers')).toBe('Meer over robotstofzuigers')
     expect(productPageLinkLabel('mesh-wifi')).toBe('Meer over mesh wifi')
+    expect(productPageLinkLabel('thuisbatterijen')).toBe('Meer over thuisbatterijen')
   })
 
   it('falls back to generic label for unknown flows', () => {

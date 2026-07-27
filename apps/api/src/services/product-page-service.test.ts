@@ -206,4 +206,42 @@ describe('buildFlowToProductPageSlugMap', () => {
     const map = await buildFlowToProductPageSlugMap(db as never)
     expect(map['mesh-wifi']).toBe('mesh-wifi-kiezen')
   })
+
+  it('maps thuisbatterijen to the published thuisbatterij product page', async () => {
+    const db = {
+      query: {
+        products: {
+          findMany: vi.fn().mockResolvedValue([
+            {
+              slug: 'thuisbatterij',
+              canonicalName: 'thuisbatterij',
+              primaryFlow: { slug: 'thuisbatterijen' },
+              pages: [{ slug: 'thuisbatterij-kiezen', status: 'published' }],
+            },
+          ]),
+        },
+        productPages: {
+          findMany: vi.fn().mockResolvedValue([
+            {
+              slug: 'thuisbatterij-kiezen',
+              blocks: [
+                {
+                  type: 'flow',
+                  data: { flowSlug: 'thuisbatterijen' },
+                },
+              ],
+            },
+          ]),
+        },
+        flows: {
+          findMany: vi.fn().mockResolvedValue([
+            { id: 'flow-5', slug: 'thuisbatterijen', title: 'Thuisbatterij keuzehulp' },
+          ]),
+        },
+      },
+    }
+
+    const map = await buildFlowToProductPageSlugMap(db as never)
+    expect(map.thuisbatterijen).toBe('thuisbatterij-kiezen')
+  })
 })

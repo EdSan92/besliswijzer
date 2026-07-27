@@ -1,0 +1,377 @@
+{
+  "publish": true,
+  "overwrite": true,
+  "flow": {
+    "slug": "thuisbatterijen",
+    "title": "Thuisbatterij keuzehulp",
+    "categorySlug": "energie",
+    "seo": {
+      "title": "Welke thuisbatterij past bij jouw situatie?",
+      "description": "Beantwoord een paar vragen over je energieverbruik, zonnepanelen en budget en ontdek welk thuisaccu-systeem het beste bij je past."
+    },
+    "nodes": [
+      {
+        "nodeKey": "zonnepanelen",
+        "type": "question",
+        "title": "Heb je zonnepanelen?",
+        "content": {
+          "inputType": "single",
+          "description": "Met zonnepanelen sla je overdag op wat je later zelf gebruikt."
+        },
+        "sortOrder": 0,
+        "isEntry": true,
+        "options": [
+          { "optionKey": "ja", "label": "Ja", "value": "ja", "sortOrder": 0 },
+          { "optionKey": "nee", "label": "Nee", "value": "nee", "sortOrder": 1 },
+          { "optionKey": "niet_zeker", "label": "Nog niet / niet zeker", "value": "niet_zeker", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "verbruik",
+        "type": "question",
+        "title": "Wat is je jaarverbruik ongeveer?",
+        "content": {
+          "inputType": "single",
+          "description": "Een indicatie helpt de benodigde kWh-capaciteit te bepalen."
+        },
+        "sortOrder": 1,
+        "options": [
+          { "optionKey": "laag", "label": "Laag (tot 2.500 kWh)", "value": "laag", "sortOrder": 0 },
+          { "optionKey": "middel", "label": "Middel (2.500 – 4.500 kWh)", "value": "middel", "sortOrder": 1 },
+          { "optionKey": "hoog", "label": "Hoog (meer dan 4.500 kWh)", "value": "hoog", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "autonomie",
+        "type": "question",
+        "title": "Wat wil je bereiken met een thuisbatterij?",
+        "content": {
+          "inputType": "single",
+          "description": "Noodstroom vraagt andere specificaties dan maximaal eigen verbruik."
+        },
+        "sortOrder": 2,
+        "options": [
+          { "optionKey": "uren_backup", "label": "Noodstroom bij stroomuitval", "value": "uren_backup", "sortOrder": 0 },
+          { "optionKey": "dag_zelfvoorzienend", "label": "Eigen opgewekte stroom 's avonds gebruiken", "value": "dag_zelfvoorzienend", "sortOrder": 1 },
+          { "optionKey": "max_besparing", "label": "Maximale besparing op energierekening", "value": "max_besparing", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "dynamisch_contract",
+        "type": "question",
+        "title": "Heb je een dynamisch energiecontract?",
+        "content": {
+          "inputType": "single",
+          "description": "Met dynamische prijzen kun je goedkoop laden en duur terugleveren."
+        },
+        "sortOrder": 3,
+        "options": [
+          { "optionKey": "ja", "label": "Ja", "value": "ja", "sortOrder": 0 },
+          { "optionKey": "nee", "label": "Nee", "value": "nee", "sortOrder": 1 },
+          { "optionKey": "niet_zeker", "label": "Nog niet / niet zeker", "value": "niet_zeker", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "installatie",
+        "type": "question",
+        "title": "Waar kan de batterij geplaatst worden?",
+        "content": {
+          "inputType": "single",
+          "description": "Binnen, buiten of beide bepalen welke modellen in aanmerking komen."
+        },
+        "sortOrder": 4,
+        "options": [
+          { "optionKey": "binnen", "label": "Binnen (garage, meterkast)", "value": "binnen", "sortOrder": 0 },
+          { "optionKey": "buiten", "label": "Buiten (gevel, schuur)", "value": "buiten", "sortOrder": 1 },
+          { "optionKey": "beide_mogelijk", "label": "Beide locaties mogelijk", "value": "beide_mogelijk", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "omvormer",
+        "type": "question",
+        "title": "Heb je al een omvormer of thuisaccu?",
+        "content": {
+          "inputType": "single",
+          "description": "Compatibiliteit met je bestaande omvormer bepaalt welke systemen passen."
+        },
+        "sortOrder": 5,
+        "options": [
+          { "optionKey": "geen", "label": "Nee, nog geen systeem", "value": "geen", "sortOrder": 0 },
+          { "optionKey": "bekend_merk", "label": "Ja, ik weet het merk/type", "value": "bekend_merk", "sortOrder": 1 },
+          { "optionKey": "onbekend", "label": "Ja, maar merk/type onbekend", "value": "onbekend", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "systeemtype",
+        "type": "question",
+        "title": "Wat past het beste bij je?",
+        "content": {
+          "inputType": "single",
+          "description": "Modulair kun je later uitbreiden; all-in-one is vaak eenvoudiger te installeren."
+        },
+        "sortOrder": 6,
+        "options": [
+          { "optionKey": "modulair", "label": "Modulair uitbreidbaar", "value": "modulair", "sortOrder": 0 },
+          { "optionKey": "all_in_one", "label": "All-in-one systeem", "value": "all_in_one", "sortOrder": 1 },
+          { "optionKey": "geen_voorkeur", "label": "Geen voorkeur", "value": "geen_voorkeur", "sortOrder": 2 }
+        ]
+      },
+      {
+        "nodeKey": "budget",
+        "type": "question",
+        "title": "Wat is je budget ongeveer?",
+        "content": {
+          "inputType": "single",
+          "description": "Thuisbatterijen variëren sterk in kWh-capaciteit en prijs."
+        },
+        "sortOrder": 7,
+        "options": [
+          { "optionKey": "tot_5000", "label": "Tot €5.000", "value": "tot_5000", "sortOrder": 0 },
+          { "optionKey": "5000_10000", "label": "€5.000 – €10.000", "value": "5000_10000", "sortOrder": 1 },
+          { "optionKey": "10000_plus", "label": "Meer dan €10.000", "value": "10000_plus", "sortOrder": 2 }
+        ]
+      }
+    ],
+    "rules": [
+      {
+        "fromNodeKey": "zonnepanelen",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.zonnepanelen" }, ""] },
+        "targetNodeKey": "verbruik",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "verbruik",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.verbruik" }, ""] },
+        "targetNodeKey": "autonomie",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "autonomie",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.autonomie" }, ""] },
+        "targetNodeKey": "dynamisch_contract",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "dynamisch_contract",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.dynamisch_contract" }, ""] },
+        "targetNodeKey": "installatie",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "installatie",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.installatie" }, ""] },
+        "targetNodeKey": "omvormer",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "omvormer",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.omvormer" }, ""] },
+        "targetNodeKey": "systeemtype",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "systeemtype",
+        "ruleType": "branch",
+        "condition": { ">=": [{ "var": "answers.systeemtype" }, ""] },
+        "targetNodeKey": "budget",
+        "priority": 10
+      },
+      {
+        "fromNodeKey": "budget",
+        "ruleType": "result_map",
+        "condition": {
+          "or": [
+            { "==": [{ "var": "answers.budget" }, "10000_plus"] },
+            {
+              "and": [
+                { "==": [{ "var": "answers.autonomie" }, "max_besparing"] },
+                { "==": [{ "var": "answers.budget" }, "5000_10000"] },
+                { "==": [{ "var": "answers.zonnepanelen" }, "ja"] }
+              ]
+            }
+          ]
+        },
+        "targetResultKey": "advies_premium",
+        "priority": 110
+      },
+      {
+        "fromNodeKey": "budget",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.autonomie" }, "uren_backup"] },
+        "targetResultKey": "advies_backup",
+        "priority": 105
+      },
+      {
+        "fromNodeKey": "budget",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.systeemtype" }, "modulair"] },
+        "targetResultKey": "advies_modulair",
+        "priority": 100
+      },
+      {
+        "fromNodeKey": "budget",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.zonnepanelen" }, "ja"] },
+        "targetResultKey": "advies_zonnepanelen",
+        "priority": 95
+      },
+      {
+        "fromNodeKey": "budget",
+        "ruleType": "result_map",
+        "condition": { "==": [{ "var": "answers.budget" }, "tot_5000"] },
+        "targetResultKey": "advies_compact",
+        "priority": 90
+      },
+      {
+        "fromNodeKey": "budget",
+        "ruleType": "result_map",
+        "condition": { ">=": [{ "var": "answers.budget" }, ""] },
+        "targetResultKey": "advies_compact",
+        "priority": 70
+      }
+    ],
+    "results": [
+      {
+        "resultKey": "advies_compact",
+        "title": "Compacte thuisbatterij",
+        "body": {
+          "summary": "Instapmodellen voor kleinere huishoudens of beperkt budget.",
+          "why": "Je zoekt een betaalbare thuisbatterij voor basis eigenverbruik of als eerste stap.",
+          "checklist": [
+            "5–10 kWh capaciteit",
+            "Geschikt voor binneninstallatie",
+            "Instapmodellen vanaf circa €3.500"
+          ],
+          "voorbeeldmodellen": [
+            "Enphase IQ Battery 5P",
+            "Solis S6 Hybrid + batterijmodule",
+            "BYD Battery-Box Premium HVS 5.1"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-compact",
+            "type": "affiliate",
+            "url": "https://example.com/thuisbatterij-compact",
+            "label": "Bekijk compacte thuisbatterijen",
+            "trackingId": "aff-thuisbatterij-compact"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_zonnepanelen",
+        "title": "Thuisbatterij voor zonnepanelen",
+        "body": {
+          "summary": "Optimaliseer eigen verbruik van je opgewekte stroom met passende kWh-capaciteit.",
+          "why": "Je hebt zonnepanelen en wilt meer van je eigen opwek direct gebruiken.",
+          "checklist": [
+            "Compatibel met je omvormer",
+            "Capaciteit afgestemd op opwek en verbruik",
+            "Dynamisch contract-ready indien gewenst"
+          ],
+          "voorbeeldmodellen": [
+            "Sungrow SBR",
+            "Huawei LUNA2000",
+            "SolarEdge Energy Bank"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-zonnepanelen",
+            "type": "affiliate",
+            "url": "https://example.com/thuisbatterij-zonnepanelen",
+            "label": "Bekijk zonnepanelen-thuisbatterijen",
+            "trackingId": "aff-thuisbatterij-zonnepanelen"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_backup",
+        "title": "Thuisbatterij voor noodstroom",
+        "body": {
+          "summary": "Systemen met backup-functie voor essentiële apparaten bij stroomuitval.",
+          "why": "Je wilt dat kritieke apparaten blijven werken wanneer het stroomnet uitvalt.",
+          "checklist": [
+            "Backup/UPS-modus ondersteund",
+            "Voldoende kW vermogen voor koelkast, router, verlichting",
+            "Professionele installatie met omvormerkeuze"
+          ],
+          "voorbeeldmodellen": [
+            "Tesla Powerwall 3",
+            "BYD Battery-Box Premium HVM",
+            "Sonnen eco 10"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-backup",
+            "type": "affiliate",
+            "url": "https://example.com/thuisbatterij-backup",
+            "label": "Bekijk backup-thuisbatterijen",
+            "trackingId": "aff-thuisbatterij-backup"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_modulair",
+        "title": "Modulair uitbreidbare thuisbatterij",
+        "body": {
+          "summary": "Start klein en breid later uit met extra kWh-modules.",
+          "why": "Je wilt flexibel groeien naarmate je verbruik of zonnepanelen veranderen.",
+          "checklist": [
+            "Stackable modules",
+            "Compatibiliteit met hybride omvormers",
+            "Uitbreidbaar tot 20+ kWh"
+          ],
+          "voorbeeldmodellen": [
+            "BYD Battery-Box Premium HVS",
+            "Pylontech Force H2",
+            "LG Chem RESU modular"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-modulair",
+            "type": "affiliate",
+            "url": "https://example.com/thuisbatterij-modulair",
+            "label": "Bekijk modulaire systemen",
+            "trackingId": "aff-thuisbatterij-modulair"
+          }
+        ]
+      },
+      {
+        "resultKey": "advies_premium",
+        "title": "Premium geïntegreerd thuisaccu-systeem",
+        "body": {
+          "summary": "All-in-one premium systemen met hoge capaciteit, app-beheer en maximale integratie.",
+          "why": "Je zoekt het meest complete systeem voor hoge verbruikers of maximale besparing.",
+          "checklist": [
+            "10 kWh of meer",
+            "Geïntegreerde omvormer en monitoring",
+            "Geschikt voor dynamische energiecontracten"
+          ],
+          "voorbeeldmodellen": [
+            "Tesla Powerwall 3",
+            "Sonnen ecoLinx",
+            "Enphase IQ Battery 10T"
+          ]
+        },
+        "ctas": [
+          {
+            "id": "cta-premium",
+            "type": "affiliate",
+            "url": "https://example.com/thuisbatterij-premium",
+            "label": "Bekijk premium thuisbatterijen",
+            "trackingId": "aff-thuisbatterij-premium"
+          }
+        ]
+      }
+    ]
+  }
+}

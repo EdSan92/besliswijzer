@@ -3,6 +3,7 @@ const KNOWN_FLOW_PAGE_LINKS: Record<string, string> = {
   airfryers: 'airfryer-kiezen',
   robotstofzuigers: 'robotstofzuiger-kiezen',
   'mesh-wifi': 'mesh-wifi-kiezen',
+  thuisbatterijen: 'thuisbatterij-kiezen',
 }
 
 function mergedPageLinks(pageLinks: Record<string, string>): Record<string, string> {
@@ -31,6 +32,7 @@ const PRODUCT_PAGE_LINK_LABELS: Record<string, string> = {
   airfryers: 'Meer over airfryers',
   robotstofzuigers: 'Meer over robotstofzuigers',
   'mesh-wifi': 'Meer over mesh wifi',
+  thuisbatterijen: 'Meer over thuisbatterijen',
 }
 
 export function productPageLinkLabel(flowSlug: string): string {

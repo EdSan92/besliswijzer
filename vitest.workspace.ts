@@ -6,6 +6,7 @@ export default defineWorkspace([
   'packages/pipeline-quality',
   'packages/pipeline-schema',
   'packages/keyword-research',
+  'packages/flow-brief',
   'packages/flow-engine',
   'apps/opportunity-engine',
   'apps/api',

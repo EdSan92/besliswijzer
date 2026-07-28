@@ -1,0 +1,115 @@
+{
+  "slug": "airfryers",
+  "title": "Airfryer keuzehulp",
+  "categorySlug": null,
+  "seo": {
+    "title": "Welke airfryer past bij jou?",
+    "description": "Beantwoord korte vragen en ontdek welke airfryer het beste bij jou past."
+  },
+  "metadata": {
+    "targetAudience": "Huishoudens die een airfryer overwegen",
+    "problem": "Keuze tussen capaciteit, functies en budget",
+    "searchIntent": "Welke airfryer kopen",
+    "exclusions": ["Professionele keukens"],
+    "buyingCriteria": ["Capaciteit", "Budget", "Functies"],
+    "requiredProductFields": ["capacityLiters", "price", "dualBasket"]
+  },
+  "questions": [
+    {
+      "questionKey": "huishouden",
+      "title": "Voor hoeveel personen kook je meestal?",
+      "description": "Dit bepaalt de ideale inhoud en het type airfryer.",
+      "inputType": "single",
+      "decisionPurpose": "Bepaalt benodigde capaciteit",
+      "options": [
+        { "optionKey": "1_2", "label": "1–2 personen", "value": "1_2" },
+        { "optionKey": "3_4", "label": "3–4 personen", "value": "3_4" },
+        { "optionKey": "5plus", "label": "5 personen of meer", "value": "5plus" }
+      ]
+    },
+    {
+      "questionKey": "budget",
+      "title": "Wat is je budget ongeveer?",
+      "description": "Airfryers zijn er van instap tot premium.",
+      "inputType": "single",
+      "decisionPurpose": "Segmenteert instap versus premium",
+      "options": [
+        { "optionKey": "tot_75", "label": "Tot €75", "value": "tot_75" },
+        { "optionKey": "75_150", "label": "€75 – €150", "value": "75_150" },
+        { "optionKey": "meer_250", "label": "Meer dan €250", "value": "meer_250" }
+      ]
+    },
+    {
+      "questionKey": "functies",
+      "title": "Welke functies zijn belangrijk?",
+      "inputType": "single",
+      "decisionPurpose": "Bepaalt oven- of premiumadvies",
+      "options": [
+        { "optionKey": "bakken", "label": "Vooral bakken", "value": "bakken" },
+        { "optionKey": "oven", "label": "Ovenfuncties", "value": "oven" },
+        { "optionKey": "alles", "label": "Zoveel mogelijk functies", "value": "alles" }
+      ]
+    }
+  ],
+  "decisionRules": [
+    {
+      "fromQuestionKey": "lead",
+      "condition": { "==": [{ "var": "answers.functies" }, "oven"] },
+      "targetResultKey": "advies_oven",
+      "priority": 110
+    },
+    {
+      "fromQuestionKey": "lead",
+      "condition": { "==": [{ "var": "answers.budget" }, "meer_250"] },
+      "targetResultKey": "advies_premium",
+      "priority": 105
+    },
+    {
+      "fromQuestionKey": "lead",
+      "condition": { "==": [{ "var": "answers.budget" }, "tot_75"] },
+      "targetResultKey": "advies_instap",
+      "priority": 75
+    },
+    {
+      "fromQuestionKey": "lead",
+      "condition": {},
+      "targetResultKey": "advies_familie",
+      "priority": 70
+    }
+  ],
+  "results": [
+    {
+      "resultKey": "advies_instap",
+      "title": "Compacte instap-airfryer",
+      "body": { "summary": "Geschikt voor kleine huishoudens of beperkt budget." },
+      "ctas": [
+        {
+          "id": "cta-instap",
+          "type": "affiliate",
+          "url": "https://example.com/airfryer-instap",
+          "label": "Bekijk instap-airfryers",
+          "trackingId": "aff-airfryer-instap"
+        }
+      ]
+    },
+    {
+      "resultKey": "advies_familie",
+      "title": "Airfryer voor het hele gezin",
+      "body": { "summary": "Meer capaciteit voor gezinnen." },
+      "ctas": []
+    },
+    {
+      "resultKey": "advies_oven",
+      "title": "Airfryer-oven",
+      "body": { "summary": "Ovenmodellen voor complete maaltijden." },
+      "ctas": []
+    },
+    {
+      "resultKey": "advies_premium",
+      "title": "Premium airfryer",
+      "body": { "summary": "Topmodellen met maximale functies." },
+      "ctas": []
+    }
+  ],
+  "includeLeadCapture": true
+}

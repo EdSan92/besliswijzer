@@ -34,6 +34,7 @@ decision-engine/
 │   ├── pipeline-quality/       # @besliswijzer/pipeline-quality — Deterministische pipeline quality gate
 │   ├── pipeline-schema/        # @besliswijzer/pipeline-schema — Contentpipeline domeinmodel + statussen
 │   ├── keyword-research/       # @besliswijzer/keyword-research — Keyword ingestie + provider adapters
+│   ├── flow-brief/             # @besliswijzer/flow-brief — AI flowbrief generatie + validatie
 │   ├── flow-engine/            # @besliswijzer/flow-engine — Runtime flow navigatie (pure logic)
 │   └── product-schema/         # @besliswijzer/product-schema — Producten, pages, blocks, matching
 ├── AI_CONTEXT.md               # Dit document
@@ -272,6 +273,20 @@ Belangrijkste exports:
 Artefact `kind: keyword_data`, versie `1.0.0`. Cache TTL via `KEYWORD_RESEARCH_CACHE_TTL_MS` (default 24u). Tests gebruiken fixtures; geen live API-calls in CI.
 
 Locatie: `packages/keyword-research/src/`
+
+### `@besliswijzer/flow-brief`
+
+AI-gestuurde generatie en validatie van R4 flowbrief-artefacten. Hergebruikt `flowBriefSchema` en `validateFlowBrief` uit `@besliswijzer/flow-compiler`.
+
+Belangrijkste exports:
+- `generateFlowBrief`, `FlowBriefModelProvider`, `MockFlowBriefModelProvider`
+- `FlowBriefArtifact`, `createFlowBriefArtifact`, `flowBriefGenerationOutputSchema`
+- `assessFlowBriefQuality`, `parseFlowBriefGenerationOutput`, `mapKeywordArtifactToInput`
+- `readFlowBriefConfigFromEnv` — `FLOW_BRIEF_MODEL_PROVIDER`, `FLOW_BRIEF_MODEL_NAME`, `FLOW_BRIEF_PROMPT_VERSION`
+
+Gedrag: structured JSON-only output, schema-validatie, één repair-poging, kwaliteitswarnings (dubbele vragen, onbewezen claims). Geen flow-JSON compilatie (dat is flow-compiler).
+
+Locatie: `packages/flow-brief/src/`
 
 ### `@besliswijzer/product-schema`
 
@@ -657,6 +672,9 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/keyword-research/src/ingest.ts` | Keyword ingestie + cache |
 | `packages/keyword-research/src/providers/google-keyword-insight.provider.ts` | Google Ads keyword adapter |
 | `packages/keyword-research/src/artifact.ts` | Keyword data pipeline-artefact schema |
+| `packages/flow-brief/src/generate.ts` | Flowbrief generatie + repair |
+| `packages/flow-brief/src/artifact.ts` | Flowbrief pipeline-artefact schema |
+| `packages/flow-brief/src/warnings.ts` | Kwaliteitswarnings voor flowbrief output |
 | `packages/db/src/pipeline-run-store.ts` | Drizzle persistence voor pipeline runs |
 | `packages/db/drizzle/0004_pipeline_runs.sql` | Pipeline run migratie |
 | `packages/flow-engine/src/index.ts` | Runtime navigatie + JSON Logic |
@@ -730,4 +748,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 28 juli 2026 (R4 keyword-research) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 28 juli 2026 (R4 flow-brief) · Gebaseerd op de decision-engine monorepo*

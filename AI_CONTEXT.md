@@ -249,6 +249,9 @@ Belangrijkste exports:
 - `buildIdempotencyKey`, `PIPELINE_RUN_TRANSITIONS`, `assertValidRunStatusTransition`
 - `createPipelineRun`, `createOrGetPipelineRun`, `transitionPipelineRunStatus`, `updatePipelineStep`
 - `InMemoryPipelineRunStore`, `PipelineRunStore`
+- `PipelineOrchestrator`, `PipelineStepHandler`, `PipelineStepRegistry`, `buildStepIdempotencyKey`
+
+Orchestrator: sequentiële stapuitvoering met checkpoint na elke stap; `start`, `resume` en `retryStep`; timeout per handler; idempotency key per stap.
 
 Persistente opslag: `DrizzlePipelineRunStore` in `@besliswijzer/db` (tabellen `pipeline_runs`, `pipeline_steps`, …).
 
@@ -633,6 +636,8 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/pipeline-schema/src/model.ts` | PipelineRun/Step/Artifact Zod schemas |
 | `packages/pipeline-schema/src/transitions.ts` | Run-status machine |
 | `packages/pipeline-schema/src/store.ts` | Run factory + idempotency helpers |
+| `packages/pipeline-schema/src/orchestrator/orchestrator.ts` | Pipeline orchestrator (start/resume/retry) |
+| `packages/pipeline-schema/src/orchestrator/types.ts` | Step handler contract + idempotency key |
 | `packages/db/src/pipeline-run-store.ts` | Drizzle persistence voor pipeline runs |
 | `packages/db/drizzle/0004_pipeline_runs.sql` | Pipeline run migratie |
 | `packages/flow-engine/src/index.ts` | Runtime navigatie + JSON Logic |
@@ -706,4 +711,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 28 juli 2026 (R4 pipeline-schema) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 28 juli 2026 (R4 pipeline-orchestrator) · Gebaseerd op de decision-engine monorepo*

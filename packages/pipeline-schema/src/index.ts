@@ -37,6 +37,24 @@ export {
   type CreatePipelineRunResult,
   type PipelineRunStore,
 } from './store.js'
+export {
+  assertRegistryCoversSteps,
+  PipelineStepRegistry,
+} from './orchestrator/registry.js'
+export {
+  PipelineOrchestrator,
+  type PipelineOrchestratorOptions,
+  type ResumePipelineRunOptions,
+  type RetryPipelineStepOptions,
+  type StartPipelineRunOptions,
+} from './orchestrator/orchestrator.js'
+export {
+  buildStepIdempotencyKey,
+  PipelineStepExecutionError,
+  type PipelineStepContext,
+  type PipelineStepHandler,
+  type PipelineStepResult,
+} from './orchestrator/types.js'
 
 /**
  * Pipeline run status machine (R4 contentpipeline):

@@ -32,6 +32,7 @@ decision-engine/
 │   ├── flow-schema/            # @besliswijzer/flow-schema — Zod types voor flows
 │   ├── flow-compiler/          # @besliswijzer/flow-compiler — Flowbrief → FlowDefinition compiler
 │   ├── pipeline-quality/       # @besliswijzer/pipeline-quality — Deterministische pipeline quality gate
+│   ├── pipeline-schema/        # @besliswijzer/pipeline-schema — Contentpipeline domeinmodel + statussen
 │   ├── flow-engine/            # @besliswijzer/flow-engine — Runtime flow navigatie (pure logic)
 │   └── product-schema/         # @besliswijzer/product-schema — Producten, pages, blocks, matching
 ├── AI_CONTEXT.md               # Dit document
@@ -238,6 +239,20 @@ Belangrijkste exports:
 - Regels: flowstructuur/graph, contentsecties, bronnen, pagina-similariteit
 
 Locatie: `packages/pipeline-quality/src/`
+
+### `@besliswijzer/pipeline-schema`
+
+Domeinmodel voor R4 contentpipeline-runs: runs, stappen, artefacten, bronverwijzingen en fouten.
+
+Belangrijkste exports:
+- `pipelineRunSchema`, `pipelineStepSchema`, `pipelineArtifactSchema`, `sourceReferenceSchema`, `pipelineErrorSchema`
+- `buildIdempotencyKey`, `PIPELINE_RUN_TRANSITIONS`, `assertValidRunStatusTransition`
+- `createPipelineRun`, `createOrGetPipelineRun`, `transitionPipelineRunStatus`, `updatePipelineStep`
+- `InMemoryPipelineRunStore`, `PipelineRunStore`
+
+Persistente opslag: `DrizzlePipelineRunStore` in `@besliswijzer/db` (tabellen `pipeline_runs`, `pipeline_steps`, …).
+
+Locatie: `packages/pipeline-schema/src/`
 
 ### `@besliswijzer/product-schema`
 
@@ -615,6 +630,11 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/flow-compiler/src/fixtures/*.json` | Categorie-flowbrief testfixtures |
 | `packages/pipeline-quality/src/rules-engine.ts` | Pipeline quality gate |
 | `packages/pipeline-quality/src/gate.ts` | Publicatie-blokkade bij errors |
+| `packages/pipeline-schema/src/model.ts` | PipelineRun/Step/Artifact Zod schemas |
+| `packages/pipeline-schema/src/transitions.ts` | Run-status machine |
+| `packages/pipeline-schema/src/store.ts` | Run factory + idempotency helpers |
+| `packages/db/src/pipeline-run-store.ts` | Drizzle persistence voor pipeline runs |
+| `packages/db/drizzle/0004_pipeline_runs.sql` | Pipeline run migratie |
 | `packages/flow-engine/src/index.ts` | Runtime navigatie + JSON Logic |
 | `packages/flow-schema/src/merge-flow-definitions.ts` | Flow merging logica |
 | `apps/api/src/services/flow-service.ts` | Flow CRUD + step resolution |
@@ -686,4 +706,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 28 juli 2026 (R4 pipeline-quality) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 28 juli 2026 (R4 pipeline-schema) · Gebaseerd op de decision-engine monorepo*

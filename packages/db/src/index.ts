@@ -3,6 +3,7 @@ import postgres from 'postgres'
 import * as schema from './schema.js'
 
 export * from './schema.js'
+export { DrizzlePipelineRunStore } from './pipeline-run-store.js'
 
 export function createDb(connectionString: string) {
   const client = postgres(connectionString, { max: 10 })

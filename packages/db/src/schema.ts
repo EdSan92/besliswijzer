@@ -25,6 +25,28 @@ export const eventTypeEnum = pgEnum('event_type', [
   'lead_submit',
 ])
 export const pageStatusEnum = pgEnum('page_status', ['draft', 'published', 'archived'])
+export const pipelineRunStatusEnum = pgEnum('pipeline_run_status', [
+  'queued',
+  'running',
+  'needs_review',
+  'approved',
+  'failed',
+  'published',
+])
+export const pipelineStepStatusEnum = pgEnum('pipeline_step_status', [
+  'pending',
+  'running',
+  'completed',
+  'failed',
+  'skipped',
+])
+export const pipelineArtifactKindEnum = pgEnum('pipeline_artifact_kind', [
+  'keyword_data',
+  'flow_brief',
+  'compiled_flow',
+  'content_package',
+  'quality_report',
+])
 
 export const flowCategories = pgTable('flow_categories', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -248,4 +270,111 @@ export const productKeywordsRelations = relations(productKeywords, ({ one }) => 
     fields: [productKeywords.productId],
     references: [products.id],
   }),
+}))
+
+export const pipelineRuns = pgTable(
+  'pipeline_runs',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    idempotencyKey: text('idempotency_key').notNull(),
+    categorySlug: text('category_slug').notNull(),
+    language: text('language').notNull().default('nl'),
+    pipelineVersion: text('pipeline_version').notNull(),
+    inputVersion: text('input_version').notNull(),
+    status: pipelineRunStatusEnum('status').notNull().default('queued'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex('pipeline_runs_idempotency_key_idx').on(table.idempotencyKey)],
+)
+
+export const pipelineSteps = pgTable(
+  'pipeline_steps',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    runId: uuid('run_id')
+      .notNull()
+      .references(() => pipelineRuns.id, { onDelete: 'cascade' }),
+    stepKey: text('step_key').notNull(),
+    status: pipelineStepStatusEnum('status').notNull().default('pending'),
+    input: jsonb('input'),
+    output: jsonb('output'),
+    errorMessage: text('error_message'),
+    startedAt: timestamp('started_at', { withTimezone: true }),
+    finishedAt: timestamp('finished_at', { withTimezone: true }),
+    sortOrder: integer('sort_order').notNull().default(0),
+  },
+  (table) => [uniqueIndex('pipeline_steps_run_key_idx').on(table.runId, table.stepKey)],
+)
+
+export const pipelineArtifacts = pgTable('pipeline_artifacts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  runId: uuid('run_id')
+    .notNull()
+    .references(() => pipelineRuns.id, { onDelete: 'cascade' }),
+  stepId: uuid('step_id')
+    .notNull()
+    .references(() => pipelineSteps.id, { onDelete: 'cascade' }),
+  kind: pipelineArtifactKindEnum('kind').notNull(),
+  version: integer('version').notNull(),
+  payload: jsonb('payload').notNull().default({}),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
+
+export const pipelineSourceReferences = pgTable('pipeline_source_references', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  runId: uuid('run_id')
+    .notNull()
+    .references(() => pipelineRuns.id, { onDelete: 'cascade' }),
+  stepId: uuid('step_id').references(() => pipelineSteps.id, { onDelete: 'set null' }),
+  label: text('label').notNull(),
+  url: text('url'),
+  provider: text('provider'),
+  retrievedAt: timestamp('retrieved_at', { withTimezone: true }).notNull(),
+  assumption: boolean('assumption').notNull().default(false),
+})
+
+export const pipelineErrors = pgTable('pipeline_errors', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  runId: uuid('run_id')
+    .notNull()
+    .references(() => pipelineRuns.id, { onDelete: 'cascade' }),
+  stepId: uuid('step_id').references(() => pipelineSteps.id, { onDelete: 'set null' }),
+  code: text('code').notNull(),
+  message: text('message').notNull(),
+  retryable: boolean('retryable').notNull().default(false),
+  occurredAt: timestamp('occurred_at', { withTimezone: true }).notNull(),
+})
+
+export const pipelineRunsRelations = relations(pipelineRuns, ({ many }) => ({
+  steps: many(pipelineSteps),
+  artifacts: many(pipelineArtifacts),
+  sources: many(pipelineSourceReferences),
+  errors: many(pipelineErrors),
+}))
+
+export const pipelineStepsRelations = relations(pipelineSteps, ({ one, many }) => ({
+  run: one(pipelineRuns, { fields: [pipelineSteps.runId], references: [pipelineRuns.id] }),
+  artifacts: many(pipelineArtifacts),
+}))
+
+export const pipelineArtifactsRelations = relations(pipelineArtifacts, ({ one }) => ({
+  run: one(pipelineRuns, { fields: [pipelineArtifacts.runId], references: [pipelineRuns.id] }),
+  step: one(pipelineSteps, { fields: [pipelineArtifacts.stepId], references: [pipelineSteps.id] }),
+}))
+
+export const pipelineSourceReferencesRelations = relations(pipelineSourceReferences, ({ one }) => ({
+  run: one(pipelineRuns, {
+    fields: [pipelineSourceReferences.runId],
+    references: [pipelineRuns.id],
+  }),
+  step: one(pipelineSteps, {
+    fields: [pipelineSourceReferences.stepId],
+    references: [pipelineSteps.id],
+  }),
+}))
+
+export const pipelineErrorsRelations = relations(pipelineErrors, ({ one }) => ({
+  run: one(pipelineRuns, { fields: [pipelineErrors.runId], references: [pipelineRuns.id] }),
+  step: one(pipelineSteps, { fields: [pipelineErrors.stepId], references: [pipelineSteps.id] }),
 }))

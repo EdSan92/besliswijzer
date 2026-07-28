@@ -23,6 +23,7 @@ export const pipelineArtifactKindSchema = z.enum([
   'compiled_flow',
   'content_package',
   'quality_report',
+  'publish_record',
 ])
 
 export type PipelineRunStatus = z.infer<typeof pipelineRunStatusSchema>

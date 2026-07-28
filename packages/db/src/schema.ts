@@ -46,6 +46,7 @@ export const pipelineArtifactKindEnum = pgEnum('pipeline_artifact_kind', [
   'compiled_flow',
   'content_package',
   'quality_report',
+  'publish_record',
 ])
 
 export const flowCategories = pgTable('flow_categories', {

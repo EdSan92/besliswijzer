@@ -35,6 +35,7 @@ decision-engine/
 │   ├── pipeline-schema/        # @besliswijzer/pipeline-schema — Contentpipeline domeinmodel + statussen
 │   ├── keyword-research/       # @besliswijzer/keyword-research — Keyword ingestie + provider adapters
 │   ├── flow-brief/             # @besliswijzer/flow-brief — AI flowbrief generatie + validatie
+│   ├── pipeline-publish/       # @besliswijzer/pipeline-publish — Idempotente CMS-publicatie
 │   ├── flow-engine/            # @besliswijzer/flow-engine — Runtime flow navigatie (pure logic)
 │   └── product-schema/         # @besliswijzer/product-schema — Producten, pages, blocks, matching
 ├── AI_CONTEXT.md               # Dit document
@@ -287,6 +288,19 @@ Belangrijkste exports:
 Gedrag: structured JSON-only output, schema-validatie, één repair-poging, kwaliteitswarnings (dubbele vragen, onbewezen claims). Geen flow-JSON compilatie (dat is flow-compiler).
 
 Locatie: `packages/flow-brief/src/`
+
+### `@besliswijzer/pipeline-publish`
+
+Idempotente CMS-publicatie voor goedgekeurde pipeline-runs.
+
+Belangrijkste exports:
+- `CmsPublishProvider`, `FakeCmsPublishProvider`
+- `publishApprovedPipelineRun`, `PublishPipelineRunResult`
+- `PublishRecord`, `createPublishRecord`, `CmsVersionConflictError`
+
+Gedrag: alleen `approved` runs; idempotent bij `published`; upsert flow (`compiled_flow`) en optioneel productpagina (`content_package`); optimistic version check; partial publish record voor herstel; `publish_record` artifact op run.
+
+Locatie: `packages/pipeline-publish/src/`
 
 ### `@besliswijzer/product-schema`
 
@@ -675,8 +689,11 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/flow-brief/src/generate.ts` | Flowbrief generatie + repair |
 | `packages/flow-brief/src/artifact.ts` | Flowbrief pipeline-artefact schema |
 | `packages/flow-brief/src/warnings.ts` | Kwaliteitswarnings voor flowbrief output |
+| `packages/pipeline-publish/src/publish.ts` | Idempotente CMS-publicatie voor approved runs |
+| `packages/pipeline-publish/src/providers/fake-cms.provider.ts` | Fake CMS client voor contracttests |
 | `packages/db/src/pipeline-run-store.ts` | Drizzle persistence voor pipeline runs |
 | `packages/db/drizzle/0004_pipeline_runs.sql` | Pipeline run migratie |
+| `packages/db/drizzle/0005_publish_record_artifact.sql` | publish_record artifact kind |
 | `packages/flow-engine/src/index.ts` | Runtime navigatie + JSON Logic |
 | `packages/flow-schema/src/merge-flow-definitions.ts` | Flow merging logica |
 | `apps/api/src/services/flow-service.ts` | Flow CRUD + step resolution |
@@ -748,4 +765,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 28 juli 2026 (R4 flow-brief) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 28 juli 2026 (R4 pipeline-publish) · Gebaseerd op de decision-engine monorepo*

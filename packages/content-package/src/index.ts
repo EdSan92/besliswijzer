@@ -46,3 +46,5 @@ export {
   mergeWarnings,
 } from './warnings.js'
 export type { ContentPackageWarning } from './warnings.js'
+
+export { validGenerationOutput as MOCK_CONTENT_PACKAGE_OUTPUT } from './fixtures/generation-output.js'

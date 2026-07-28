@@ -46,7 +46,13 @@ function parseCompiledFlowArtifact(artifact: PipelineArtifact): CompiledFlowArte
 }
 
 function parseContentPackageArtifact(artifact: PipelineArtifact): ContentPackage {
-  const parsed = contentPackageSchema.safeParse(artifact.payload)
+  const payload = artifact.payload
+  const candidate =
+    payload && typeof payload === 'object' && 'content' in payload
+      ? (payload as { content: unknown }).content
+      : payload
+
+  const parsed = contentPackageSchema.safeParse(candidate)
   if (!parsed.success) {
     throw new PipelinePublishError('Content package artifact payload is invalid', 'MISSING_ARTIFACT')
   }

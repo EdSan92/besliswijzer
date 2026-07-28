@@ -1,4 +1,4 @@
-import type { PipelineRun } from './model.js'
+import type { PipelineRun, PipelineRunStatus } from './model.js'
 import { pipelineRunSchema } from './model.js'
 import type { PipelineRunStore } from './store.js'
 
@@ -16,6 +16,18 @@ export class InMemoryPipelineRunStore implements PipelineRunStore {
 
   async findById(id: string): Promise<PipelineRun | null> {
     return this.byId.get(id) ?? null
+  }
+
+  async list(options?: { status?: PipelineRunStatus; limit?: number }): Promise<PipelineRun[]> {
+    let runs = [...this.byId.values()]
+    if (options?.status) {
+      runs = runs.filter((run) => run.status === options.status)
+    }
+    runs.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+    if (options?.limit) {
+      runs = runs.slice(0, options.limit)
+    }
+    return runs.map((run) => pipelineRunSchema.parse(run))
   }
 
   async save(run: PipelineRun): Promise<PipelineRun> {

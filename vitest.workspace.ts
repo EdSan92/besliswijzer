@@ -8,6 +8,8 @@ export default defineWorkspace([
   'packages/keyword-research',
   'packages/flow-brief',
   'packages/content-package',
+  'packages/pipeline-review',
+  'packages/pipeline-steps',
   'packages/pipeline-publish',
   'packages/flow-engine',
   'apps/opportunity-engine',

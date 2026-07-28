@@ -36,6 +36,8 @@ decision-engine/
 │   ├── keyword-research/       # @besliswijzer/keyword-research — Keyword ingestie + provider adapters
 │   ├── flow-brief/             # @besliswijzer/flow-brief — AI flowbrief generatie + validatie
 │   ├── content-package/        # @besliswijzer/content-package — SEO-contentpakket generatie
+│   ├── pipeline-review/        # @besliswijzer/pipeline-review — Review-API + kwaliteitsgate
+│   ├── pipeline-steps/         # @besliswijzer/pipeline-steps — Orchestrator step handlers + E2E
 │   ├── pipeline-publish/       # @besliswijzer/pipeline-publish — Idempotente CMS-publicatie
 │   ├── flow-engine/            # @besliswijzer/flow-engine — Runtime flow navigatie (pure logic)
 │   └── product-schema/         # @besliswijzer/product-schema — Producten, pages, blocks, matching
@@ -304,6 +306,28 @@ Gedrag: structured JSON-only output (intro, buying guide, FAQ, metadata, interne
 
 Locatie: `packages/content-package/src/`
 
+### `@besliswijzer/pipeline-review`
+
+Reviewlaag voor R4 pipeline-runs: lijst/detail, artefactcorrecties met versiehistorie, approve/reject met audit (`review_record` artefact) en kwaliteitsgate vóór goedkeuring.
+
+Belangrijkste exports:
+- `listPipelineRuns`, `getPipelineRunDetail`, `updatePipelineRunArtifact`
+- `approvePipelineRun`, `rejectPipelineRun`, `PipelineReviewError`
+- `buildQualityReportForRun`, `buildArtifactCorrectionDiff`
+
+Locatie: `packages/pipeline-review/src/`
+
+### `@besliswijzer/pipeline-steps`
+
+Productie step handlers voor de pipeline-orchestrator plus observability helpers en E2E-fixture.
+
+Belangrijkste exports:
+- `createDefaultPipelineHandlers`, `PIPELINE_STEP_KEYS`, `DEFAULT_PIPELINE_STEP_KEYS`
+- `createPipelineArtifact`, `findLatestArtifact`, `PipelineObservability`
+- Handlers: keyword ingest, flow brief, compile flow, content package, quality gate
+
+Locatie: `packages/pipeline-steps/src/`
+
 ### `@besliswijzer/pipeline-publish`
 
 Idempotente CMS-publicatie voor goedgekeurde pipeline-runs.
@@ -379,8 +403,14 @@ In productie: admin sessie via Nuxt proxy (`server/api/admin/[...path].ts`).
 | GET | `/products/match?keyword=&category=` | Keyword → product matching |
 | POST | `/product-pages` | Product + pagina aanmaken |
 | POST | `/product-pages/:slug/faq-items` | FAQ item toevoegen aan pagina |
+| GET | `/pipeline-runs` | Pipeline run overzicht (filter: status, limit) |
+| GET | `/pipeline-runs/:id` | Run detail + kwaliteitsrapport + diffs |
+| POST | `/pipeline-runs` | Nieuwe run starten (mock providers in dev) |
+| PATCH | `/pipeline-runs/:id/artifacts` | Artefactcorrectie (nieuwe versie + audit) |
+| POST | `/pipeline-runs/:id/approve` | Goedkeuren na kwaliteitsgate |
+| POST | `/pipeline-runs/:id/reject` | Afwijzen met verplichte reden |
 
-Routes: `apps/api/src/routes/admin.ts` · Services: `apps/api/src/services/`
+Routes: `apps/api/src/routes/admin.ts` · Pipeline: `apps/api/src/routes/pipeline-admin.ts` · Services: `apps/api/src/services/`
 
 ### Opportunity Engine (`/api/*`)
 
@@ -707,6 +737,11 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/content-package/src/generate.ts` | SEO-contentpakket generatie + repair |
 | `packages/content-package/src/artifact.ts` | Content package pipeline-artefact schema |
 | `packages/content-package/src/warnings.ts` | Kwaliteitswarnings voor content package output |
+| `packages/pipeline-review/src/review.ts` | Approve/reject/correct pipeline runs |
+| `packages/pipeline-steps/src/create-handlers.ts` | Default orchestrator step handlers |
+| `packages/pipeline-steps/src/pipeline-e2e.test.ts` | E2E fixture keyword → publish |
+| `apps/api/src/routes/pipeline-admin.ts` | Admin API voor pipeline runs + review |
+| `apps/web/pages/admin/pipeline-runs/` | Admin UI voor pipeline review |
 | `packages/pipeline-publish/src/publish.ts` | Idempotente CMS-publicatie voor approved runs |
 | `packages/pipeline-publish/src/providers/fake-cms.provider.ts` | Fake CMS client voor contracttests |
 | `packages/db/src/pipeline-run-store.ts` | Drizzle persistence voor pipeline runs |
@@ -783,4 +818,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 28 juli 2026 (R4 content-package) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 28 juli 2026 (R4 review + pipeline wiring) · Gebaseerd op de decision-engine monorepo*

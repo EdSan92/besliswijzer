@@ -11,18 +11,39 @@ importers:
       '@playwright/test':
         specifier: ^1.52.0
         version: 1.61.1
+      vitest:
+        specifier: ^3.0.5
+        version: 3.2.6(@types/node@22.20.0)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   apps/api:
     dependencies:
+      '@besliswijzer/content-package':
+        specifier: workspace:*
+        version: link:../../packages/content-package
       '@besliswijzer/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@besliswijzer/flow-brief':
+        specifier: workspace:*
+        version: link:../../packages/flow-brief
       '@besliswijzer/flow-engine':
         specifier: workspace:*
         version: link:../../packages/flow-engine
       '@besliswijzer/flow-schema':
         specifier: workspace:*
         version: link:../../packages/flow-schema
+      '@besliswijzer/keyword-research':
+        specifier: workspace:*
+        version: link:../../packages/keyword-research
+      '@besliswijzer/pipeline-review':
+        specifier: workspace:*
+        version: link:../../packages/pipeline-review
+      '@besliswijzer/pipeline-schema':
+        specifier: workspace:*
+        version: link:../../packages/pipeline-schema
+      '@besliswijzer/pipeline-steps':
+        specifier: workspace:*
+        version: link:../../packages/pipeline-steps
       '@besliswijzer/product-schema':
         specifier: workspace:*
         version: link:../../packages/product-schema
@@ -354,12 +375,77 @@ importers:
         specifier: ^3.0.5
         version: 3.2.6(@types/node@22.20.0)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
+  packages/pipeline-review:
+    dependencies:
+      '@besliswijzer/flow-compiler':
+        specifier: workspace:*
+        version: link:../flow-compiler
+      '@besliswijzer/pipeline-quality':
+        specifier: workspace:*
+        version: link:../pipeline-quality
+      '@besliswijzer/pipeline-schema':
+        specifier: workspace:*
+        version: link:../pipeline-schema
+      zod:
+        specifier: ^3.24.1
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.5
+        version: 22.20.0
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.5
+        version: 3.2.6(@types/node@22.20.0)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+
   packages/pipeline-schema:
     dependencies:
       zod:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
+      '@types/node':
+        specifier: ^22.10.5
+        version: 22.20.0
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.5
+        version: 3.2.6(@types/node@22.20.0)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+
+  packages/pipeline-steps:
+    dependencies:
+      '@besliswijzer/content-package':
+        specifier: workspace:*
+        version: link:../content-package
+      '@besliswijzer/flow-brief':
+        specifier: workspace:*
+        version: link:../flow-brief
+      '@besliswijzer/flow-compiler':
+        specifier: workspace:*
+        version: link:../flow-compiler
+      '@besliswijzer/keyword-research':
+        specifier: workspace:*
+        version: link:../keyword-research
+      '@besliswijzer/pipeline-quality':
+        specifier: workspace:*
+        version: link:../pipeline-quality
+      '@besliswijzer/pipeline-schema':
+        specifier: workspace:*
+        version: link:../pipeline-schema
+      zod:
+        specifier: ^3.24.1
+        version: 3.25.76
+    devDependencies:
+      '@besliswijzer/pipeline-publish':
+        specifier: workspace:*
+        version: link:../pipeline-publish
+      '@besliswijzer/pipeline-review':
+        specifier: workspace:*
+        version: link:../pipeline-review
       '@types/node':
         specifier: ^22.10.5
         version: 22.20.0

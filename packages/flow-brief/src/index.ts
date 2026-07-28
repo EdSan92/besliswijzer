@@ -40,3 +40,5 @@ export {
   mergeWarnings,
 } from './warnings.js'
 export type { FlowBriefWarning } from './warnings.js'
+
+export { validGenerationOutput as MOCK_FLOW_BRIEF_OUTPUT } from './fixtures/generation-output.js'

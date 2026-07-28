@@ -55,6 +55,7 @@ import {
   type UpdateProductPageInput,
 } from '../services/product-page-service.js'
 import { isArchivedFlow } from '../services/flow-admin-service.js'
+import { registerPipelineAdminRoutes } from './pipeline-admin.js'
 
 async function verifyAdminKey(request: FastifyRequest, reply: FastifyReply): Promise<boolean> {
   const key = request.headers['x-admin-key']
@@ -832,4 +833,6 @@ export async function registerAdminRoutes(app: FastifyInstance) {
       return csv
     },
   )
+
+  await registerPipelineAdminRoutes(app)
 }

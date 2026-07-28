@@ -9,20 +9,8 @@ export const validGenerationOutput = {
       reason: 'Gerelateerde keuken- en huishoudcategorie',
     },
   ],
-  claims: [
-    {
-      id: 'capacity-rule',
-      text: 'Reken op ongeveer 1 liter per persoon voor een volledige maaltijd.',
-      requiresSource: true,
-    },
-  ],
-  warnings: [
-    {
-      code: 'NEEDS_VERIFICATION',
-      field: 'claims.capacity-rule',
-      message: 'Capacity guidance is derived from flowbrief buying criteria, not independently verified',
-    },
-  ],
+  claims: [],
+  warnings: [],
 }
 
 export const invalidGenerationOutput = {

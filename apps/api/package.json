@@ -13,6 +13,12 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@besliswijzer/content-package": "workspace:*",
+    "@besliswijzer/flow-brief": "workspace:*",
+    "@besliswijzer/keyword-research": "workspace:*",
+    "@besliswijzer/pipeline-review": "workspace:*",
+    "@besliswijzer/pipeline-schema": "workspace:*",
+    "@besliswijzer/pipeline-steps": "workspace:*",
     "@besliswijzer/db": "workspace:*",
     "@besliswijzer/flow-engine": "workspace:*",
     "@besliswijzer/flow-schema": "workspace:*",

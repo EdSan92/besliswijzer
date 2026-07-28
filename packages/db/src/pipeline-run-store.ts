@@ -1,6 +1,6 @@
-import type { PipelineRun, PipelineRunStore } from '@besliswijzer/pipeline-schema'
+import type { PipelineRun, PipelineRunStatus, PipelineRunStore } from '@besliswijzer/pipeline-schema'
 import { pipelineRunSchema } from '@besliswijzer/pipeline-schema'
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import type { Database } from './index.js'
 import {
   pipelineArtifacts,
@@ -103,6 +103,20 @@ export class DrizzlePipelineRunStore implements PipelineRunStore {
       return null
     }
     return this.loadRunGraph(run)
+  }
+
+  async list(options?: { status?: PipelineRunStatus; limit?: number }): Promise<PipelineRun[]> {
+    let query = this.db.select().from(pipelineRuns).orderBy(desc(pipelineRuns.updatedAt))
+    if (options?.limit) {
+      query = query.limit(options.limit) as typeof query
+    }
+
+    const rows = await query
+    const filtered = options?.status
+      ? rows.filter((row) => row.status === options.status)
+      : rows
+
+    return Promise.all(filtered.map((row) => this.loadRunGraph(row)))
   }
 
   async save(run: PipelineRun): Promise<PipelineRun> {

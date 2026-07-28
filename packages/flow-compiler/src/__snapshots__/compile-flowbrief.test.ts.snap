@@ -1,0 +1,521 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`compileFlowBrief snapshots > matches airfryer compiler snapshot 1`] = `
+{
+  "categorySlug": null,
+  "nodes": [
+    {
+      "content": {
+        "description": "Dit bepaalt de ideale inhoud en het type airfryer.",
+        "inputType": "single",
+      },
+      "isEntry": true,
+      "nodeKey": "huishouden",
+      "options": [
+        {
+          "label": "1–2 personen",
+          "optionKey": "1_2",
+          "sortOrder": 0,
+          "value": "1_2",
+        },
+        {
+          "label": "3–4 personen",
+          "optionKey": "3_4",
+          "sortOrder": 1,
+          "value": "3_4",
+        },
+        {
+          "label": "5 personen of meer",
+          "optionKey": "5plus",
+          "sortOrder": 2,
+          "value": "5plus",
+        },
+      ],
+      "sortOrder": 0,
+      "title": "Voor hoeveel personen kook je meestal?",
+      "type": "question",
+    },
+    {
+      "content": {
+        "description": "Airfryers zijn er van instap tot premium.",
+        "inputType": "single",
+      },
+      "isEntry": false,
+      "nodeKey": "budget",
+      "options": [
+        {
+          "label": "Tot €75",
+          "optionKey": "tot_75",
+          "sortOrder": 0,
+          "value": "tot_75",
+        },
+        {
+          "label": "€75 – €150",
+          "optionKey": "75_150",
+          "sortOrder": 1,
+          "value": "75_150",
+        },
+        {
+          "label": "Meer dan €250",
+          "optionKey": "meer_250",
+          "sortOrder": 2,
+          "value": "meer_250",
+        },
+      ],
+      "sortOrder": 1,
+      "title": "Wat is je budget ongeveer?",
+      "type": "question",
+    },
+    {
+      "content": {
+        "description": "Bepaalt oven- of premiumadvies",
+        "inputType": "single",
+      },
+      "isEntry": false,
+      "nodeKey": "functies",
+      "options": [
+        {
+          "label": "Vooral bakken",
+          "optionKey": "bakken",
+          "sortOrder": 0,
+          "value": "bakken",
+        },
+        {
+          "label": "Ovenfuncties",
+          "optionKey": "oven",
+          "sortOrder": 1,
+          "value": "oven",
+        },
+        {
+          "label": "Zoveel mogelijk functies",
+          "optionKey": "alles",
+          "sortOrder": 2,
+          "value": "alles",
+        },
+      ],
+      "sortOrder": 2,
+      "title": "Welke functies zijn belangrijk?",
+      "type": "question",
+    },
+    {
+      "content": {
+        "description": "Optioneel — ontvang een korte samenvatting met jouw beste match.",
+      },
+      "isEntry": false,
+      "nodeKey": "lead",
+      "options": [],
+      "sortOrder": 3,
+      "title": "Advies per e-mail ontvangen?",
+      "type": "lead_capture",
+    },
+  ],
+  "results": [
+    {
+      "body": {
+        "summary": "Geschikt voor kleine huishoudens of beperkt budget.",
+      },
+      "ctas": [
+        {
+          "id": "cta-instap",
+          "label": "Bekijk instap-airfryers",
+          "trackingId": "aff-airfryer-instap",
+          "type": "affiliate",
+          "url": "https://example.com/airfryer-instap",
+        },
+      ],
+      "resultKey": "advies_instap",
+      "title": "Compacte instap-airfryer",
+    },
+    {
+      "body": {
+        "summary": "Meer capaciteit voor gezinnen.",
+      },
+      "ctas": [],
+      "resultKey": "advies_familie",
+      "title": "Airfryer voor het hele gezin",
+    },
+    {
+      "body": {
+        "summary": "Ovenmodellen voor complete maaltijden.",
+      },
+      "ctas": [],
+      "resultKey": "advies_oven",
+      "title": "Airfryer-oven",
+    },
+    {
+      "body": {
+        "summary": "Topmodellen met maximale functies.",
+      },
+      "ctas": [],
+      "resultKey": "advies_premium",
+      "title": "Premium airfryer",
+    },
+  ],
+  "rules": [
+    {
+      "condition": {
+        ">=": [
+          {
+            "var": "answers.budget",
+          },
+          "",
+        ],
+      },
+      "fromNodeKey": "budget",
+      "priority": 10,
+      "ruleType": "branch",
+      "targetNodeKey": "functies",
+    },
+    {
+      "condition": {
+        ">=": [
+          {
+            "var": "answers.functies",
+          },
+          "",
+        ],
+      },
+      "fromNodeKey": "functies",
+      "priority": 10,
+      "ruleType": "branch",
+      "targetNodeKey": "lead",
+    },
+    {
+      "condition": {
+        ">=": [
+          {
+            "var": "answers.huishouden",
+          },
+          "",
+        ],
+      },
+      "fromNodeKey": "huishouden",
+      "priority": 10,
+      "ruleType": "branch",
+      "targetNodeKey": "budget",
+    },
+    {
+      "condition": {
+        "==": [
+          {
+            "var": "answers.functies",
+          },
+          "oven",
+        ],
+      },
+      "fromNodeKey": "lead",
+      "priority": 110,
+      "ruleType": "result_map",
+      "targetNodeKey": null,
+      "targetResultKey": "advies_oven",
+    },
+    {
+      "condition": {
+        "==": [
+          {
+            "var": "answers.budget",
+          },
+          "meer_250",
+        ],
+      },
+      "fromNodeKey": "lead",
+      "priority": 105,
+      "ruleType": "result_map",
+      "targetNodeKey": null,
+      "targetResultKey": "advies_premium",
+    },
+    {
+      "condition": {
+        "==": [
+          {
+            "var": "answers.budget",
+          },
+          "tot_75",
+        ],
+      },
+      "fromNodeKey": "lead",
+      "priority": 75,
+      "ruleType": "result_map",
+      "targetNodeKey": null,
+      "targetResultKey": "advies_instap",
+    },
+    {
+      "condition": {
+        ">=": [
+          {
+            "var": "answers.lead",
+          },
+          "",
+        ],
+      },
+      "fromNodeKey": "lead",
+      "priority": 70,
+      "ruleType": "result_map",
+      "targetNodeKey": null,
+      "targetResultKey": "advies_familie",
+    },
+  ],
+  "seo": {
+    "description": "Beantwoord korte vragen en ontdek welke airfryer het beste bij jou past.",
+    "title": "Welke airfryer past bij jou?",
+  },
+  "slug": "airfryers",
+  "title": "Airfryer keuzehulp",
+}
+`;
+
+exports[`compileFlowBrief snapshots > matches robotstofzuiger compiler snapshot 1`] = `
+{
+  "categorySlug": null,
+  "nodes": [
+    {
+      "content": {
+        "description": "Bepaalt borstel- en zuigprofiel",
+        "inputType": "single",
+      },
+      "isEntry": true,
+      "nodeKey": "vloertype",
+      "options": [
+        {
+          "label": "Hout, tegels of laminaat",
+          "optionKey": "hard",
+          "sortOrder": 0,
+          "value": "hard",
+        },
+        {
+          "label": "Mix van vloertypes",
+          "optionKey": "mix",
+          "sortOrder": 1,
+          "value": "mix",
+        },
+        {
+          "label": "Voornamelijk tapijt",
+          "optionKey": "tapijt",
+          "sortOrder": 2,
+          "value": "tapijt",
+        },
+      ],
+      "sortOrder": 0,
+      "title": "Welk type vloer heb je voornamelijk?",
+      "type": "question",
+    },
+    {
+      "content": {
+        "description": "Bepaalt anti-klit en zuigkracht",
+        "inputType": "single",
+      },
+      "isEntry": false,
+      "nodeKey": "huisdieren",
+      "options": [
+        {
+          "label": "Nee",
+          "optionKey": "nee",
+          "sortOrder": 0,
+          "value": "nee",
+        },
+        {
+          "label": "Ja, huisdieren",
+          "optionKey": "ja",
+          "sortOrder": 1,
+          "value": "ja",
+        },
+      ],
+      "sortOrder": 1,
+      "title": "Heb je huisdieren?",
+      "type": "question",
+    },
+    {
+      "content": {
+        "description": "Segmenteert instap versus premium",
+        "inputType": "single",
+      },
+      "isEntry": false,
+      "nodeKey": "budget",
+      "options": [
+        {
+          "label": "Tot €300",
+          "optionKey": "laag",
+          "sortOrder": 0,
+          "value": "laag",
+        },
+        {
+          "label": "Meer dan €600",
+          "optionKey": "hoog",
+          "sortOrder": 1,
+          "value": "hoog",
+        },
+      ],
+      "sortOrder": 2,
+      "title": "Wat is je budget?",
+      "type": "question",
+    },
+    {
+      "content": {
+        "description": "Optioneel — ontvang een korte samenvatting met jouw beste match.",
+      },
+      "isEntry": false,
+      "nodeKey": "lead",
+      "options": [],
+      "sortOrder": 3,
+      "title": "Advies per e-mail ontvangen?",
+      "type": "lead_capture",
+    },
+  ],
+  "results": [
+    {
+      "body": {
+        "summary": "Betaalbare modellen voor eenvoudige woningen.",
+      },
+      "ctas": [],
+      "resultKey": "advies_instap",
+      "title": "Instap robotstofzuiger",
+    },
+    {
+      "body": {
+        "summary": "Balans tussen prijs en functies.",
+      },
+      "ctas": [],
+      "resultKey": "advies_allround",
+      "title": "Allround robotstofzuiger",
+    },
+    {
+      "body": {
+        "summary": "Extra zuigkracht tegen haren.",
+      },
+      "ctas": [],
+      "resultKey": "advies_huisdier",
+      "title": "Robotstofzuiger voor huisdieren",
+    },
+    {
+      "body": {
+        "summary": "Topnavigatie en zelflediging.",
+      },
+      "ctas": [],
+      "resultKey": "advies_premium",
+      "title": "Premium robotstofzuiger",
+    },
+  ],
+  "rules": [
+    {
+      "condition": {
+        ">=": [
+          {
+            "var": "answers.budget",
+          },
+          "",
+        ],
+      },
+      "fromNodeKey": "budget",
+      "priority": 10,
+      "ruleType": "branch",
+      "targetNodeKey": "lead",
+    },
+    {
+      "condition": {
+        ">=": [
+          {
+            "var": "answers.huisdieren",
+          },
+          "",
+        ],
+      },
+      "fromNodeKey": "huisdieren",
+      "priority": 10,
+      "ruleType": "branch",
+      "targetNodeKey": "budget",
+    },
+    {
+      "condition": {
+        "==": [
+          {
+            "var": "answers.budget",
+          },
+          "hoog",
+        ],
+      },
+      "fromNodeKey": "lead",
+      "priority": 100,
+      "ruleType": "result_map",
+      "targetNodeKey": null,
+      "targetResultKey": "advies_premium",
+    },
+    {
+      "condition": {
+        "and": [
+          {
+            "==": [
+              {
+                "var": "answers.huisdieren",
+              },
+              "ja",
+            ],
+          },
+          {
+            "==": [
+              {
+                "var": "answers.vloertype",
+              },
+              "tapijt",
+            ],
+          },
+        ],
+      },
+      "fromNodeKey": "lead",
+      "priority": 95,
+      "ruleType": "result_map",
+      "targetNodeKey": null,
+      "targetResultKey": "advies_huisdier",
+    },
+    {
+      "condition": {
+        "==": [
+          {
+            "var": "answers.budget",
+          },
+          "laag",
+        ],
+      },
+      "fromNodeKey": "lead",
+      "priority": 80,
+      "ruleType": "result_map",
+      "targetNodeKey": null,
+      "targetResultKey": "advies_instap",
+    },
+    {
+      "condition": {
+        ">=": [
+          {
+            "var": "answers.lead",
+          },
+          "",
+        ],
+      },
+      "fromNodeKey": "lead",
+      "priority": 70,
+      "ruleType": "result_map",
+      "targetNodeKey": null,
+      "targetResultKey": "advies_allround",
+    },
+    {
+      "condition": {
+        ">=": [
+          {
+            "var": "answers.vloertype",
+          },
+          "",
+        ],
+      },
+      "fromNodeKey": "vloertype",
+      "priority": 10,
+      "ruleType": "branch",
+      "targetNodeKey": "huisdieren",
+    },
+  ],
+  "seo": {
+    "description": "Beantwoord korte vragen over je woning en ontdek de beste robotstofzuiger.",
+    "title": "Welke robotstofzuiger past bij jou?",
+  },
+  "slug": "robotstofzuigers",
+  "title": "Robotstofzuiger keuzehulp",
+}
+`;

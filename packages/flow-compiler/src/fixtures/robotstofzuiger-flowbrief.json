@@ -1,0 +1,108 @@
+{
+  "slug": "robotstofzuigers",
+  "title": "Robotstofzuiger keuzehulp",
+  "categorySlug": null,
+  "seo": {
+    "title": "Welke robotstofzuiger past bij jou?",
+    "description": "Beantwoord korte vragen over je woning en ontdek de beste robotstofzuiger."
+  },
+  "metadata": {
+    "targetAudience": "Huishoudens die een robotstofzuiger overwegen",
+    "problem": "Keuze tussen zuigkracht, navigatie en budget",
+    "searchIntent": "Welke robotstofzuiger kopen",
+    "exclusions": ["Industriële schoonmaak"],
+    "buyingCriteria": ["Vloertype", "Huisdieren", "Oppervlak"],
+    "requiredProductFields": ["suctionPower", "batteryLife", "mopFunction"]
+  },
+  "questions": [
+    {
+      "questionKey": "vloertype",
+      "title": "Welk type vloer heb je voornamelijk?",
+      "inputType": "single",
+      "decisionPurpose": "Bepaalt borstel- en zuigprofiel",
+      "options": [
+        { "optionKey": "hard", "label": "Hout, tegels of laminaat", "value": "hard" },
+        { "optionKey": "mix", "label": "Mix van vloertypes", "value": "mix" },
+        { "optionKey": "tapijt", "label": "Voornamelijk tapijt", "value": "tapijt" }
+      ]
+    },
+    {
+      "questionKey": "huisdieren",
+      "title": "Heb je huisdieren?",
+      "inputType": "single",
+      "decisionPurpose": "Bepaalt anti-klit en zuigkracht",
+      "options": [
+        { "optionKey": "nee", "label": "Nee", "value": "nee" },
+        { "optionKey": "ja", "label": "Ja, huisdieren", "value": "ja" }
+      ]
+    },
+    {
+      "questionKey": "budget",
+      "title": "Wat is je budget?",
+      "inputType": "single",
+      "decisionPurpose": "Segmenteert instap versus premium",
+      "options": [
+        { "optionKey": "laag", "label": "Tot €300", "value": "laag" },
+        { "optionKey": "hoog", "label": "Meer dan €600", "value": "hoog" }
+      ]
+    }
+  ],
+  "decisionRules": [
+    {
+      "fromQuestionKey": "lead",
+      "condition": { "==": [{ "var": "answers.budget" }, "hoog"] },
+      "targetResultKey": "advies_premium",
+      "priority": 100
+    },
+    {
+      "fromQuestionKey": "lead",
+      "condition": {
+        "and": [
+          { "==": [{ "var": "answers.huisdieren" }, "ja"] },
+          { "==": [{ "var": "answers.vloertype" }, "tapijt"] }
+        ]
+      },
+      "targetResultKey": "advies_huisdier",
+      "priority": 95
+    },
+    {
+      "fromQuestionKey": "lead",
+      "condition": { "==": [{ "var": "answers.budget" }, "laag"] },
+      "targetResultKey": "advies_instap",
+      "priority": 80
+    },
+    {
+      "fromQuestionKey": "lead",
+      "condition": {},
+      "targetResultKey": "advies_allround",
+      "priority": 70
+    }
+  ],
+  "results": [
+    {
+      "resultKey": "advies_instap",
+      "title": "Instap robotstofzuiger",
+      "body": { "summary": "Betaalbare modellen voor eenvoudige woningen." },
+      "ctas": []
+    },
+    {
+      "resultKey": "advies_allround",
+      "title": "Allround robotstofzuiger",
+      "body": { "summary": "Balans tussen prijs en functies." },
+      "ctas": []
+    },
+    {
+      "resultKey": "advies_huisdier",
+      "title": "Robotstofzuiger voor huisdieren",
+      "body": { "summary": "Extra zuigkracht tegen haren." },
+      "ctas": []
+    },
+    {
+      "resultKey": "advies_premium",
+      "title": "Premium robotstofzuiger",
+      "body": { "summary": "Topnavigatie en zelflediging." },
+      "ctas": []
+    }
+  ],
+  "includeLeadCapture": true
+}

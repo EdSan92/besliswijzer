@@ -30,6 +30,8 @@ decision-engine/
 ├── packages/
 │   ├── db/                     # @besliswijzer/db — Drizzle ORM, schema, migrations
 │   ├── flow-schema/            # @besliswijzer/flow-schema — Zod types voor flows
+│   ├── flow-compiler/          # @besliswijzer/flow-compiler — Flowbrief → FlowDefinition compiler
+│   ├── pipeline-quality/       # @besliswijzer/pipeline-quality — Deterministische pipeline quality gate
 │   ├── flow-engine/            # @besliswijzer/flow-engine — Runtime flow navigatie (pure logic)
 │   └── product-schema/         # @besliswijzer/product-schema — Producten, pages, blocks, matching
 ├── AI_CONTEXT.md               # Dit document
@@ -212,6 +214,30 @@ Belangrijkste exports:
 - `calculateProgress`
 
 Locatie: `packages/flow-engine/src/index.ts`
+
+### `@besliswijzer/flow-compiler`
+
+Deterministische compiler voor de R4 contentmachine: zet een gevalideerde **flowbrief** om naar `FlowDefinition` (Veraio flow-JSON).
+
+Belangrijkste exports:
+- `flowBriefSchema`, `validateFlowBrief` — inputcontract voor goedgekeurde flowbriefs
+- `compileFlowBrief` — deterministische mapping naar `@besliswijzer/flow-schema`
+- `validateFlowGraph` — bereikbaarheid, cycli, ontbrekende resultaatpaden
+- `createCompiledFlowArtefact`, `FLOW_COMPILER_VERSION` — pipeline-artefact wrapper (geen CMS-publicatie)
+
+Locatie: `packages/flow-compiler/src/`
+
+### `@besliswijzer/pipeline-quality`
+
+Deterministische quality gate voor R4-pipeline-artefacten vóór review/publicatie.
+
+Belangrijkste exports:
+- `runPipelineQualityChecks` — rules engine over flowbrief, compiled flow, contentpakket en bronclaims
+- `canPublish`, `assertPublishAllowed` — blokkeert publicatie bij `error`-bevindingen
+- `pipelineQualityConfigSchema`, `mergePipelineQualityConfig` — configureerbare drempels
+- Regels: flowstructuur/graph, contentsecties, bronnen, pagina-similariteit
+
+Locatie: `packages/pipeline-quality/src/`
 
 ### `@besliswijzer/product-schema`
 
@@ -584,6 +610,11 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | Bestand | Rol |
 |---------|-----|
 | `packages/flow-schema/src/index.ts` | Alle flow types + Zod schemas |
+| `packages/flow-compiler/src/compile-flowbrief.ts` | Flowbrief → FlowDefinition compiler |
+| `packages/flow-compiler/src/validate-flow-graph.ts` | Graph-validatie (bereikbaarheid, cycli) |
+| `packages/flow-compiler/src/fixtures/*.json` | Categorie-flowbrief testfixtures |
+| `packages/pipeline-quality/src/rules-engine.ts` | Pipeline quality gate |
+| `packages/pipeline-quality/src/gate.ts` | Publicatie-blokkade bij errors |
 | `packages/flow-engine/src/index.ts` | Runtime navigatie + JSON Logic |
 | `packages/flow-schema/src/merge-flow-definitions.ts` | Flow merging logica |
 | `apps/api/src/services/flow-service.ts` | Flow CRUD + step resolution |
@@ -655,4 +686,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 27 juli 2026 (R2.1 analytics bèta) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 28 juli 2026 (R4 pipeline-quality) · Gebaseerd op de decision-engine monorepo*

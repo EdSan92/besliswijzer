@@ -190,6 +190,25 @@ importers:
         specifier: ^5.7.3
         version: 5.9.3
 
+  packages/flow-compiler:
+    dependencies:
+      '@besliswijzer/flow-engine':
+        specifier: workspace:*
+        version: link:../flow-engine
+      '@besliswijzer/flow-schema':
+        specifier: workspace:*
+        version: link:../flow-schema
+      zod:
+        specifier: ^3.24.1
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.5
+        version: 3.2.6(@types/node@22.20.0)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+
   packages/flow-engine:
     dependencies:
       '@besliswijzer/flow-schema':
@@ -211,6 +230,25 @@ importers:
 
   packages/flow-schema:
     dependencies:
+      zod:
+        specifier: ^3.24.1
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.5
+        version: 3.2.6(@types/node@22.20.0)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+
+  packages/pipeline-quality:
+    dependencies:
+      '@besliswijzer/flow-compiler':
+        specifier: workspace:*
+        version: link:../flow-compiler
+      '@besliswijzer/flow-schema':
+        specifier: workspace:*
+        version: link:../flow-schema
       zod:
         specifier: ^3.24.1
         version: 3.25.76

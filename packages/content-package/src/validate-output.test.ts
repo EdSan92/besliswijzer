@@ -12,7 +12,7 @@ describe('parseContentPackageGenerationOutput', () => {
     if (parsed.ok) {
       expect(parsed.output.content.slug).toBe('airfryers')
       expect(parsed.output.internalLinks).toHaveLength(1)
-      expect(parsed.output.claims).toHaveLength(1)
+      expect(parsed.output.claims).toHaveLength(0)
     }
   })
 

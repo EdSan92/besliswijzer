@@ -33,6 +33,7 @@ decision-engine/
 │   ├── flow-compiler/          # @besliswijzer/flow-compiler — Flowbrief → FlowDefinition compiler
 │   ├── pipeline-quality/       # @besliswijzer/pipeline-quality — Deterministische pipeline quality gate
 │   ├── pipeline-schema/        # @besliswijzer/pipeline-schema — Contentpipeline domeinmodel + statussen
+│   ├── keyword-research/       # @besliswijzer/keyword-research — Keyword ingestie + provider adapters
 │   ├── flow-engine/            # @besliswijzer/flow-engine — Runtime flow navigatie (pure logic)
 │   └── product-schema/         # @besliswijzer/product-schema — Producten, pages, blocks, matching
 ├── AI_CONTEXT.md               # Dit document
@@ -256,6 +257,21 @@ Orchestrator: sequentiële stapuitvoering met checkpoint na elke stap; `start`, 
 Persistente opslag: `DrizzlePipelineRunStore` in `@besliswijzer/db` (tabellen `pipeline_runs`, `pipeline_steps`, …).
 
 Locatie: `packages/pipeline-schema/src/`
+
+### `@besliswijzer/keyword-research`
+
+Provider-onafhankelijke keyword- en zoekintentie-ingestie voor R4 contentpipeline.
+
+Belangrijkste exports:
+- `KeywordResearchProvider`, `KeywordResearchRequest`, `KeywordResearchProviderResult`
+- `KeywordResearchArtifact`, `createKeywordResearchArtifact`, `keywordResearchArtifactSchema`
+- `ingestKeywordResearch`, `KeywordResearchCache`, `buildKeywordResearchCacheKey`
+- `GoogleKeywordInsightProvider`, `readGoogleKeywordInsightConfigFromEnv`
+- `MetricValue` (`known` / `unknown`) — geen verzonnen cijfers bij ontbrekende providerdata
+
+Artefact `kind: keyword_data`, versie `1.0.0`. Cache TTL via `KEYWORD_RESEARCH_CACHE_TTL_MS` (default 24u). Tests gebruiken fixtures; geen live API-calls in CI.
+
+Locatie: `packages/keyword-research/src/`
 
 ### `@besliswijzer/product-schema`
 
@@ -638,6 +654,9 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/pipeline-schema/src/store.ts` | Run factory + idempotency helpers |
 | `packages/pipeline-schema/src/orchestrator/orchestrator.ts` | Pipeline orchestrator (start/resume/retry) |
 | `packages/pipeline-schema/src/orchestrator/types.ts` | Step handler contract + idempotency key |
+| `packages/keyword-research/src/ingest.ts` | Keyword ingestie + cache |
+| `packages/keyword-research/src/providers/google-keyword-insight.provider.ts` | Google Ads keyword adapter |
+| `packages/keyword-research/src/artifact.ts` | Keyword data pipeline-artefact schema |
 | `packages/db/src/pipeline-run-store.ts` | Drizzle persistence voor pipeline runs |
 | `packages/db/drizzle/0004_pipeline_runs.sql` | Pipeline run migratie |
 | `packages/flow-engine/src/index.ts` | Runtime navigatie + JSON Logic |
@@ -711,4 +730,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 28 juli 2026 (R4 pipeline-orchestrator) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 28 juli 2026 (R4 keyword-research) · Gebaseerd op de decision-engine monorepo*

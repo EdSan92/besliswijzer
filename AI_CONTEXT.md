@@ -35,6 +35,7 @@ decision-engine/
 │   ├── pipeline-schema/        # @besliswijzer/pipeline-schema — Contentpipeline domeinmodel + statussen
 │   ├── keyword-research/       # @besliswijzer/keyword-research — Keyword ingestie + provider adapters
 │   ├── flow-brief/             # @besliswijzer/flow-brief — AI flowbrief generatie + validatie
+│   ├── content-package/        # @besliswijzer/content-package — SEO-contentpakket generatie
 │   ├── pipeline-publish/       # @besliswijzer/pipeline-publish — Idempotente CMS-publicatie
 │   ├── flow-engine/            # @besliswijzer/flow-engine — Runtime flow navigatie (pure logic)
 │   └── product-schema/         # @besliswijzer/product-schema — Producten, pages, blocks, matching
@@ -288,6 +289,20 @@ Belangrijkste exports:
 Gedrag: structured JSON-only output, schema-validatie, één repair-poging, kwaliteitswarnings (dubbele vragen, onbewezen claims). Geen flow-JSON compilatie (dat is flow-compiler).
 
 Locatie: `packages/flow-brief/src/`
+
+### `@besliswijzer/content-package`
+
+AI-gestuurde generatie en validatie van R4 SEO-contentpakketten vanuit goedgekeurde flowbrief/keyword-context. Hergebruikt `contentPackageSchema`, `sourcedClaimSchema` en `runContentPackageRules` uit `@besliswijzer/pipeline-quality`.
+
+Belangrijkste exports:
+- `generateContentPackage`, `ContentPackageModelProvider`, `MockContentPackageModelProvider`
+- `ContentPackageArtifact`, `createContentPackageArtifact`, `contentPackageGenerationOutputSchema`
+- `assessContentPackageQuality`, `parseContentPackageGenerationOutput`, `mapFlowBriefToInput`, `mapKeywordArtifactToInput`
+- `readContentPackageConfigFromEnv` — `CONTENT_PACKAGE_MODEL_PROVIDER`, `CONTENT_PACKAGE_MODEL_NAME`, `CONTENT_PACKAGE_PROMPT_VERSION`
+
+Gedrag: structured JSON-only output (intro, buying guide, FAQ, metadata, interne link-suggesties, claim register); schema-validatie; lengtecontroles via pipeline-quality rules; één repair-poging; kwaliteitswarnings voor korte metadata, dubbele FAQ en claims die verificatie nodig hebben. Output is concept-artefact (`status: draft`); geen autonome publicatie.
+
+Locatie: `packages/content-package/src/`
 
 ### `@besliswijzer/pipeline-publish`
 
@@ -689,6 +704,9 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/flow-brief/src/generate.ts` | Flowbrief generatie + repair |
 | `packages/flow-brief/src/artifact.ts` | Flowbrief pipeline-artefact schema |
 | `packages/flow-brief/src/warnings.ts` | Kwaliteitswarnings voor flowbrief output |
+| `packages/content-package/src/generate.ts` | SEO-contentpakket generatie + repair |
+| `packages/content-package/src/artifact.ts` | Content package pipeline-artefact schema |
+| `packages/content-package/src/warnings.ts` | Kwaliteitswarnings voor content package output |
 | `packages/pipeline-publish/src/publish.ts` | Idempotente CMS-publicatie voor approved runs |
 | `packages/pipeline-publish/src/providers/fake-cms.provider.ts` | Fake CMS client voor contracttests |
 | `packages/db/src/pipeline-run-store.ts` | Drizzle persistence voor pipeline runs |
@@ -765,4 +783,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 28 juli 2026 (R4 pipeline-publish) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 28 juli 2026 (R4 content-package) · Gebaseerd op de decision-engine monorepo*

@@ -681,6 +681,8 @@ GOOGLE_KEYWORD_INSIGHT_MOCK=true
 pnpm install                          # Dependencies
 docker compose up -d postgres         # PostgreSQL
 pnpm db:migrate                       # Drizzle migrations (public schema)
+pnpm pipeline:verify-migration-0006   # Check enum review_record (0006)
+pnpm pipeline:staging-smoke             # Migratie + R4 DB-smoke tegen DATABASE_URL
 pnpm db:seed                          # Warmtepomp + robotmaaier + airfryer + robotstofzuiger + mesh wifi + thuisbatterij referentieflows + productpagina's
 pnpm dev                              # API + Web parallel
 pnpm dev:opportunity                  # Opportunity Engine apart
@@ -740,6 +742,9 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/pipeline-review/src/review.ts` | Approve/reject/correct pipeline runs |
 | `packages/pipeline-steps/src/create-handlers.ts` | Default orchestrator step handlers |
 | `packages/pipeline-steps/src/pipeline-e2e.test.ts` | E2E fixture keyword → publish |
+| `packages/pipeline-steps/src/staging-smoke.ts` | R4 staging smoke (review/publish/retry) |
+| `packages/db/src/verify-migration-0006.ts` | Verificatie migratie 0006 |
+| `packages/db/src/scripts/staging-pipeline-smoke.ts` | CLI migrate + verify + smoke |
 | `apps/api/src/routes/pipeline-admin.ts` | Admin API voor pipeline runs + review |
 | `apps/web/pages/admin/pipeline-runs/` | Admin UI voor pipeline review |
 | `packages/pipeline-publish/src/publish.ts` | Idempotente CMS-publicatie voor approved runs |
@@ -818,4 +823,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 28 juli 2026 (R4 review + pipeline wiring) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 28 juli 2026 (VER-45 staging smoke + migratie 0006) · Gebaseerd op de decision-engine monorepo*

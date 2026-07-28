@@ -23,12 +23,12 @@
     "@besliswijzer/flow-compiler": "workspace:*",
     "@besliswijzer/keyword-research": "workspace:*",
     "@besliswijzer/pipeline-quality": "workspace:*",
+    "@besliswijzer/pipeline-publish": "workspace:*",
+    "@besliswijzer/pipeline-review": "workspace:*",
     "@besliswijzer/pipeline-schema": "workspace:*",
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@besliswijzer/pipeline-publish": "workspace:*",
-    "@besliswijzer/pipeline-review": "workspace:*",
     "@types/node": "^22.10.5",
     "typescript": "^5.7.3",
     "vitest": "^3.0.5"

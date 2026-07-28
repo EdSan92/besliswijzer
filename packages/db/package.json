@@ -16,10 +16,13 @@
     "dev": "tsc --watch",
     "generate": "drizzle-kit generate",
     "migrate": "tsx src/migrate.ts",
+    "verify:migration-0006": "tsx src/scripts/verify-migration-0006.ts",
+    "staging:smoke": "tsx src/scripts/staging-pipeline-smoke.ts",
     "seed": "tsx src/seed.ts",
     "seed:product-page": "tsx src/seed-product-page.ts",
     "studio": "drizzle-kit studio",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@besliswijzer/flow-schema": "workspace:*",
@@ -28,9 +31,11 @@
     "postgres": "^3.4.5"
   },
   "devDependencies": {
+    "@besliswijzer/pipeline-steps": "workspace:*",
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.4",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
   }
 }

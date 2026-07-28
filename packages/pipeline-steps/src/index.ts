@@ -22,6 +22,8 @@ export {
 
 export { createDefaultPipelineHandlers, type CreatePipelineHandlersDeps } from './create-handlers.js'
 
+export { runPipelineStagingSmoke, type PipelineStagingSmokeResult } from './staging-smoke.js'
+
 export { createKeywordIngestHandler, type KeywordIngestStepInput } from './handlers/keyword-ingest.handler.js'
 export { createFlowBriefHandler } from './handlers/flow-brief.handler.js'
 export { createCompileFlowHandler } from './handlers/compile-flow.handler.js'

@@ -11,6 +11,7 @@ export default defineWorkspace([
   'packages/pipeline-review',
   'packages/pipeline-steps',
   'packages/pipeline-publish',
+  'packages/db',
   'packages/flow-engine',
   'apps/opportunity-engine',
   'apps/api',

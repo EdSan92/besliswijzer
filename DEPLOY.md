@@ -142,6 +142,60 @@ psql "postgresql://...neon.../besliswijzer?sslmode=require" -f backup.sql
 | Admin 401 / kan niet inloggen | `ADMIN_API_KEY` identiek op **web én API**; web opnieuw deployen na wijziging; login via **HTTPS**-URL (cookie `secure`) |
 | Admin API 500 / Server Error | Check `NUXT_PUBLIC_API_BASE` op **web** = HTTPS API-URL; `ADMIN_API_KEY` gelijk op web + API; redeploy beide services |
 | Lege database | `pnpm db:migrate` + `pnpm db:seed` tegen Neon URL |
+| R4 review artefacten ontbreken | Zie **R4 migratie 0006** hieronder |
+
+---
+
+## R4 migratie 0006 (review_record)
+
+Migratie `packages/db/drizzle/0006_review_record_artifact.sql` voegt `review_record` toe aan enum `pipeline_artifact_kind`. Vereist voor pipeline review/approve/reject audit.
+
+### Vooraf (backup)
+
+Neon: maak in het dashboard een **branch snapshot** of export vóór migratie op staging/productie.
+
+Lokaal/staging via `pg_dump` (optioneel):
+
+```powershell
+$env:DATABASE_URL = "postgresql://...?sslmode=require"
+pg_dump $env:DATABASE_URL --schema-only --no-owner -f backup-schema-$(Get-Date -Format yyyyMMdd).sql
+```
+
+### Migratie uitvoeren
+
+```powershell
+$env:DATABASE_URL = "postgresql://...staging...?sslmode=require"
+pnpm db:migrate
+pnpm pipeline:verify-migration-0006
+```
+
+Migratie is **herhaalbaar** (`ADD VALUE IF NOT EXISTS`).
+
+### Staging validatie (volledige R4-smoke)
+
+```powershell
+$env:DATABASE_URL = "postgresql://...staging...?sslmode=require"
+pnpm pipeline:staging-smoke
+```
+
+Voert migratie uit (tenzij `--skip-migrate`), verifieert enum, en test review/correctie/approve/idempotente publish/retry/reject tegen `DrizzlePipelineRunStore`. Smoke-runs gebruiken category `__staging_smoke__` — bestaande data blijft intact.
+
+Integratietests lokaal:
+
+```powershell
+$env:PIPELINE_STAGING_SMOKE = "true"
+pnpm --filter @besliswijzer/db test
+pnpm --filter @besliswijzer/pipeline-steps test
+```
+
+### Rollback / herstel
+
+PostgreSQL ondersteunt **geen** verwijderen van enum-waarden. Rollback-opties:
+
+1. **Schema-restore** uit Neon branch snapshot of `pg_dump` backup.
+2. **Forward-fix**: laat `review_record` staan; oudere API-versies die de waarde niet kennen vermijden.
+
+Bij mislukte migratie halverwege: opnieuw `pnpm db:migrate` — statement is idempotent.
 
 ---
 

@@ -386,6 +386,9 @@ importers:
       '@besliswijzer/flow-compiler':
         specifier: workspace:*
         version: link:../flow-compiler
+      '@besliswijzer/flow-schema':
+        specifier: workspace:*
+        version: link:../flow-schema
       '@besliswijzer/pipeline-quality':
         specifier: workspace:*
         version: link:../pipeline-quality
@@ -452,9 +455,6 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
-      '@besliswijzer/db':
-        specifier: workspace:*
-        version: link:../db
       '@types/node':
         specifier: ^22.10.5
         version: 22.20.0

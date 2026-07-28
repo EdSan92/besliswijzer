@@ -15,6 +15,7 @@ async function logout() {
         <NuxtLink to="/admin">Flows</NuxtLink>
         <NuxtLink to="/admin/opportunities">Opportunities</NuxtLink>
         <NuxtLink to="/admin/product-pages">Productpagina's</NuxtLink>
+        <NuxtLink to="/admin/pipeline-runs">Pipeline runs</NuxtLink>
         <slot name="nav" />
         <NuxtLink to="/" target="_blank">Site bekijken</NuxtLink>
       </nav>      <button v-if="!isDev" class="logout-btn" type="button" @click="logout">

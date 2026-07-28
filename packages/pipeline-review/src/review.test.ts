@@ -100,6 +100,19 @@ describe('pipeline review service', () => {
     expect(detail.corrections.some((entry) => entry.kind === 'content_package')).toBe(true)
   })
 
+  it('rejects invalid artifact corrections', async () => {
+    const store = new InMemoryPipelineRunStore()
+    const run = await store.save(createReviewableRun())
+
+    await expect(
+      updatePipelineRunArtifact(store, run.id, {
+        kind: 'content_package',
+        actor: 'admin@test.local',
+        payload: { content: { slug: 'x' } },
+      }),
+    ).rejects.toMatchObject({ code: 'INVALID_PAYLOAD' })
+  })
+
   it('approves runs without blocking quality errors', async () => {
     const store = new InMemoryPipelineRunStore()
     const run = await store.save(createReviewableRun())

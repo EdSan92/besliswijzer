@@ -16,6 +16,7 @@ import {
   type PipelineRunSummary,
   type ReviewRecordPayload,
 } from './artifacts.js'
+import { validateArtifactCorrectionPayload } from './artifact-validation.js'
 import { PipelineReviewError } from './errors.js'
 import {
   assertRunCanBeApproved,
@@ -153,6 +154,14 @@ export async function updatePipelineRunArtifact(
     throw new PipelineReviewError(
       `Artifacts can only be corrected while run is needs_review (current: ${run.status})`,
       'INVALID_STATUS',
+    )
+  }
+
+  const validation = validateArtifactCorrectionPayload(body.kind, body.payload)
+  if (!validation.ok) {
+    throw new PipelineReviewError(
+      `Invalid ${body.kind} payload: ${validation.errors.join('; ')}`,
+      'INVALID_PAYLOAD',
     )
   }
 

@@ -3,6 +3,7 @@ export class PipelineReviewError extends Error {
     | 'NOT_FOUND'
     | 'INVALID_STATUS'
     | 'VALIDATION_FAILED'
+    | 'INVALID_PAYLOAD'
     | 'REASON_REQUIRED'
     | 'BLOCKING_QUALITY'
 

@@ -312,6 +312,7 @@ Reviewlaag voor R4 pipeline-runs: lijst/detail, artefactcorrecties met versiehis
 
 Belangrijkste exports:
 - `listPipelineRuns`, `getPipelineRunDetail`, `updatePipelineRunArtifact`
+- `validateArtifactCorrectionPayload` — schema-validatie bij artifact-PATCH (flow_brief, content_package, compiled_flow)
 - `approvePipelineRun`, `rejectPipelineRun`, `PipelineReviewError`
 - `buildQualityReportForRun`, `buildArtifactCorrectionDiff`
 
@@ -746,7 +747,8 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/db/src/verify-migration-0006.ts` | Verificatie migratie 0006 |
 | `packages/db/src/scripts/staging-pipeline-smoke.ts` | CLI migrate + verify + smoke |
 | `apps/api/src/routes/pipeline-admin.ts` | Admin API voor pipeline runs + review |
-| `apps/web/pages/admin/pipeline-runs/` | Admin UI voor pipeline review |
+| `apps/web/pages/admin/pipeline-runs/` | Admin UI voor pipeline review + artifactcorrectie |
+| `apps/web/utils/pipeline-artifact-correction.ts` | Client JSON-parse + correctable kinds |
 | `packages/pipeline-publish/src/publish.ts` | Idempotente CMS-publicatie voor approved runs |
 | `packages/pipeline-publish/src/providers/fake-cms.provider.ts` | Fake CMS client voor contracttests |
 | `packages/db/src/pipeline-run-store.ts` | Drizzle persistence voor pipeline runs |
@@ -823,4 +825,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 28 juli 2026 (VER-45 staging smoke + migratie 0006) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 28 juli 2026 (VER-46 admin pipeline review UI) · Gebaseerd op de decision-engine monorepo*

@@ -25,6 +25,8 @@ export {
 
 export { PipelineReviewError } from './errors.js'
 
+export { validateArtifactCorrectionPayload } from './artifact-validation.js'
+
 export {
   listPipelineRuns,
   getPipelineRunDetail,

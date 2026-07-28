@@ -50,60 +50,61 @@ function statusLabel(status: string) {
 </script>
 
 <template>
-  <div class="page">
-    <header class="header">
-      <div>
-        <h1>Pipeline runs</h1>
-        <p>Review AI-gegenereerde content voordat deze wordt gepubliceerd.</p>
+  <AdminLayout>
+    <div class="page">
+      <header class="header">
+        <div>
+          <h1>Pipeline runs</h1>
+          <p>Review AI-gegenereerde content voordat deze wordt gepubliceerd.</p>
+        </div>
+      </header>
+
+      <p v-if="error" class="error">{{ error.message }}</p>
+      <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+      <p v-if="message" class="message">{{ message }}</p>
+
+      <div class="toolbar">
+        <label>
+          Status
+          <select v-model="statusFilter" @change="refresh()">
+            <option value="all">Alle</option>
+            <option value="needs_review">Review nodig</option>
+            <option value="approved">Goedgekeurd</option>
+            <option value="published">Gepubliceerd</option>
+            <option value="failed">Mislukt</option>
+          </select>
+        </label>
+        <button type="button" :disabled="pending" @click="refresh()">Vernieuwen</button>
       </div>
-      <NuxtLink to="/admin" class="back-link">← Admin</NuxtLink>
-    </header>
 
-    <p v-if="error" class="error">{{ error.message }}</p>
-    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-    <p v-if="message" class="message">{{ message }}</p>
+      <table v-if="filteredRuns.length" class="table">
+        <thead>
+          <tr>
+            <th>Categorie</th>
+            <th>Status</th>
+            <th>Inputversie</th>
+            <th>Artefacten</th>
+            <th>Bijgewerkt</th>
+            <th />
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="run in filteredRuns" :key="run.id">
+            <td>{{ run.categorySlug }} ({{ run.language }})</td>
+            <td><span class="badge">{{ statusLabel(run.status) }}</span></td>
+            <td>{{ run.inputVersion }}</td>
+            <td>{{ run.artifactKinds.join(', ') }}</td>
+            <td>{{ formatDate(run.updatedAt) }}</td>
+            <td>
+              <NuxtLink :to="`/admin/pipeline-runs/${run.id}`">Open</NuxtLink>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-    <div class="toolbar">
-      <label>
-        Status
-        <select v-model="statusFilter" @change="refresh()">
-          <option value="all">Alle</option>
-          <option value="needs_review">Review nodig</option>
-          <option value="approved">Goedgekeurd</option>
-          <option value="published">Gepubliceerd</option>
-          <option value="failed">Mislukt</option>
-        </select>
-      </label>
-      <button type="button" :disabled="pending" @click="refresh()">Vernieuwen</button>
+      <p v-else class="empty">Geen pipeline runs gevonden.</p>
     </div>
-
-    <table v-if="filteredRuns.length" class="table">
-      <thead>
-        <tr>
-          <th>Categorie</th>
-          <th>Status</th>
-          <th>Inputversie</th>
-          <th>Artefacten</th>
-          <th>Bijgewerkt</th>
-          <th />
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="run in filteredRuns" :key="run.id">
-          <td>{{ run.categorySlug }} ({{ run.language }})</td>
-          <td><span class="badge">{{ statusLabel(run.status) }}</span></td>
-          <td>{{ run.inputVersion }}</td>
-          <td>{{ run.artifactKinds.join(', ') }}</td>
-          <td>{{ formatDate(run.updatedAt) }}</td>
-          <td>
-            <NuxtLink :to="`/admin/pipeline-runs/${run.id}`">Open</NuxtLink>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p v-else class="empty">Geen pipeline runs gevonden.</p>
-  </div>
+  </AdminLayout>
 </template>
 
 <style scoped>
@@ -158,9 +159,5 @@ function statusLabel(status: string) {
 
 .empty {
   color: #6b7280;
-}
-
-.back-link {
-  color: #2563eb;
 }
 </style>

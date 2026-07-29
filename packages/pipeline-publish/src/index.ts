@@ -16,6 +16,12 @@ export { CmsVersionConflictError, PipelinePublishError } from './errors.js'
 export type { PipelinePublishErrorCode } from './errors.js'
 
 export { FakeCmsPublishProvider } from './providers/fake-cms.provider.js'
+export { BesliswijzerCmsPublishProvider } from './providers/besliswijzer-cms.provider.js'
+
+export { readCmsPublishConfigFromEnv } from './config.js'
+export type { CmsPublishConfig } from './config.js'
+
+export { mapContentPackageToBlocks } from './content-package-to-blocks.js'
 
 export type {
   CmsPublishMode,

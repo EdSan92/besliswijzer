@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
+import type { FastifyInstance, FastifyReply } from 'fastify'
 import { z } from 'zod'
 import { DrizzlePipelineRunStore } from '@besliswijzer/db'
 import {
@@ -21,13 +21,10 @@ import {
 import {
   DEFAULT_PIPELINE_STEP_KEYS,
   PIPELINE_VERSION,
-  MOCK_FLOW_BRIEF_OUTPUT,
-  MOCK_CONTENT_PACKAGE_OUTPUT,
   createDefaultPipelineHandlers,
+  createPipelineProviders,
+  PipelineLiveConfigError,
 } from '@besliswijzer/pipeline-steps'
-import { GoogleKeywordInsightProvider } from '@besliswijzer/keyword-research'
-import { MockFlowBriefModelProvider } from '@besliswijzer/flow-brief'
-import { MockContentPackageModelProvider } from '@besliswijzer/content-package'
 
 const createRunBodySchema = z.object({
   categorySlug: z.string().min(1),
@@ -49,23 +46,27 @@ function createPipelineStore(app: FastifyInstance): PipelineRunListStore {
 }
 
 function createOrchestrator(app: FastifyInstance) {
+  const providers = createPipelineProviders({ env: process.env })
   const store = createPipelineStore(app)
-  const useLiveProviders = process.env.PIPELINE_USE_LIVE_PROVIDERS === 'true'
 
-  const handlers = createDefaultPipelineHandlers({
-    keywordProvider: new GoogleKeywordInsightProvider({
-      mock: !useLiveProviders || process.env.GOOGLE_KEYWORD_INSIGHT_MOCK === 'true',
+  return {
+    orchestrator: new PipelineOrchestrator({
+      store,
+      handlers: createDefaultPipelineHandlers({
+        keywordProvider: providers.keywordProvider,
+        flowBriefProvider: providers.flowBriefProvider,
+        contentPackageProvider: providers.contentPackageProvider,
+      }),
     }),
-    flowBriefProvider: new MockFlowBriefModelProvider({ initialResponse: MOCK_FLOW_BRIEF_OUTPUT }),
-    contentPackageProvider: new MockContentPackageModelProvider({
-      initialResponse: MOCK_CONTENT_PACKAGE_OUTPUT,
-    }),
-  })
-
-  return new PipelineOrchestrator({ store, handlers })
+    providers,
+  }
 }
 
 function handleReviewError(error: unknown, reply: FastifyReply) {
+  if (error instanceof PipelineLiveConfigError) {
+    return reply.status(503).send({ error: error.message, code: 'LIVE_CONFIG_INVALID', missing: error.missing })
+  }
+
   if (error instanceof PipelineReviewError) {
     const status =
       error.code === 'NOT_FOUND' ? 404 : error.code === 'INVALID_STATUS' ? 409 : 400
@@ -115,15 +116,19 @@ export async function registerPipelineAdminRoutes(app: FastifyInstance) {
     })
 
     if (run.status === 'queued' || (run.status === 'failed' && created)) {
-      const orchestrator = createOrchestrator(app)
-      const started = await orchestrator.start({
-        runId: run.id,
-        initialInput: {
-          primaryKeyword: body.data.primaryKeyword,
-          categoryTitle: body.data.categoryTitle ?? body.data.categorySlug,
-        },
-      })
-      return reply.status(created ? 201 : 200).send({ run: started, created })
+      try {
+        const { orchestrator } = createOrchestrator(app)
+        const started = await orchestrator.start({
+          runId: run.id,
+          initialInput: {
+            primaryKeyword: body.data.primaryKeyword,
+            categoryTitle: body.data.categoryTitle ?? body.data.categorySlug,
+          },
+        })
+        return reply.status(created ? 201 : 200).send({ run: started, created })
+      } catch (error) {
+        return handleReviewError(error, reply)
+      }
     }
 
     return reply.status(200).send({ run, created })

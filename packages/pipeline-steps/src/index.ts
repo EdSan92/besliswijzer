@@ -24,6 +24,16 @@ export { createDefaultPipelineHandlers, type CreatePipelineHandlersDeps } from '
 
 export { runPipelineStagingSmoke, type PipelineStagingSmokeResult } from './staging-smoke.js'
 
+export {
+  createPipelineProviders,
+  type PipelineProviders,
+} from './providers/create-pipeline-providers.js'
+export {
+  readPipelineLiveConfigFromEnv,
+  validatePipelineLiveConfig,
+  PipelineLiveConfigError,
+} from './providers/pipeline-live-config.js'
+
 export { createKeywordIngestHandler, type KeywordIngestStepInput } from './handlers/keyword-ingest.handler.js'
 export { createFlowBriefHandler } from './handlers/flow-brief.handler.js'
 export { createCompileFlowHandler } from './handlers/compile-flow.handler.js'

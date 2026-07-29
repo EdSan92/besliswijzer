@@ -324,8 +324,11 @@ Productie step handlers voor de pipeline-orchestrator plus observability helpers
 
 Belangrijkste exports:
 - `createDefaultPipelineHandlers`, `PIPELINE_STEP_KEYS`, `DEFAULT_PIPELINE_STEP_KEYS`
+- `createPipelineProviders`, `readPipelineLiveConfigFromEnv`, `PipelineLiveConfigError`
 - `createPipelineArtifact`, `findLatestArtifact`, `PipelineObservability`
 - Handlers: keyword ingest, flow brief, compile flow, content package, quality gate
+
+Live providers (`PIPELINE_USE_LIVE_PROVIDERS=true`): Gemini structured JSON voor flowbrief/content package; Google keyword adapter (mock via `GOOGLE_KEYWORD_INSIGHT_MOCK`); CMS via `@besliswijzer/pipeline-publish` (`BesliswijzerCmsPublishProvider` wanneer `CMS_PUBLISH_MOCK=false`). Configvalidatie faalt veilig vóór start; AI-metrics loggen tokens/latency zonder prompts/secrets. Staging: `pnpm pipeline:staging-live`.
 
 Locatie: `packages/pipeline-steps/src/`
 
@@ -334,11 +337,12 @@ Locatie: `packages/pipeline-steps/src/`
 Idempotente CMS-publicatie voor goedgekeurde pipeline-runs.
 
 Belangrijkste exports:
-- `CmsPublishProvider`, `FakeCmsPublishProvider`
+- `CmsPublishProvider`, `FakeCmsPublishProvider`, `BesliswijzerCmsPublishProvider`
 - `publishApprovedPipelineRun`, `PublishPipelineRunResult`
+- `readCmsPublishConfigFromEnv`, `mapContentPackageToBlocks`
 - `PublishRecord`, `createPublishRecord`, `CmsVersionConflictError`
 
-Gedrag: alleen `approved` runs; idempotent bij `published`; upsert flow (`compiled_flow`) en optioneel productpagina (`content_package`); optimistic version check; partial publish record voor herstel; `publish_record` artifact op run.
+Gedrag: alleen `approved` runs; idempotent bij `published`; upsert flow (`compiled_flow`) en optioneel productpagina (`content_package`); optimistic version check; partial publish record voor herstel; `publish_record` artifact op run. Live CMS-adapter: flow import + productpagina PATCH (404 = duidelijke fout).
 
 Locatie: `packages/pipeline-publish/src/`
 
@@ -406,7 +410,7 @@ In productie: admin sessie via Nuxt proxy (`server/api/admin/[...path].ts`).
 | POST | `/product-pages/:slug/faq-items` | FAQ item toevoegen aan pagina |
 | GET | `/pipeline-runs` | Pipeline run overzicht (filter: status, limit) |
 | GET | `/pipeline-runs/:id` | Run detail + kwaliteitsrapport + diffs |
-| POST | `/pipeline-runs` | Nieuwe run starten (mock providers in dev) |
+| POST | `/pipeline-runs` | Nieuwe run starten (`createPipelineProviders`: mocks standaard, live via env) |
 | PATCH | `/pipeline-runs/:id/artifacts` | Artefactcorrectie (nieuwe versie + audit) |
 | POST | `/pipeline-runs/:id/approve` | Goedkeuren na kwaliteitsgate |
 | POST | `/pipeline-runs/:id/reject` | Afwijzen met verplichte reden |
@@ -672,6 +676,11 @@ BESLIJSWIJZER_API_BASE=http://localhost:3101
 DISCOVERY_AUTO_ROUTE_FAQ=5
 DISCOVERY_AUTO_GENERATE_FLOWS=0
 GOOGLE_KEYWORD_INSIGHT_MOCK=true
+# Live pipeline (optioneel; mocks blijven default)
+# PIPELINE_USE_LIVE_PROVIDERS=true
+# CMS_PUBLISH_MOCK=true
+# PIPELINE_AI_TIMEOUT_MS=30000
+# BESLIJSWIJZER_API_BASE=http://localhost:3101
 ```
 
 ---
@@ -684,6 +693,7 @@ docker compose up -d postgres         # PostgreSQL
 pnpm db:migrate                       # Drizzle migrations (public schema)
 pnpm pipeline:verify-migration-0006   # Check enum review_record (0006)
 pnpm pipeline:staging-smoke             # Migratie + R4 DB-smoke tegen DATABASE_URL
+pnpm pipeline:staging-live                # Live pipeline-run tot needs_review (vereist GEMINI + env)
 pnpm db:seed                          # Warmtepomp + robotmaaier + airfryer + robotstofzuiger + mesh wifi + thuisbatterij referentieflows + productpagina's
 pnpm dev                              # API + Web parallel
 pnpm dev:opportunity                  # Opportunity Engine apart
@@ -742,8 +752,14 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/content-package/src/warnings.ts` | Kwaliteitswarnings voor content package output |
 | `packages/pipeline-review/src/review.ts` | Approve/reject/correct pipeline runs |
 | `packages/pipeline-steps/src/create-handlers.ts` | Default orchestrator step handlers |
+| `packages/pipeline-steps/src/providers/create-pipeline-providers.ts` | Mock/live provider factory |
+| `packages/pipeline-steps/src/providers/gemini-structured-client.ts` | Gemini JSON API (timeout/retry/metrics) |
+| `packages/pipeline-steps/src/providers/pipeline-live-config.ts` | Live mode env + validatie |
+| `packages/pipeline-steps/src/scripts/staging-live-pipeline.ts` | Staging live run script |
 | `packages/pipeline-steps/src/pipeline-e2e.test.ts` | E2E fixture keyword → publish |
 | `packages/pipeline-steps/src/staging-smoke.ts` | R4 staging smoke (review/publish/retry) |
+| `packages/pipeline-publish/src/providers/besliswijzer-cms.provider.ts` | Live CMS adapter (flow import + page PATCH) |
+| `packages/pipeline-publish/src/config.ts` | CMS publish env config |
 | `packages/db/src/verify-migration-0006.ts` | Verificatie migratie 0006 |
 | `packages/db/src/scripts/staging-pipeline-smoke.ts` | CLI migrate + verify + smoke |
 | `apps/api/src/routes/pipeline-admin.ts` | Admin API voor pipeline runs + review |
@@ -825,4 +841,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 28 juli 2026 (VER-46 admin pipeline review UI) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 29 juli 2026 (VER-47 live pipeline providers) · Gebaseerd op de decision-engine monorepo*

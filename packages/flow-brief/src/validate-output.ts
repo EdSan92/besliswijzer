@@ -1,4 +1,4 @@
-import { flowBriefSchema, validateFlowBrief } from '@besliswijzer/flow-compiler'
+import { flowBriefSchema, validateFlowBrief, compileFlowBrief } from '@besliswijzer/flow-compiler'
 import {
   flowBriefGenerationOutputSchema,
   type FlowBriefGenerationOutput,
@@ -43,6 +43,11 @@ export function validateParsedFlowBriefOutput(output: FlowBriefGenerationOutput)
     if (!question.decisionPurpose.trim()) {
       errors.push(`Question "${question.questionKey}" is missing decisionPurpose`)
     }
+  }
+
+  const compiled = compileFlowBrief(output.brief)
+  if (!compiled.ok) {
+    errors.push(...compiled.errors)
   }
 
   return errors

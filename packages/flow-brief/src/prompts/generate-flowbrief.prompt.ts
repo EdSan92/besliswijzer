@@ -24,13 +24,28 @@ const OUTPUT_SHAPE = `{
         "options": [{ "optionKey": "a", "label": "...", "value": "a" }]
       }
     ],
-    "decisionRules": [],
+    "decisionRules": [
+      {
+        "fromQuestionKey": "budget",
+        "condition": { "==": [{ "var": "answers.budget" }, "tot_75"] },
+        "targetResultKey": "advies_instap",
+        "priority": 100
+      }
+    ],
     "results": [
       {
         "resultKey": "advies",
         "title": "...",
         "body": { "summary": "..." },
-        "ctas": []
+        "ctas": [
+          {
+            "id": "cta-main",
+            "type": "affiliate",
+            "url": "https://example.com/product",
+            "label": "Bekijk aanbevelingen",
+            "trackingId": "aff-main"
+          }
+        ]
       }
     ],
     "includeLeadCapture": false
@@ -48,6 +63,12 @@ export function buildGenerateFlowBriefPrompt(
     `Prompt version: ${promptVersion}`,
     'Genereer een flowbrief als strikt JSON-object.',
     'Gebruik geen vrije tekst buiten het JSON-object.',
+    'Gebruik voor ctas.type alleen: affiliate, download of external (nooit link).',
+    'Elke cta heeft verplicht id, type, url (geldige https-URL), label.',
+    'decisionRules gebruiken fromQuestionKey plus condition als JSON-object (geen string).',
+    'Zorg dat elke vraag via decisionRules een pad heeft naar minstens één result.',
+    'Voeg een fallback-regel met lege condition {} toe per vraag indien nodig.',
+    'Gebruik lege arrays alleen wanneer echt niets van toepassing is.',
     'Zet onzekere claims of ontbrekende bronnen in warnings; noem geen onbewezen productfeiten als feiten in brief.',
     'Iedere vraag moet een expliciet decisionPurpose hebben.',
     `Categorie: ${input.categoryTitle} (${input.categorySlug})`,

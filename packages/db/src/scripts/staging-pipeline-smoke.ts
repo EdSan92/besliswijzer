@@ -4,10 +4,11 @@ import { fileURLToPath } from 'node:url'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import { runPipelineStagingSmoke } from '@besliswijzer/pipeline-steps'
 import { createDb, DrizzlePipelineRunStore } from '../index.js'
+import { ensurePipelineArtifactEnums } from '../ensure-pipeline-artifact-enums.js'
 import { verifyMigration0006 } from '../verify-migration-0006.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-config({ path: resolve(__dirname, '../../../.env') })
+config({ path: resolve(__dirname, '../../../../.env') })
 
 const connectionString =
   process.env.DATABASE_URL ?? 'postgresql://decision:decision@localhost:5432/besliswijzer'
@@ -23,6 +24,8 @@ async function main() {
       await migrate(db, { migrationsFolder: resolve(__dirname, '../../drizzle') })
       console.log('Migrations complete.')
     }
+
+    await ensurePipelineArtifactEnums(db)
 
     const migrationCheck = await verifyMigration0006(db)
     console.log(migrationCheck.message)

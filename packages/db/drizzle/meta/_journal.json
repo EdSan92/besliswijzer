@@ -38,6 +38,13 @@
       "breakpoints": true
     },
     {
+      "idx": 5,
+      "version": "7",
+      "when": 1785273600000,
+      "tag": "0005_publish_record_artifact",
+      "breakpoints": true
+    },
+    {
       "idx": 6,
       "version": "7",
       "when": 1785277200000,

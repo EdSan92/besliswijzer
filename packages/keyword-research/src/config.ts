@@ -1,3 +1,5 @@
+import type { KeywordCallMetrics } from './provider-metrics.js'
+
 export type GoogleKeywordInsightConfig = {
   mock?: boolean
   developerToken?: string
@@ -8,6 +10,7 @@ export type GoogleKeywordInsightConfig = {
   maxRetries?: number
   timeoutMs?: number
   fetchImpl?: typeof fetch
+  onMetrics?: (metrics: KeywordCallMetrics) => void
 }
 
 export function readGoogleKeywordInsightConfigFromEnv(

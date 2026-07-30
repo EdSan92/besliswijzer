@@ -272,6 +272,7 @@ Belangrijkste exports:
 - `KeywordResearchArtifact`, `createKeywordResearchArtifact`, `keywordResearchArtifactSchema`
 - `ingestKeywordResearch`, `KeywordResearchCache`, `buildKeywordResearchCacheKey`
 - `GoogleKeywordInsightProvider`, `readGoogleKeywordInsightConfigFromEnv`
+- `validateGoogleKeywordLiveConfig`, `logKeywordProviderMetrics` — live staging + veilige metrics (`pipeline.keyword_call`)
 - `MetricValue` (`known` / `unknown`) — geen verzonnen cijfers bij ontbrekende providerdata
 
 Artefact `kind: keyword_data`, versie `1.0.0`. Cache TTL via `KEYWORD_RESEARCH_CACHE_TTL_MS` (default 24u). Tests gebruiken fixtures; geen live API-calls in CI.
@@ -694,6 +695,7 @@ pnpm db:migrate                       # Drizzle migrations (public schema)
 pnpm pipeline:verify-migration-0006   # Check enum review_record (0006)
 pnpm pipeline:staging-smoke             # Migratie + R4 DB-smoke tegen DATABASE_URL
 pnpm pipeline:staging-live                # Live pipeline-run tot needs_review (vereist GEMINI + env)
+pnpm pipeline:staging-live-keyword          # Alleen keyword-ingest live (GOOGLE_KEYWORD_INSIGHT_MOCK=false + Google Ads env)
 pnpm db:seed                          # Warmtepomp + robotmaaier + airfryer + robotstofzuiger + mesh wifi + thuisbatterij referentieflows + productpagina's
 pnpm dev                              # API + Web parallel
 pnpm dev:opportunity                  # Opportunity Engine apart
@@ -756,6 +758,10 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/pipeline-steps/src/providers/gemini-structured-client.ts` | Gemini JSON API (timeout/retry/metrics) |
 | `packages/pipeline-steps/src/providers/pipeline-live-config.ts` | Live mode env + validatie |
 | `packages/pipeline-steps/src/scripts/staging-live-pipeline.ts` | Staging live run script |
+| `packages/pipeline-steps/src/scripts/staging-live-keyword.ts` | Staging live keyword-only script |
+| `packages/pipeline-steps/src/staging-live-keyword.ts` | Keyword-only staging runner |
+| `packages/keyword-research/src/validate-live-config.ts` | Google Ads live config validatie |
+| `packages/keyword-research/src/provider-metrics.ts` | Keyword API metrics logging |
 | `packages/pipeline-steps/src/pipeline-e2e.test.ts` | E2E fixture keyword → publish |
 | `packages/pipeline-steps/src/staging-smoke.ts` | R4 staging smoke (review/publish/retry) |
 | `packages/pipeline-publish/src/providers/besliswijzer-cms.provider.ts` | Live CMS adapter (flow import + page PATCH) |
@@ -841,4 +847,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 29 juli 2026 (VER-47 live pipeline providers) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 30 juli 2026 (VER-48 Google Ads keyword staging) · Gebaseerd op de decision-engine monorepo*

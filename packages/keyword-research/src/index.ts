@@ -33,6 +33,14 @@ export {
 } from './config.js'
 export type { GoogleKeywordInsightConfig } from './config.js'
 
+export {
+  validateGoogleKeywordLiveConfig,
+  GoogleKeywordLiveConfigError,
+} from './validate-live-config.js'
+
+export { logKeywordProviderMetrics } from './provider-metrics.js'
+export type { KeywordCallMetrics } from './provider-metrics.js'
+
 export { KeywordResearchError, normalizeProviderError } from './errors.js'
 export type { KeywordResearchErrorCode } from './errors.js'
 

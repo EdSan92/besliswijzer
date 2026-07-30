@@ -66,6 +66,9 @@ describe('GoogleKeywordInsightProvider', () => {
         primaryKeyword: 'airfryer',
         language: 'nl',
       }),
-    ).rejects.toThrow('HTTP 429 rate limit')
+    ).rejects.toMatchObject({
+      code: 'PROVIDER_RATE_LIMIT',
+      retryable: true,
+    })
   })
 })

@@ -1,4 +1,5 @@
 import { KeywordResearchError } from '../errors.js'
+import { logKeywordProviderMetrics, type KeywordCallMetrics } from '../provider-metrics.js'
 import { RateLimiter } from '../utils/rate-limiter.js'
 import { withRetry } from '../utils/retry.js'
 import type { GoogleKeywordInsightConfig } from '../config.js'
@@ -52,9 +53,15 @@ export class GoogleKeywordInsightProvider implements KeywordResearchProvider {
       return this.mockResult(request.primaryKeyword, keywords)
     }
 
+    const started = Date.now()
+    let retryCount = 0
+
     const ideas = await this.rateLimiter.throttle(() =>
       withRetry(() => this.fetchKeywordIdeas(keywords), {
         maxRetries: this.config.maxRetries ?? 3,
+        onRetry: () => {
+          retryCount += 1
+        },
       }),
     )
 
@@ -70,6 +77,17 @@ export class GoogleKeywordInsightProvider implements KeywordResearchProvider {
         false,
       )
     }
+
+    const metrics: KeywordCallMetrics = {
+      provider: this.name,
+      operation: 'research',
+      primaryKeywordLength: request.primaryKeyword.length,
+      variantCount: variants.length,
+      latencyMs: Date.now() - started,
+      retryCount,
+    }
+    logKeywordProviderMetrics(metrics)
+    this.config.onMetrics?.(metrics)
 
     return {
       primaryKeyword: request.primaryKeyword,
@@ -133,7 +151,14 @@ export class GoogleKeywordInsightProvider implements KeywordResearchProvider {
 
       const body = (await response.json()) as GoogleKeywordResponse
       if (!response.ok) {
-        throw new Error(body.error?.message ?? `Keyword API HTTP ${response.status}`)
+        const message = body.error?.message ?? `Keyword API HTTP ${response.status}`
+        if (response.status === 429 || message.toLowerCase().includes('rate limit')) {
+          throw new KeywordResearchError(message, 'PROVIDER_RATE_LIMIT', this.name, true)
+        }
+        if (response.status === 401 || response.status === 403) {
+          throw new KeywordResearchError(message, 'PROVIDER_ERROR', this.name, false)
+        }
+        throw new KeywordResearchError(message, 'PROVIDER_ERROR', this.name, response.status >= 500)
       }
 
       return body.results ?? []

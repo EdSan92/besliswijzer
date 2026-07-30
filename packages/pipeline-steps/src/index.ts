@@ -25,6 +25,14 @@ export { createDefaultPipelineHandlers, type CreatePipelineHandlersDeps } from '
 export { runPipelineStagingSmoke, type PipelineStagingSmokeResult } from './staging-smoke.js'
 
 export {
+  runStagingLiveKeywordIngest,
+  assertStagingLiveKeywordConfig,
+  STAGING_LIVE_KEYWORD_CATEGORY,
+  type RunStagingLiveKeywordIngestOptions,
+  type StagingLiveKeywordIngestResult,
+} from './staging-live-keyword.js'
+
+export {
   createPipelineProviders,
   type PipelineProviders,
 } from './providers/create-pipeline-providers.js'

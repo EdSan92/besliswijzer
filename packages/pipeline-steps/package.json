@@ -16,7 +16,8 @@
     "dev": "tsc --watch",
     "test": "vitest run",
     "lint": "tsc --noEmit",
-    "staging:live": "tsx src/scripts/staging-live-pipeline.ts"
+    "staging:live": "tsx src/scripts/staging-live-pipeline.ts",
+    "staging:live-keyword": "tsx src/scripts/staging-live-keyword.ts"
   },
   "dependencies": {
     "@besliswijzer/content-package": "workspace:*",

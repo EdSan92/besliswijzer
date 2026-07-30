@@ -21,6 +21,22 @@ export { BesliswijzerCmsPublishProvider } from './providers/besliswijzer-cms.pro
 export { readCmsPublishConfigFromEnv } from './config.js'
 export type { CmsPublishConfig } from './config.js'
 
+export { validateCmsLiveConfig, CmsLiveConfigError } from './validate-live-config.js'
+export { logCmsProviderMetrics } from './provider-metrics.js'
+export type { CmsCallMetrics } from './provider-metrics.js'
+export { mapCmsHttpError } from './cms-http-errors.js'
+
+export {
+  assertStagingLiveCmsConfig,
+  createStagingCmsReviewRun,
+  runStagingLiveCmsPublish,
+  STAGING_LIVE_CMS_CATEGORY,
+} from './staging-live-cms.js'
+export type {
+  RunStagingLiveCmsPublishOptions,
+  StagingLiveCmsPublishResult,
+} from './staging-live-cms.js'
+
 export { mapContentPackageToBlocks } from './content-package-to-blocks.js'
 
 export type {

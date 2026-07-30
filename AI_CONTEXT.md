@@ -340,10 +340,11 @@ Idempotente CMS-publicatie voor goedgekeurde pipeline-runs.
 Belangrijkste exports:
 - `CmsPublishProvider`, `FakeCmsPublishProvider`, `BesliswijzerCmsPublishProvider`
 - `publishApprovedPipelineRun`, `PublishPipelineRunResult`
-- `readCmsPublishConfigFromEnv`, `mapContentPackageToBlocks`
-- `PublishRecord`, `createPublishRecord`, `CmsVersionConflictError`
+- `readCmsPublishConfigFromEnv`, `validateCmsLiveConfig`, `mapContentPackageToBlocks`
+- `runStagingLiveCmsPublish`, `assertStagingLiveCmsConfig`, `logCmsProviderMetrics`
+- `PublishRecord`, `createPublishRecord`, `CmsVersionConflictError`, `mapCmsHttpError`
 
-Gedrag: alleen `approved` runs; idempotent bij `published`; upsert flow (`compiled_flow`) en optioneel productpagina (`content_package`); optimistic version check; partial publish record voor herstel; `publish_record` artifact op run. Live CMS-adapter: flow import + productpagina PATCH (404 = duidelijke fout).
+Gedrag: alleen `approved` runs; idempotent bij `published`; upsert flow (`compiled_flow`) en optioneel productpagina (`content_package`); optimistic version check; partial publish record voor herstel; `publish_record` artifact op run. Live CMS-adapter: flow import + productpagina PATCH; 401/403 → `CMS_AUTH`, productpagina 404 → `CMS_NOT_FOUND`; metrics via `pipeline.cms_call` (geen secrets). Staging: `pnpm pipeline:staging-live-cms` (`CMS_PUBLISH_MOCK=false`, staging `BESLIJSWIJZER_API_BASE`).
 
 Locatie: `packages/pipeline-publish/src/`
 
@@ -696,6 +697,7 @@ pnpm pipeline:verify-migration-0006   # Check enum review_record (0006)
 pnpm pipeline:staging-smoke             # Migratie + R4 DB-smoke tegen DATABASE_URL
 pnpm pipeline:staging-live                # Live pipeline-run tot needs_review (vereist GEMINI + env)
 pnpm pipeline:staging-live-keyword          # Alleen keyword-ingest live (GOOGLE_KEYWORD_INSIGHT_MOCK=false + Google Ads env)
+pnpm pipeline:staging-live-cms              # CMS publish live tegen staging API (CMS_PUBLISH_MOCK=false)
 pnpm db:seed                          # Warmtepomp + robotmaaier + airfryer + robotstofzuiger + mesh wifi + thuisbatterij referentieflows + productpagina's
 pnpm dev                              # API + Web parallel
 pnpm dev:opportunity                  # Opportunity Engine apart
@@ -765,6 +767,10 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/pipeline-steps/src/pipeline-e2e.test.ts` | E2E fixture keyword → publish |
 | `packages/pipeline-steps/src/staging-smoke.ts` | R4 staging smoke (review/publish/retry) |
 | `packages/pipeline-publish/src/providers/besliswijzer-cms.provider.ts` | Live CMS adapter (flow import + page PATCH) |
+| `packages/pipeline-publish/src/validate-live-config.ts` | CMS live config validatie |
+| `packages/pipeline-publish/src/provider-metrics.ts` | CMS API metrics logging |
+| `packages/pipeline-publish/src/staging-live-cms.ts` | Staging CMS publish runner |
+| `packages/pipeline-publish/src/scripts/staging-live-cms.ts` | Staging live CMS script |
 | `packages/pipeline-publish/src/config.ts` | CMS publish env config |
 | `packages/db/src/verify-migration-0006.ts` | Verificatie migratie 0006 |
 | `packages/db/src/scripts/staging-pipeline-smoke.ts` | CLI migrate + verify + smoke |
@@ -847,4 +853,4 @@ Een interactief architectuurdiagram staat in de Cursor Canvas:
 
 ---
 
-*Laatst bijgewerkt: 30 juli 2026 (VER-48 Google Ads keyword staging) · Gebaseerd op de decision-engine monorepo*
+*Laatst bijgewerkt: 30 juli 2026 (VER-49 CMS staging live) · Gebaseerd op de decision-engine monorepo*

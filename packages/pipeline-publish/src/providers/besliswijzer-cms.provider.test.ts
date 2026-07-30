@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { BesliswijzerCmsPublishProvider } from './besliswijzer-cms.provider.js'
+import { PipelinePublishError } from '../errors.js'
 import type { FlowDefinition } from '@besliswijzer/flow-schema'
 
 const flow = {
@@ -45,5 +46,59 @@ describe('BesliswijzerCmsPublishProvider', () => {
     expect(calls.some((call) => call.url.endsWith('/flows/import') && call.method === 'POST')).toBe(
       true,
     )
+  })
+
+  it('maps auth failures to CMS_AUTH errors', async () => {
+    const fetchImpl = vi.fn(async () => Response.json({ error: 'Unauthorized' }, { status: 401 }))
+
+    const provider = new BesliswijzerCmsPublishProvider({
+      apiBase: 'https://api.test',
+      adminApiKey: 'admin-key',
+      fetchImpl,
+      onMetrics: vi.fn(),
+    })
+
+    await expect(
+      provider.upsertFlow({
+        veraioId: 'airfryers:nl',
+        locale: 'nl',
+        slug: 'airfryers',
+        flow,
+        expectedVersion: null,
+        mode: 'draft',
+      }),
+    ).rejects.toMatchObject({
+      code: 'CMS_AUTH',
+    } satisfies Partial<PipelinePublishError>)
+  })
+
+  it('maps missing product pages to CMS_NOT_FOUND errors', async () => {
+    const fetchImpl = vi.fn(async () => Response.json({ error: 'Not found' }, { status: 404 }))
+
+    const provider = new BesliswijzerCmsPublishProvider({
+      apiBase: 'https://api.test',
+      adminApiKey: 'admin-key',
+      fetchImpl,
+      onMetrics: vi.fn(),
+    })
+
+    await expect(
+      provider.upsertProductPage({
+        veraioId: 'airfryers:nl',
+        locale: 'nl',
+        slug: 'missing-page',
+        content: {
+          slug: 'missing-page',
+          intro: 'Intro',
+          buyingGuide: 'Guide',
+          faq: [],
+          metadata: { title: 'Title', description: 'Desc' },
+        },
+        expectedVersion: null,
+        mode: 'draft',
+      }),
+    ).rejects.toMatchObject({
+      code: 'CMS_NOT_FOUND',
+    } satisfies Partial<PipelinePublishError>)
   })
 })

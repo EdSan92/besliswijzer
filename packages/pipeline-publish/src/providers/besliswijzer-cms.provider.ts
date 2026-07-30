@@ -1,6 +1,8 @@
 import type { FlowDefinition } from '@besliswijzer/flow-schema'
 import type { ContentPackage } from '@besliswijzer/pipeline-quality'
+import { mapCmsHttpError } from '../cms-http-errors.js'
 import { mapContentPackageToBlocks } from '../content-package-to-blocks.js'
+import { logCmsProviderMetrics, type CmsCallMetrics } from '../provider-metrics.js'
 import type {
   CmsPublishMode,
   CmsPublishProvider,
@@ -25,6 +27,7 @@ export type BesliswijzerCmsPublishProviderOptions = {
   apiBase: string
   adminApiKey: string
   fetchImpl?: typeof fetch
+  onMetrics?: (metrics: CmsCallMetrics) => void
 }
 
 export class BesliswijzerCmsPublishProvider implements CmsPublishProvider {
@@ -51,15 +54,59 @@ export class BesliswijzerCmsPublishProvider implements CmsPublishProvider {
     return `${type}:${veraioId}:${locale}`
   }
 
+  private recordMetrics(metrics: CmsCallMetrics): void {
+    if (this.options.onMetrics) {
+      this.options.onMetrics(metrics)
+      return
+    }
+
+    logCmsProviderMetrics(metrics)
+  }
+
+  private async request(
+    operation: CmsCallMetrics['operation'],
+    resourceType: CmsCallMetrics['resourceType'],
+    input: RequestInfo,
+    init?: RequestInit,
+  ): Promise<Response> {
+    const startedAt = Date.now()
+    const response = await this.fetchImpl(input, init)
+    const latencyMs = Date.now() - startedAt
+
+    this.recordMetrics({
+      provider: this.name,
+      operation,
+      resourceType,
+      status: response.ok ? 'success' : 'error',
+      httpStatus: response.status,
+      latencyMs,
+    })
+
+    return response
+  }
+
   async getFlowVersion(veraioId: string, locale: string): Promise<number | null> {
     const cached = this.versionState.get(this.versionKey('flow', veraioId, locale))
     if (cached !== undefined) {
       return cached
     }
 
-    const response = await this.fetchImpl(this.url('/api/v1/admin/flows'), {
-      headers: this.headers(),
-    })
+    const response = await this.request(
+      'get_flow_version',
+      'flow',
+      this.url('/api/v1/admin/flows'),
+      {
+        headers: this.headers(),
+      },
+    )
+
+    if (response.status === 401 || response.status === 403) {
+      throw mapCmsHttpError({
+        status: response.status,
+        operation: 'get_flow_version',
+        resourceType: 'flow',
+      })
+    }
 
     if (!response.ok) {
       return null
@@ -78,12 +125,25 @@ export class BesliswijzerCmsPublishProvider implements CmsPublishProvider {
     }
 
     const slug = veraioId.split(':')[0]
-    const response = await this.fetchImpl(this.url(`/api/v1/admin/product-pages/${slug}`), {
-      headers: this.headers(),
-    })
+    const response = await this.request(
+      'get_product_page_version',
+      'product_page',
+      this.url(`/api/v1/admin/product-pages/${slug}`),
+      {
+        headers: this.headers(),
+      },
+    )
 
     if (response.status === 404) {
       return null
+    }
+
+    if (response.status === 401 || response.status === 403) {
+      throw mapCmsHttpError({
+        status: response.status,
+        operation: 'get_product_page_version',
+        resourceType: 'product_page',
+      })
     }
 
     if (!response.ok) {
@@ -95,18 +155,28 @@ export class BesliswijzerCmsPublishProvider implements CmsPublishProvider {
   }
 
   async upsertFlow(input: CmsUpsertFlowInput): Promise<CmsUpsertResult> {
-    const response = await this.fetchImpl(this.url('/api/v1/admin/flows/import'), {
-      method: 'POST',
-      headers: this.headers(),
-      body: JSON.stringify({
-        flow: input.flow,
-        publish: input.mode === 'publish',
-      }),
-    })
+    const response = await this.request(
+      'upsert_flow',
+      'flow',
+      this.url('/api/v1/admin/flows/import'),
+      {
+        method: 'POST',
+        headers: this.headers(),
+        body: JSON.stringify({
+          flow: input.flow,
+          publish: input.mode === 'publish',
+        }),
+      },
+    )
 
     if (!response.ok) {
       const error = await response.text()
-      throw new Error(`Flow import failed (${response.status}): ${error.slice(0, 200)}`)
+      throw mapCmsHttpError({
+        status: response.status,
+        operation: 'upsert_flow',
+        resourceType: 'flow',
+        detail: error,
+      })
     }
 
     const payload = (await response.json()) as { flowId?: string; slug?: string }
@@ -135,21 +205,25 @@ export class BesliswijzerCmsPublishProvider implements CmsPublishProvider {
       },
     }
 
-    const response = await this.fetchImpl(this.url(`/api/v1/admin/product-pages/${input.slug}`), {
-      method: 'PATCH',
-      headers: this.headers(),
-      body: JSON.stringify(body),
-    })
-
-    if (response.status === 404) {
-      throw new Error(
-        `Product page "${input.slug}" not found in CMS; create it before pipeline publish`,
-      )
-    }
+    const response = await this.request(
+      'upsert_product_page',
+      'product_page',
+      this.url(`/api/v1/admin/product-pages/${input.slug}`),
+      {
+        method: 'PATCH',
+        headers: this.headers(),
+        body: JSON.stringify(body),
+      },
+    )
 
     if (!response.ok) {
       const error = await response.text()
-      throw new Error(`Product page upsert failed (${response.status}): ${error.slice(0, 200)}`)
+      throw mapCmsHttpError({
+        status: response.status,
+        operation: 'upsert_product_page',
+        resourceType: 'product_page',
+        detail: error,
+      })
     }
 
     const version = (input.expectedVersion ?? 0) + 1

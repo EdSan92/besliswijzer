@@ -15,18 +15,23 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "test": "vitest run",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "staging:live-cms": "tsx src/scripts/staging-live-cms.ts"
   },
   "dependencies": {
     "@besliswijzer/flow-compiler": "workspace:*",
     "@besliswijzer/flow-schema": "workspace:*",
     "@besliswijzer/pipeline-quality": "workspace:*",
+    "@besliswijzer/pipeline-review": "workspace:*",
     "@besliswijzer/pipeline-schema": "workspace:*",
     "@besliswijzer/product-schema": "workspace:*",
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@besliswijzer/db": "workspace:*",
     "@types/node": "^22.10.5",
+    "dotenv": "^16.4.7",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "vitest": "^3.0.5"
   }

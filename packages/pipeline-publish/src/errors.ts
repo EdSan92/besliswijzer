@@ -3,6 +3,9 @@ export type PipelinePublishErrorCode =
   | 'MISSING_ARTIFACT'
   | 'VERSION_CONFLICT'
   | 'PARTIAL_PUBLISH'
+  | 'CMS_AUTH'
+  | 'CMS_NOT_FOUND'
+  | 'CMS_REQUEST_FAILED'
 
 export class PipelinePublishError extends Error {
   readonly code: PipelinePublishErrorCode

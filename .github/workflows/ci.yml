@@ -60,7 +60,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build shared packages
-        run: pnpm --filter "./packages/*" build
+        run: pnpm -r --filter "./packages/*" run build
 
       - name: Generate Prisma client
         run: pnpm --filter @veraio/opportunity-engine exec prisma generate

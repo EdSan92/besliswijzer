@@ -769,8 +769,8 @@ pnpm test:e2e:install                 # Chromium installeren voor E2E
 | `packages/pipeline-publish/src/providers/besliswijzer-cms.provider.ts` | Live CMS adapter (flow import + page PATCH) |
 | `packages/pipeline-publish/src/validate-live-config.ts` | CMS live config validatie |
 | `packages/pipeline-publish/src/provider-metrics.ts` | CMS API metrics logging |
+| `packages/pipeline-steps/src/scripts/staging-live-cms.ts` | Staging live CMS script |
 | `packages/pipeline-publish/src/staging-live-cms.ts` | Staging CMS publish runner |
-| `packages/pipeline-publish/src/scripts/staging-live-cms.ts` | Staging live CMS script |
 | `packages/pipeline-publish/src/config.ts` | CMS publish env config |
 | `packages/db/src/verify-migration-0006.ts` | Verificatie migratie 0006 |
 | `packages/db/src/scripts/staging-pipeline-smoke.ts` | CLI migrate + verify + smoke |

@@ -358,18 +358,9 @@ importers:
         specifier: ^3.24.1
         version: 3.25.76
     devDependencies:
-      '@besliswijzer/db':
-        specifier: workspace:*
-        version: link:../db
       '@types/node':
         specifier: ^22.10.5
         version: 22.20.0
-      dotenv:
-        specifier: ^16.4.7
-        version: 16.6.1
-      tsx:
-        specifier: ^4.19.2
-        version: 4.22.4
       typescript:
         specifier: ^5.7.3
         version: 5.9.3

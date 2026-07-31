@@ -5,7 +5,7 @@ import { createDb, DrizzlePipelineRunStore } from '@besliswijzer/db'
 import {
   assertStagingLiveCmsConfig,
   runStagingLiveCmsPublish,
-} from '../staging-live-cms.js'
+} from '@besliswijzer/pipeline-publish'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 config({ path: resolve(__dirname, '../../../../.env') })
